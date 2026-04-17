@@ -31,13 +31,13 @@ Decimal phases appear between their surrounding integers in numeric order.
   3. `.gitattributes` enforces LF line endings and `git status` shows no unexpected diffs after checkout on Windows
   4. `.design/STATE.md` is initialized after scan; all subsequent stages read and update it — a killed session resumes from the last checkpoint
   5. `agents/README.md` and `connections/connections.md` exist and define the conventions for Phase 2+
-**Plans**: TBD
+**Plans**: 4 plans
 
 Plans:
-- [ ] 01-01: Distribution cleanup — .gitignore, untrack .planning/ and .claude/memory/, README distribution section
-- [ ] 01-02: Cross-platform bash — POSIX grep, .gitattributes, bootstrap.sh path normalization, non-src fallback paths
-- [ ] 01-03: State machine — `.design/STATE.md` template, read/write contract in all stages, resume logic
-- [ ] 01-04: Infrastructure scaffolding — `agents/README.md`, `connections/connections.md`, move `reference/refero.md` → `connections/refero.md`
+- [ ] 01-01-PLAN.md — Distribution cleanup: .gitignore additions, untrack .planning/ and .claude/memory/, README Distribution section (DIST-01/02/03)
+- [ ] 01-02-PLAN.md — Cross-platform bash: .gitattributes LF enforcement, bootstrap.sh Windows path normalization, POSIX grep migration in scan+verify SKILL.md, SCAN-04 source-root fallback (PLAT-01/02/03/04, SCAN-04)
+- [ ] 01-03-PLAN.md — State machine template: reference/STATE-TEMPLATE.md with XML sections and write contract (STATE-01/02/03)
+- [ ] 01-04-PLAN.md — Infrastructure scaffolding: agents/README.md authoring contract, connections/connections.md capability matrix, git mv refero.md → connections/ (AGENT-00, CONN-00)
 
 ### Phase 2: Core Agents + Stage Orchestration
 **Goal**: The pipeline runs through specialized agents — discover/plan/design/verify become thin orchestrators that spawn the right agent for each sub-task, matching GSD's planner/executor/verifier pattern
