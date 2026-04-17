@@ -53,6 +53,29 @@ Check for:
 - Heading vs body text visually distinguishable by weight/family (not just size)
 - Spacing used to group related elements (8–16px within groups, 32–64px between groups)
 
+### Auto-checkable grep patterns (Phase 3 addition)
+
+Use these patterns during audit to flag hierarchy violations automatically:
+
+**Multiple same-weight headings (hierarchy violation):**
+```bash
+grep -rEn "font-weight:\s*400.*(h1|h2|h3)" src/ --include="*.css" --include="*.scss" 2>/dev/null | head -10
+```
+
+**CTA count (flag >1 primary per section):**
+```bash
+grep -rEn 'variant="primary"|btn-primary|bg-primary' src/ --include="*.tsx" --include="*.jsx" 2>/dev/null | wc -l
+```
+
+**Spacing groups (within-group 8–16px vs between-group 32–64px):**
+```bash
+grep -rEn "(padding|margin|gap):\s*(8|12|16)px" src/ --include="*.css" 2>/dev/null | head -5
+grep -rEn "(margin-top|margin-bottom|gap):\s*(32|40|48|64)px" src/ --include="*.css" 2>/dev/null | head -5
+```
+
+These patterns supplement the qualitative rubric above — they cannot replace
+visual inspection but reduce false positives during automated audit passes.
+
 ### 3. Typography (Weight: 15%)
 
 | Score | Criteria |
