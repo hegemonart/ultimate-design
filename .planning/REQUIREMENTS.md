@@ -102,7 +102,7 @@
 
 ### Automation Agents (Phase 3 of agent layer)
 
-- [x] **AGENT-12**: `agents/design-fixer.md` — applies fix list from DESIGN-VERIFICATION.md gaps atomically with per-fix commits, enables verify→fix loop without manual re-planning
+- [ ] **AGENT-12**: `agents/design-fixer.md` — applies fix list from DESIGN-VERIFICATION.md gaps atomically with per-fix commits, enables verify→fix loop without manual re-planning
 - [x] **AGENT-13**: `agents/design-advisor.md` — researches a single gray area with a 5-column comparison table + rationale (called from discover when gray areas need more than judgment)
 - [x] **AGENT-14**: `agents/design-doc-writer.md` — generates handoff docs / component specs from DESIGN-SUMMARY.md (powers the `style` command)
 
@@ -132,11 +132,23 @@
 - [x] **COMP-04**: Flags design drift: score regression in a category not covered by any explicit design task in `DESIGN-PLAN.md`
 - [x] **COMP-05**: Produces `.design/COMPARE-REPORT.md`
 
-### Validation
+### Validation *(Phase 6 — Complete)*
 
 - [x] **VAL-01**: `claude plugin validate .` passes clean after all v3 changes
 - [x] **VAL-02**: Root `SKILL.md` argument-hint, Command Reference table, and Jump Mode section all updated for style/darkmode/compare
-- [x] **VAL-03**: Plugin version bumped to 3.0.0 in all manifest files (`.claude-plugin/plugin.json`, `.claude-plugin/marketplace.json`)
+- [x] **VAL-03**: Plugin version bumped to 3.0.0 in all manifest files (`.claude-plugin/plugin.json`, `.claude-plugin/marketplace.json`); plugin renamed to get-design-done
+
+### Claude Design Integration *(Phase 7)*
+
+- [ ] **CDES-01**: `connections/claude-design.md` — documents handoff bundle format, adapter pattern, and reverse workflow (DESIGN.md → Claude Design onboarding input)
+- [ ] **CDES-02**: design-context-builder gains Step 0B — reads a Claude Design handoff bundle and pre-populates DESIGN-CONTEXT.md with D-XX decisions (parallel to existing Figma Step 0)
+- [ ] **CDES-03**: `reference/STATE-TEMPLATE.md` gains `handoff_source` field; STATE.md initialization marks prior stages as "sourced from handoff" when `--from-handoff` is used
+- [ ] **CDES-04**: Pipeline router (root SKILL.md) exposes `handoff` sub-command / `--from-handoff` flag — skips scan+discover, routes directly to verify with handoff-sourced context
+- [ ] **CDES-05**: Verify stage `--post-handoff` mode: relaxes DESIGN-PLAN.md prerequisite, runs integration-checker + verifier + fixer, produces DESIGN-VERIFICATION.md with "Handoff Faithfulness" score section
+
+### Pinterest Connection *(Phase 7)*
+
+- [ ] **PINS-01**: `connections/pinterest.md` — documents Pinterest MCP setup, ToolSearch probe pattern, available tools, and fallback chain; design-context-builder Area 5 extended to Pinterest MCP → Refero MCP → awesome-design-md; `connections/connections.md` capability matrix updated
 
 ## v2 Requirements
 
@@ -232,7 +244,7 @@
 | CONN-04 | Phase 4 | Complete |
 | CONN-05 | Phase 4 | Complete |
 | CONN-06 | Phase 4 | Complete |
-| AGENT-12 | Phase 5 | Complete |
+| AGENT-12 | Phase 5 | Pending |
 | AGENT-13 | Phase 5 | Complete |
 | AGENT-14 | Phase 5 | Complete |
 | STYL-01 | Phase 5 | Complete |
@@ -255,12 +267,20 @@
 | VAL-01 | Phase 6 | Complete |
 | VAL-02 | Phase 6 | Complete |
 | VAL-03 | Phase 6 | Complete |
+| CDES-01 | Phase 7 | Pending |
+| CDES-02 | Phase 7 | Pending |
+| CDES-03 | Phase 7 | Pending |
+| CDES-04 | Phase 7 | Pending |
+| CDES-05 | Phase 7 | Pending |
+| PINS-01 | Phase 7 | Pending |
 
 **Coverage:**
 - v1 requirements: 73 total
-- Mapped to phases: 73
+- Phase 7 additions: 6 (CDES-01–05, PINS-01)
+- Total: 79
+- Mapped to phases: 79
 - Unmapped: 0 ✓
 
 ---
 *Requirements defined: 2026-04-17*
-*Last updated: 2026-04-17 after agent layer + state machine + connections + distribution expansion*
+*Last updated: 2026-04-18 — Phase 7 Claude Design Integration + Pinterest Connection requirements added; Phase 6 VAL-* marked Complete*
