@@ -6,6 +6,31 @@ This file is the connection specification for Refero within the ultimate-design 
 
 Refero is the **discover stage's primary visual reference tool**. It retrieves real product screenshots and design references, replacing "imagine how this should look" with "look at how Linear/Stripe/Phantom/Raycast did it."
 
+---
+
+## Setup
+
+**Prerequisites:**
+
+- Refero account with an active subscription (required for search access)
+- Refero MCP installed via Refero's MCP setup instructions (vendor-specific — follow Refero's official documentation; do not use a generic Claude Code MCP add command unless Refero documents one)
+
+**Install:**
+
+Install per Refero's MCP setup instructions, then restart the Claude Code session. After restart, the `mcp__refero__*` tools appear in the session.
+
+**Verification:**
+
+```
+ToolSearch({ query: "refero", max_results: 10 })
+```
+
+Expect non-empty results. If empty, the Refero MCP is not registered — complete the install steps and restart.
+
+**Note on tool names:** Exact tool names may vary between Refero MCP versions. Always verify via ToolSearch before calling any `mcp__refero__*` tool. Do not hardcode tool names in prompts — treat the ToolSearch result as the authoritative list.
+
+---
+
 ## Why refero is non-negotiable
 
 Without references, LLMs converge on:
@@ -86,6 +111,54 @@ When presenting designs, **always name the references**. Don't say "I designed t
 - Shows the user the logic so they can push back precisely
 - Makes iteration faster (user can say "less Linear, more Notion")
 - Prevents claims of originality that don't hold up
+
+## STATE.md Integration
+
+Every stage that probes Refero writes the result to `.design/STATE.md` under the `<connections>` section:
+
+```xml
+<connections>
+figma: available
+refero: not_configured
+</connections>
+```
+
+**Status values:**
+
+| Value | Meaning |
+|-------|---------|
+| `available` | ToolSearch returned non-empty results for `refero` |
+| `unavailable` | Refero tools are present but a live call errored |
+| `not_configured` | ToolSearch returned empty for `refero` — MCP not registered |
+
+**Probe pattern (ToolSearch-only — no tool call needed):**
+
+```
+ToolSearch({ query: "refero", max_results: 5 })
+  → Empty result     → refero: not_configured
+  → Non-empty result → refero: available
+```
+
+Rationale: calling a real Refero search as the probe would waste tokens and incur API cost before confirming the connection is even needed. ToolSearch presence is sufficient — if the tools are registered, the connection is available. A live call failure would downgrade to `unavailable`, but this is rare and best handled when an actual search is attempted.
+
+**Which stages probe Refero:** the discover stage (via `agents/design-context-builder.md`). The scan, plan, and verify stages do not use Refero and do not probe it.
+
+---
+
+## Fallback chain
+
+When Refero is `not_configured` or `unavailable`, the discover stage falls back through this three-tier chain:
+
+**Tier 1 — Refero MCP** (`mcp__refero__search` or verified tool name from ToolSearch):
+Real product screenshots from Refero's corpus of 125,000+ screens. Best quality, broadest coverage. Use when `refero: available`.
+
+**Tier 2 — awesome-design-md library** (`~/.claude/libs/awesome-design-md/design-md/`):
+68 brand archetypes with structured DESIGN.md token files. Pick 1–2 closest matches by brand category. Provides concrete token values (colors, fonts, spacing) you can copy-adapt. Use when Refero is unavailable.
+
+**Tier 3 — WebFetch** (getdesign.md URLs from the awesome-design-md list):
+Last resort. Fetch design reference URLs directly. Slower and less reliable than the MCP. Use only when tiers 1 and 2 are both unavailable.
+
+Never proceed without references — that's the whole point of Discover.
 
 ## Fallbacks if refero is down / not installed
 
