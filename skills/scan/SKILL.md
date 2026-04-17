@@ -42,6 +42,16 @@ find . -name "*.css" -o -name "*.scss" -o -name "*.less" 2>/dev/null | grep -v n
 
 Record: framework, CSS approach, component count, style file count, token system (yes/no).
 
+**Detect source root.** Check these directories in order and use the first one that exists:
+`src/` → `app/` → `pages/` → `lib/`. Substitute the detected source root (the matched
+directory name) into every subsequent grep command in this SKILL.md that currently references
+`src/` as the primary component root. If none of these directories exist, log
+"No standard source directory found — manual audit required" and proceed with the unchanged
+command (the `2>/dev/null` guards will suppress the no-match output).
+
+Log the detected source root in DESIGN.md frontmatter as:
+    source_roots: [<detected_dir>]
+
 ---
 
 ## Step 2 — Extract Color System
@@ -51,10 +61,10 @@ Record: framework, CSS approach, component count, style file count, token system
 grep -roh "#[0-9a-fA-F]\{3,8\}" src/ styles/ app/ --include="*.css" --include="*.scss" --include="*.tsx" --include="*.jsx" --include="*.ts" --include="*.vue" 2>/dev/null | sort | uniq -c | sort -rn | head -40
 
 # oklch / hsl / rgb colors
-grep -roh "oklch([^)]*)\|hsl([^)]*)\|rgb([^)]*)" src/ styles/ --include="*.css" --include="*.scss" 2>/dev/null | sort | uniq -c | sort -rn | head -20
+grep -rEoh "oklch\([^)]*\)|hsl\([^)]*\)|rgb\([^)]*\)" src/ styles/ --include="*.css" --include="*.scss" 2>/dev/null | sort | uniq -c | sort -rn | head -20
 
 # CSS custom properties (color tokens)
-grep -roh "\-\-[a-z][a-z0-9\-]*color[a-z0-9\-]*:\s*[^;]*\|\-\-color[a-z0-9\-]*:\s*[^;]*" src/ styles/ --include="*.css" --include="*.scss" 2>/dev/null | sort | uniq | head -30
+grep -rEoh "\-\-[a-z][a-z0-9\-]*color[a-z0-9\-]*:\s*[^;]*|\-\-color[a-z0-9\-]*:\s*[^;]*" src/ styles/ --include="*.css" --include="*.scss" 2>/dev/null | sort | uniq | head -30
 
 # Tailwind color config
 grep -A 100 '"colors"' tailwind.config.* 2>/dev/null | head -50
@@ -79,16 +89,16 @@ Produce a color inventory table:
 
 ```bash
 # Font families
-grep -roh "font-family:\s*[^;]*\|fontFamily:\s*[^,}]*" src/ styles/ --include="*.css" --include="*.scss" --include="*.ts" --include="*.tsx" 2>/dev/null | sort | uniq -c | sort -rn | head -20
+grep -rEoh "font-family:\s*[^;]*|fontFamily:\s*[^,}]*" src/ styles/ --include="*.css" --include="*.scss" --include="*.ts" --include="*.tsx" 2>/dev/null | sort | uniq -c | sort -rn | head -20
 
 # Font sizes
-grep -roh "font-size:\s*[0-9\.]*\(rem\|px\|em\)\|text-\(xs\|sm\|base\|lg\|xl\|2xl\|3xl\|4xl\|5xl\|6xl\|7xl\)" src/ styles/ --include="*.css" --include="*.scss" --include="*.tsx" --include="*.jsx" 2>/dev/null | sort | uniq -c | sort -rn | head -30
+grep -rEoh "font-size:\s*[0-9.]*\(rem|px|em\)|text-(xs|sm|base|lg|xl|2xl|3xl|4xl|5xl|6xl|7xl)" src/ styles/ --include="*.css" --include="*.scss" --include="*.tsx" --include="*.jsx" 2>/dev/null | sort | uniq -c | sort -rn | head -30
 
 # Font weights
-grep -roh "font-weight:\s*[0-9]*\|fw-[0-9]*\|font-\(thin\|light\|normal\|medium\|semibold\|bold\|extrabold\|black\)" src/ styles/ --include="*.css" --include="*.scss" --include="*.tsx" 2>/dev/null | sort | uniq -c | sort -rn | head -20
+grep -rEoh "font-weight:\s*[0-9]*|fw-[0-9]*|font-(thin|light|normal|medium|semibold|bold|extrabold|black)" src/ styles/ --include="*.css" --include="*.scss" --include="*.tsx" 2>/dev/null | sort | uniq -c | sort -rn | head -20
 
 # Line heights
-grep -roh "line-height:\s*[0-9\.]*\|leading-[a-z0-9]*" src/ styles/ --include="*.css" --include="*.scss" --include="*.tsx" 2>/dev/null | sort | uniq -c | sort -rn | head -15
+grep -rEoh "line-height:\s*[0-9.]*|leading-[a-z0-9]*" src/ styles/ --include="*.css" --include="*.scss" --include="*.tsx" 2>/dev/null | sort | uniq -c | sort -rn | head -15
 ```
 
 **Analyze:**
@@ -110,13 +120,13 @@ Produce a typography inventory table.
 
 ```bash
 # All CSS spacing values
-grep -roh "padding:\s*[0-9]*px\|margin:\s*[0-9]*px\|gap:\s*[0-9]*px" src/ styles/ --include="*.css" --include="*.scss" 2>/dev/null | grep -oh "[0-9]*px" | sort -n | uniq -c | sort -rn | head -20
+grep -rEoh "padding:\s*[0-9]*px|margin:\s*[0-9]*px|gap:\s*[0-9]*px" src/ styles/ --include="*.css" --include="*.scss" 2>/dev/null | grep -oh "[0-9]*px" | sort -n | uniq -c | sort -rn | head -20
 
 # Tailwind spacing overrides
 grep -A 30 '"spacing"' tailwind.config.* 2>/dev/null | head -35
 
 # Space tokens
-grep -roh "\-\-space[a-z0-9\-]*:\s*[^;]*\|\-\-spacing[a-z0-9\-]*:\s*[^;]*" src/ styles/ --include="*.css" 2>/dev/null | head -20
+grep -rEoh "\-\-space[a-z0-9\-]*:\s*[^;]*|\-\-spacing[a-z0-9\-]*:\s*[^;]*" src/ styles/ --include="*.css" 2>/dev/null | head -20
 ```
 
 **Analyze:**
@@ -131,23 +141,23 @@ Read `${CLAUDE_PLUGIN_ROOT}/reference/anti-patterns.md`. Run all grep commands.
 
 ```bash
 # BAN violations (−3 each from Anti-Pattern score)
-echo "=== BAN-01: Side-stripe borders ===" && grep -rn "border-left:\s*[2-9][0-9]*px\|border-right:\s*[2-9][0-9]*px" src/ --include="*.css" --include="*.scss" --include="*.tsx" 2>/dev/null
-echo "=== BAN-02: Gradient text ===" && grep -rn "background-clip:\s*text\|text-fill-color:\s*transparent" src/ 2>/dev/null
-echo "=== BAN-03: Bounce easing ===" && grep -rn "cubic-bezier(.*-[0-9]\|bounce\|elastic" src/ --include="*.css" --include="*.scss" 2>/dev/null
+echo "=== BAN-01: Side-stripe borders ===" && grep -rEn "border-left:\s*[2-9][0-9]*px|border-right:\s*[2-9][0-9]*px" src/ --include="*.css" --include="*.scss" --include="*.tsx" 2>/dev/null
+echo "=== BAN-02: Gradient text ===" && grep -rEn "background-clip:\s*text|text-fill-color:\s*transparent" src/ 2>/dev/null
+echo "=== BAN-03: Bounce easing ===" && grep -rEn "cubic-bezier\(.*-[0-9]|bounce|elastic" src/ --include="*.css" --include="*.scss" 2>/dev/null
 echo "=== BAN-08: transition: all ===" && grep -rn "transition:\s*all\b" src/ --include="*.css" --include="*.scss" --include="*.tsx" 2>/dev/null | head -10
-echo "=== BAN-05: Pure black dark mode ===" && grep -rn "#000000\b\|rgb(0,\s*0,\s*0)" src/ --include="*.css" --include="*.scss" 2>/dev/null | head -5
-echo "=== BAN-06: Disable zoom ===" && grep -rn "user-scalable=no\|maximum-scale=1" public/ src/ 2>/dev/null
+echo "=== BAN-05: Pure black dark mode ===" && grep -rEn "#000000\b|rgb\(0,\s*0,\s*0\)" src/ --include="*.css" --include="*.scss" 2>/dev/null | head -5
+echo "=== BAN-06: Disable zoom ===" && grep -rEn "user-scalable=no|maximum-scale=1" public/ src/ 2>/dev/null
 echo "=== BAN-07: outline:none without replacement ===" && grep -rn ":focus\s*{" src/ --include="*.css" --include="*.scss" 2>/dev/null | head -5
 
 # SLOP signals (−1 each)
-echo "=== SLOP-01: AI palette ===" && grep -rn "#6366f1\|#8b5cf6\|#06b6d4" src/ 2>/dev/null | head -5
+echo "=== SLOP-01: AI palette ===" && grep -rEn "#6366f1|#8b5cf6|#06b6d4" src/ 2>/dev/null | head -5
 echo "=== SLOP-04: backdrop-filter ===" && grep -rn "backdrop-filter:\s*blur" src/ --include="*.css" --include="*.scss" 2>/dev/null | head -5
 
 # Accessibility
-echo "=== A11Y: focus rings ===" && grep -rn "outline:\s*none\|outline:\s*0" src/ --include="*.css" --include="*.scss" 2>/dev/null | head -5
+echo "=== A11Y: focus rings ===" && grep -rEn "outline:\s*none|outline:\s*0" src/ --include="*.css" --include="*.scss" 2>/dev/null | head -5
 echo "=== A11Y: reduced motion ===" && grep -rn "prefers-reduced-motion" src/ --include="*.css" --include="*.scss" 2>/dev/null | head -3
-echo "=== A11Y: div onClick ===" && grep -rn "onClick.*div\|<div.*onClick" src/ --include="*.tsx" --include="*.jsx" 2>/dev/null | head -5
-echo "=== A11Y: small font ===" && grep -rn "font-size:\s*1[0-5]px\|font-size:\s*[0-9]px" src/ --include="*.css" --include="*.scss" 2>/dev/null | head -5
+echo "=== A11Y: div onClick ===" && grep -rEn "onClick.*div|<div.*onClick" src/ --include="*.tsx" --include="*.jsx" 2>/dev/null | head -5
+echo "=== A11Y: small font ===" && grep -rEn "font-size:\s*1[0-5]px|font-size:\s*[0-9]px" src/ --include="*.css" --include="*.scss" 2>/dev/null | head -5
 ```
 
 For each finding: record the count, a sample file:line, and severity (BAN = P0, SLOP = P1, A11Y = P0–P1 depending on type).
@@ -160,13 +170,13 @@ If `--quick`, skip this step.
 
 ```bash
 # Count components by directory
-find src/ app/ -name "*.tsx" -o -name "*.jsx" -o -name "*.vue" 2>/dev/null | grep -v node_modules | grep -v "\.test\.\|\.spec\.\|\.stories\." | xargs dirname | sort | uniq -c | sort -rn | head -20
+find . -name "*.tsx" -o -name "*.jsx" -o -name "*.vue" 2>/dev/null | grep -v node_modules | grep -vE "\.test\.|\.spec\.|\.stories\." | xargs dirname | sort | uniq -c | sort -rn | head -20
 
 # Find component pattern indicators
-grep -rln "className=\|class=\|styled\." src/ --include="*.tsx" --include="*.jsx" --include="*.vue" 2>/dev/null | wc -l
+grep -rEln "className=|class=|styled\." src/ --include="*.tsx" --include="*.jsx" --include="*.vue" 2>/dev/null | wc -l
 
 # Look for design system component patterns
-grep -rln "Button\|Modal\|Dialog\|Toast\|Tooltip\|Badge\|Card\|Input\|Select\|Dropdown\|Table\|Tab\|Accordion" src/ --include="*.tsx" --include="*.jsx" 2>/dev/null | grep -v node_modules | head -20
+grep -rEln "Button|Modal|Dialog|Toast|Tooltip|Badge|Card|Input|Select|Dropdown|Table|Tab|Accordion" src/ --include="*.tsx" --include="*.jsx" 2>/dev/null | grep -v node_modules | head -20
 ```
 
 Identify:
