@@ -104,15 +104,15 @@
 
 - [ ] **AGENT-12**: `agents/design-fixer.md` — applies fix list from DESIGN-VERIFICATION.md gaps atomically with per-fix commits, enables verify→fix loop without manual re-planning
 - [x] **AGENT-13**: `agents/design-advisor.md` — researches a single gray area with a 5-column comparison table + rationale (called from discover when gray areas need more than judgment)
-- [ ] **AGENT-14**: `agents/design-doc-writer.md` — generates handoff docs / component specs from DESIGN-SUMMARY.md (powers the `style` command)
+- [x] **AGENT-14**: `agents/design-doc-writer.md` — generates handoff docs / component specs from DESIGN-SUMMARY.md (powers the `style` command)
 
 ### style Command
 
-- [ ] **STYL-01**: `style` command exists at `skills/style/SKILL.md` and is routed from root `SKILL.md`
-- [ ] **STYL-02**: `style` produces `.design/DESIGN-STYLE-[ComponentName].md` per component (not a flat file)
-- [ ] **STYL-03**: Post-pipeline mode: invokes design-doc-writer agent with DESIGN-SUMMARY.md as input
-- [ ] **STYL-04**: Pre-pipeline fallback mode: invokes design-doc-writer with DESIGN.md + source file for current-state spec
-- [ ] **STYL-05**: Output includes: spacing tokens, color tokens, typography scale, component states, AI-slop detection flag, token semantic health score (raw-hex-in-components ratio)
+- [x] **STYL-01**: `style` command exists at `skills/style/SKILL.md` and is routed from root `SKILL.md`
+- [x] **STYL-02**: `style` produces `.design/DESIGN-STYLE-[ComponentName].md` per component (not a flat file)
+- [x] **STYL-03**: Post-pipeline mode: invokes design-doc-writer agent with DESIGN-SUMMARY.md as input
+- [x] **STYL-04**: Pre-pipeline fallback mode: invokes design-doc-writer with DESIGN.md + source file for current-state spec
+- [x] **STYL-05**: Output includes: spacing tokens, color tokens, typography scale, component states, AI-slop detection flag, token semantic health score (raw-hex-in-components ratio)
 
 ### darkmode Command
 
@@ -234,12 +234,12 @@
 | CONN-06 | Phase 4 | Complete |
 | AGENT-12 | Phase 5 | Pending |
 | AGENT-13 | Phase 5 | Complete |
-| AGENT-14 | Phase 5 | Pending |
-| STYL-01 | Phase 5 | Pending |
-| STYL-02 | Phase 5 | Pending |
-| STYL-03 | Phase 5 | Pending |
-| STYL-04 | Phase 5 | Pending |
-| STYL-05 | Phase 5 | Pending |
+| AGENT-14 | Phase 5 | Complete |
+| STYL-01 | Phase 5 | Complete |
+| STYL-02 | Phase 5 | Complete |
+| STYL-03 | Phase 5 | Complete |
+| STYL-04 | Phase 5 | Complete |
+| STYL-05 | Phase 5 | Complete |
 | DARK-01 | Phase 5 | Pending |
 | DARK-02 | Phase 5 | Pending |
 | DARK-03 | Phase 5 | Pending |
