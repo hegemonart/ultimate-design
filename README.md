@@ -99,6 +99,31 @@ Validate before pushing:
 claude plugin validate .
 ```
 
+## Distribution
+
+This repository is a Claude Code plugin. When installed via the marketplace, only the
+plugin runtime files ship to users — development scaffolding stays in this repo.
+
+**Ships with the plugin:**
+- `.claude-plugin/plugin.json`, `.claude-plugin/marketplace.json` — plugin manifest
+- `SKILL.md` — root orchestrator skill
+- `skills/` — stage skills (scan, discover, plan, design, verify)
+- `scripts/bootstrap.sh` — idempotent plugin initialization
+- `hooks/` — Claude Code lifecycle hooks
+- `agents/` — agent authoring contract and specs (once added)
+- `connections/` — MCP connection specs (Figma, Refero, ...)
+- `reference/` — curated reference material
+- `README.md`, `.gitignore`, `.gitattributes`
+
+**Dev-only (gitignored, not distributed):**
+- `.planning/` — GSD planning artifacts (STATE, ROADMAP, PLANs)
+- `.claude/memory/` — session-level memory
+- `.claude/settings.local.json` — personal editor/runtime settings
+- `.design/` — pipeline runtime state written during design sessions
+
+If you are installing the plugin, you will not see `.planning/` or `.claude/memory/`.
+If you are contributing, clone the repo — dev artifacts will be generated as you work.
+
 ## License
 
 MIT. See [LICENSE](./LICENSE) (add if missing).
