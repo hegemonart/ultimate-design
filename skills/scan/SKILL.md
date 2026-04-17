@@ -20,6 +20,65 @@ Default: full scan of tokens, patterns, and anti-patterns. Component inventory i
 
 ---
 
+## State Integration
+
+### Read or create STATE.md
+
+At scan entry, before running any step:
+
+1. Check for `.design/STATE.md`.
+   - **If missing:** create it from `reference/STATE-TEMPLATE.md`. Set the following fields:
+     - `started_at` = now (ISO 8601) — **set once; never overwrite on subsequent runs**
+     - `last_checkpoint` = now
+     - frontmatter `stage` = `scan`
+     - `<position>` `stage` = `scan`, `status` = `in_progress`, `task_progress` = `0/8`
+   - **If present and `stage == scan` and `status == in_progress`:** RESUME — skip already-complete steps using `task_progress` as offset. Do not reset `started_at`.
+   - **Otherwise (normal transition):** set frontmatter `stage = scan`, `<position>` `stage = scan`, `status = in_progress`, `task_progress = 0/8`. Do not overwrite `started_at`.
+
+### Probe connection availability
+
+Run both probes below. MCP tools may be in the deferred tool set — **always call ToolSearch first**; without it, a deferred tool invocation fails silently.
+
+**Figma probe:**
+
+```
+Step A1 — ToolSearch check:
+  ToolSearch({ query: "select:mcp__figma-desktop__get_metadata", max_results: 1 })
+  → Empty result      → figma: not_configured  (skip all Figma steps)
+  → Non-empty result  → proceed to Step A2
+
+Step A2 — Live tool call:
+  call mcp__figma-desktop__get_metadata
+  → Success           → figma: available
+  → Error             → figma: unavailable  (skip all Figma steps)
+```
+
+**Refero probe:**
+
+```
+Step B1 — ToolSearch check:
+  ToolSearch({ query: "refero", max_results: 5 })
+  → Empty result      → refero: not_configured  (use fallback chain)
+  → Non-empty result  → refero: available
+```
+
+Note: scan probes **both** connections because the State Integration block is the authoritative connection-detection point for the entire pipeline. Scan itself does not use Refero, but it writes the Refero status so downstream stages (discover) do not need to re-probe from scratch.
+
+### Write STATE.md
+
+Update `.design/STATE.md` with probe results:
+
+```xml
+<connections>
+figma: <available | unavailable | not_configured>
+refero: <available | not_configured>
+</connections>
+```
+
+Update `last_checkpoint` to now. Write `.design/STATE.md` to disk before proceeding to Step 1.
+
+---
+
 ## Step 1 — Orient
 
 Identify the project structure before scanning:

@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v2.1
 milestone_name: milestone
 status: executing
-stopped_at: Completed 03-05-PLAN.md
-last_updated: "2026-04-17T11:49:57.798Z"
+stopped_at: Completed 04-01-PLAN.md
+last_updated: "2026-04-17T12:36:56.776Z"
 last_activity: "2026-04-17 — Phase 03 Plan 04: three-pass component detection (SCAN-01), --full output table (SCAN-02), priority_score formula (SCAN-03)"
 progress:
   total_phases: 6
   completed_phases: 3
-  total_plans: 15
-  completed_plans: 15
+  total_plans: 18
+  completed_plans: 16
   percent: 78
 ---
 
@@ -66,6 +66,7 @@ Progress: [████████░░] 78%
 | Phase 03-quality-gate-agents-pipeline-polish P04 | 2 | 3 tasks | 1 files |
 | Phase 03 P06 | 2 | 3 tasks | 3 files |
 | Phase 03-quality-gate-agents-pipeline-polish P05 | 5 | 4 tasks | 5 files |
+| Phase 04-connections-layer P01 | 3 | 3 tasks | 3 files |
 
 ## Accumulated Context
 
@@ -118,6 +119,10 @@ Progress: [████████░░] 78%
 - [Phase 03-05]: DISC-01/03 content inserted inside builder spawn prompt (not a separate section) — ensures context-builder receives fallback chain and gray areas at runtime
 - [Phase 03-05]: --research mode documented as REMOVED with V2-04 rationale — existing complexity heuristic (3+ scopes OR 6+ decisions) covers the use case
 - [Phase 03-05]: VRFY-02 shared grep reference placed in design-verifier.md Phase 1 (not verify/SKILL.md) — keeps deduplication adjacent to consumption point
+- [Phase 04-connections-layer]: Figma promoted to Active with mcp__figma-desktop__* prefix (official Figma Desktop MCP, confirmed via settings.local.json + official docs)
+- [Phase 04-connections-layer]: Probe pattern: ToolSearch-first (deferred-tool-set safety), then get_metadata live call for Figma; ToolSearch-only for Refero
+- [Phase 04-connections-layer]: <connections> schema stays minimal (three-value status only); traceability via DESIGN.md source annotations
+- [Phase 04-connections-layer]: Probe prose is copied inline into each stage; connections/connections.md is canonical source (SKILL.md has no include mechanism)
 
 ### Pending Todos
 
@@ -129,6 +134,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-04-17T11:49:57.794Z
-Stopped at: Completed 03-05-PLAN.md
+Last session: 2026-04-17T12:36:56.771Z
+Stopped at: Completed 04-01-PLAN.md
 Resume file: None
