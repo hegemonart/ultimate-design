@@ -98,6 +98,29 @@ Read `reference/anti-patterns.md` SLOP-01..08 and BAN-01..09 before starting.
 5. **Apply from DESIGN-CONTEXT.md decisions**: D-XX entries about color → implement them.
 6. **Introduce token layer if not present**: CSS custom properties with semantic names (`--color-primary`, `--color-danger`, `--color-text-muted`).
 
+### oklch guidance (dark mode + chroma desaturation)
+
+oklch(L% C H) usage for dark mode color derivation:
+
+Light mode:
+  Text:    L = 15–25% (near-black, avoid pure #000)
+  Surface: L = 95–99%
+Dark mode:
+  Surface: L = 12–18% (near-black backgrounds — avoid pure #000)
+  Text:    L = 85–95% (near-white)
+
+Chroma desaturation (derive dark-mode chroma from light-mode chroma):
+  Dark mode C should be 40–60% of light mode C
+  Reason: saturated colors on dark backgrounds vibrate (Helmholtz-Kohlrausch effect)
+
+Example derivation:
+  Light primary: oklch(45% 0.18 260)
+  Dark primary:  oklch(65% 0.09 260)  # lighter L, half chroma
+
+NOTE: These are starting-point guidelines, not empirically validated exact
+thresholds. V2-11 defers empirical validation. Visual inspection required
+before committing final values.
+
 ---
 
 ### Type: layout
@@ -215,6 +238,67 @@ Read all relevant reference files for this component's concerns (typography, col
 3. **Build the component structure**: markup, styles, and behavior per the spec.
 4. **Verify acceptance criteria**: check each criterion from the task plan against the implementation.
 5. **Note design choices**: document any choices made beyond what was specified in DESIGN-CONTEXT.md decisions.
+
+See also: `## Component Task` guide below for decision tree, naming conventions, props contract, and styling approach.
+
+---
+
+## Component Task
+
+When the task file type is "component":
+
+### Decision tree
+1. Is there an existing component with the same role? → Restyle first, rebuild only if rebuild decision exists in DESIGN-CONTEXT.md
+2. Is styling approach declared (D-XX)? → Follow it (Tailwind / CSS Module / styled / inline)
+3. Does component need accessibility defaults? → Apply from reference/accessibility.md
+4. Is dark mode required? → Add oklch variants per Color Task guidance
+
+### Naming conventions
+- File: PascalCase (Button.tsx, not button.tsx)
+- Props interface: `<ComponentName>Props`
+- Style/class names: kebab-case for CSS; colocate Tailwind classes with component
+
+### Props contract
+- Required props documented inline
+- Optional props with explicit defaults
+- Event handlers named `on<Event>` (onClick, onSubmit, onChange)
+
+### Styling approach selection
+- Follow project existing convention (check DESIGN-PATTERNS.md output)
+- If no existing convention, default to the D-XX styling decision from DESIGN-CONTEXT.md
+- Do not mix approaches (e.g., Tailwind + CSS Modules) without a D-XX decision allowing it
+
+### Accessibility defaults
+- Interactive elements: focusable, `aria-label` when icon-only, keyboard handler
+- Contrast ratio per reference/accessibility.md
+- Role attribute when semantic HTML insufficient
+- Focus ring: `:focus-visible { outline: 2px solid var(--color-focus-ring); outline-offset: 2px; }`
+- Minimum touch target: 44×44px for interactive elements
+
+---
+
+## Decision Authority
+
+When encountering a decision not specified in the task file:
+
+### Tier 1: Proceed autonomously
+Decision is self-contained — proceed autonomously when the decision scope is
+contained entirely within the current task's files and does not conflict with
+any D-XX decision in DESIGN-CONTEXT.md.
+Example: choosing between two equivalent CSS property orders.
+
+### Tier 2: Flag and proceed
+Decision has wider impact — flag and proceed when the decision affects files or
+tasks beyond the current task but is unambiguous in the DESIGN-CONTEXT.md
+direction. Log the decision in DESIGN-STATE.md and include in the executor's
+completion summary.
+Example: introducing a new CSS custom property that will affect other components.
+
+### Tier 3: Stop and ask
+Decision is blocked — stop and ask when the decision contradicts DESIGN-CONTEXT.md
+or requires a new D-XX decision. Halt, write a question block in DESIGN-STATE.md,
+emit a marker noting the block, and wait for user input.
+Example: user says "replace AI palette" but task file references removed colors.
 
 ---
 
