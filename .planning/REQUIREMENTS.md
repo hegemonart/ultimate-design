@@ -65,9 +65,9 @@
 
 ### Scan Polish
 
-- [ ] **SCAN-01**: Component inventory detection replaced with a more accurate pattern (reduce false positives from `grep -rln`)
-- [ ] **SCAN-02**: `--full` mode per-file component analysis is fully specified with concrete output format
-- [ ] **SCAN-03**: DESIGN-DEBT.md dependency ordering uses concrete logic (priority score = severity weight × effort weight, tiebreak by file count)
+- [x] **SCAN-01**: Component inventory detection replaced with a more accurate pattern (reduce false positives from `grep -rln`)
+- [x] **SCAN-02**: `--full` mode per-file component analysis is fully specified with concrete output format
+- [x] **SCAN-03**: DESIGN-DEBT.md dependency ordering uses concrete logic (priority score = severity weight × effort weight, tiebreak by file count)
 - [x] **SCAN-04**: Fallback paths handle non-standard layouts (app/, lib/, pages/, src/) without breaking
 
 ### Discover Polish
@@ -94,11 +94,11 @@
 
 ### Reference File Polish
 
-- [ ] **REF-01**: `reference/audit-scoring.md` — additional grep patterns for Visual Hierarchy auto-scoring
-- [ ] **REF-02**: `reference/typography.md` — pick-by-brand-archetype quick guide (3–5 archetypes with recommended pairings)
-- [ ] **REF-03**: `reference/typography.md` — variable fonts section added (axis guidance, fallback strategy)
-- [ ] **REF-04**: `reference/motion.md` — spring physics patterns for React Spring and Framer Motion
-- [ ] **REF-05**: `reference/motion.md` — scroll-triggered animation guidance (threshold, once vs repeat, performance)
+- [x] **REF-01**: `reference/audit-scoring.md` — additional grep patterns for Visual Hierarchy auto-scoring
+- [x] **REF-02**: `reference/typography.md` — pick-by-brand-archetype quick guide (3–5 archetypes with recommended pairings)
+- [x] **REF-03**: `reference/typography.md` — variable fonts section added (axis guidance, fallback strategy)
+- [x] **REF-04**: `reference/motion.md` — spring physics patterns for React Spring and Framer Motion
+- [x] **REF-05**: `reference/motion.md` — scroll-triggered animation guidance (threshold, once vs repeat, performance)
 
 ### Automation Agents (Phase 3 of agent layer)
 
@@ -208,9 +208,9 @@
 | AGENT-09 | Phase 3 | Complete |
 | AGENT-10 | Phase 3 | Complete |
 | AGENT-11 | Phase 3 | Complete |
-| SCAN-01 | Phase 3 | Pending |
-| SCAN-02 | Phase 3 | Pending |
-| SCAN-03 | Phase 3 | Pending |
+| SCAN-01 | Phase 3 | Complete |
+| SCAN-02 | Phase 3 | Complete |
+| SCAN-03 | Phase 3 | Complete |
 | DISC-01 | Phase 3 | Pending |
 | DISC-02 | Phase 3 | Pending |
 | DISC-03 | Phase 3 | Pending |
@@ -221,11 +221,11 @@
 | DSGN-03 | Phase 3 | Pending |
 | VRFY-01 | Phase 3 | Pending |
 | VRFY-02 | Phase 3 | Pending |
-| REF-01 | Phase 3 | Pending |
-| REF-02 | Phase 3 | Pending |
-| REF-03 | Phase 3 | Pending |
-| REF-04 | Phase 3 | Pending |
-| REF-05 | Phase 3 | Pending |
+| REF-01 | Phase 3 | Complete |
+| REF-02 | Phase 3 | Complete |
+| REF-03 | Phase 3 | Complete |
+| REF-04 | Phase 3 | Complete |
+| REF-05 | Phase 3 | Complete |
 | CONN-01 | Phase 4 | Pending |
 | CONN-02 | Phase 4 | Pending |
 | CONN-03 | Phase 4 | Pending |

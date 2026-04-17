@@ -40,6 +40,20 @@ The stage embeds these fields in its prompt:
 
 Re-run the same automated checks from the Discover stage. Score each category 0–10 using the rubric from `reference/audit-scoring.md`. Compare against `<baseline_audit>` from DESIGN-CONTEXT.md.
 
+### Phase 1 re-audit grep patterns
+
+Use the audit grep patterns documented in `skills/scan/SKILL.md` Step 5. See
+that file for the authoritative list of shared grep patterns — do not duplicate
+them here to keep the patterns in a single source of truth.
+
+Key pattern categories consumed by this phase:
+- Hardcoded color values (hex, rgb, named colors)
+- Off-grid spacing values
+- Typography scale violations
+- Heading weight duplication
+- BAN violations (border-left, background-clip, transition:all, user-scalable)
+- SLOP signals (AI-default palette colors, backdrop-filter:blur)
+
 ### Anti-Pattern Scan
 
 Run these grep commands to detect violations:
@@ -166,18 +180,20 @@ Read `reference/heuristics.md`. Score each of the 10 heuristics 0–4.
 
 **Scoring: 0 = critical violation, 1 = major violation, 2 = minor violation, 3 = passes, 4 = excellent**
 
-| Heuristic | What to check in code |
-|---|---|
-| H-01 Visibility of status | Loading states present? Spinners, skeletons? Error states visible? `aria-busy`? |
-| H-02 Real world match | Labels use domain language? Dates formatted for humans? No backend error codes? |
-| H-03 User control & freedom | Cancel available in flows? Destructive confirmation? Undo for reversible actions? |
-| H-04 Consistency & standards | Same action = same component across screens? Color semantic consistency? |
-| H-05 Error prevention | Input validation before submit? Destructive actions require confirmation? |
-| H-06 Recognition vs recall | Navigation options always visible? Form state preserved? Search shows query? |
-| H-07 Flexibility & efficiency | Keyboard shortcuts exist? Bulk actions for lists? Power user paths? |
-| H-08 Aesthetic & minimalist | One primary CTA per section? No competing priority elements? Visual hierarchy? |
-| H-09 Error recovery | Error messages: what + why + how to fix? Errors near the causing element? |
-| H-10 Help & documentation | Inline help for complex fields? Tooltips on icon-only buttons? |
+`? VISUAL` — heuristic cannot be fully automated; requires human visual inspection. Code analysis produces partial signal only.
+
+| Heuristic | Check Type | What to check in code |
+|---|---|---|
+| H-01 Visibility of status | auto | Loading states present? Spinners, skeletons? Error states visible? `aria-busy`? |
+| H-02 Real world match | ? VISUAL | Requires human read of copy tone — labels use domain language? Dates formatted for humans? No backend error codes? |
+| H-03 User control & freedom | auto | Cancel available in flows? Destructive confirmation? Undo for reversible actions? |
+| H-04 Consistency & standards | auto | Same action = same component across screens? Color semantic consistency? |
+| H-05 Error prevention | auto | Input validation before submit? Destructive actions require confirmation? |
+| H-06 Recognition vs recall | ? VISUAL | Requires visual check of visible controls — navigation options always visible? Form state preserved? Search shows query? |
+| H-07 Flexibility & efficiency | ? VISUAL | Requires visual check of progressive disclosure — keyboard shortcuts exist? Bulk actions for lists? Power user paths? |
+| H-08 Aesthetic & minimalist | auto | One primary CTA per section? No competing priority elements? Visual hierarchy? |
+| H-09 Error recovery | auto | Error messages: what + why + how to fix? Errors near the causing element? |
+| H-10 Help & documentation | auto | Inline help for complex fields? Tooltips on icon-only buttons? |
 
 Score each H-01..H-10 from 0–4. Total = sum/40 × 100.
 

@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v2.1
 milestone_name: milestone
 status: executing
-stopped_at: Completed 03-01-PLAN.md
-last_updated: "2026-04-17T11:43:10.684Z"
-last_activity: "2026-04-17 — Phase 02 Plan 02: created design-executor agent (AGENT-02); rewrote design/SKILL.md as thin orchestrator with wave coordination (STAGE-03)"
+stopped_at: Completed 03-04-PLAN.md
+last_updated: "2026-04-17T11:47:51.826Z"
+last_activity: "2026-04-17 — Phase 03 Plan 04: three-pass component detection (SCAN-01), --full output table (SCAN-02), priority_score formula (SCAN-03)"
 progress:
   total_phases: 6
   completed_phases: 2
   total_plans: 15
-  completed_plans: 12
+  completed_plans: 14
   percent: 78
 ---
 
@@ -25,10 +25,10 @@ See: .planning/PROJECT.md (updated 2026-04-17)
 
 ## Current Position
 
-Phase: 2 of 6 (Core Agents + Stage Orchestration)
-Plan: 2 of 4 in current phase (02-02 complete)
+Phase: 3 of 6 (Quality Gate Agents + Pipeline Polish)
+Plan: 4 of 6 in current phase (03-04 complete)
 Status: In progress
-Last activity: 2026-04-17 — Phase 02 Plan 02: created design-executor agent (AGENT-02); rewrote design/SKILL.md as thin orchestrator with wave coordination (STAGE-03)
+Last activity: 2026-04-17 — Phase 03 Plan 04: three-pass component detection (SCAN-01), --full output table (SCAN-02), priority_score formula (SCAN-03)
 
 Progress: [████████░░] 78%
 
@@ -62,6 +62,9 @@ Progress: [████████░░] 78%
 | Phase 03-quality-gate-agents-pipeline-polish P03 | 2 min | 3 tasks | 4 files |
 | Phase 03-quality-gate-agents-pipeline-polish P02 | 5 | 3 tasks | 3 files |
 | Phase 03 P01 | 289 | 3 tasks | 3 files |
+| Phase 03-quality-gate-agents-pipeline-polish P06 | 2 min | 3 tasks | 3 files |
+| Phase 03-quality-gate-agents-pipeline-polish P04 | 2 | 3 tasks | 1 files |
+| Phase 03 P06 | 2 | 3 tasks | 3 files |
 
 ## Accumulated Context
 
@@ -107,6 +110,10 @@ Progress: [████████░░] 78%
 - [Phase 03]: Migrated full discover interview logic verbatim into design-context-builder (AGENT-06) — no information lost from v2.1.0
 - [Phase 03]: design-context-checker (AGENT-07) uses Goal Observability as dimension 6 — adapted from gsd-ui-checker with Registry Safety replaced by Must-Have Testability
 - [Phase 03]: discover/SKILL.md reduced to 93-line thin orchestrator — inline interview replaced by agent spawn calls for context isolation
+- [Phase 03-06]: Append-only constraint enforced: Visual Hierarchy grep patterns inserted as subsection; Brand Archetype + Variable Fonts appended as top-level sections to typography.md; Spring Physics + Scroll-Triggered Animations appended as top-level sections to motion.md
+- [Phase 03-04]: Three-pass component detection uses temp files to avoid process substitution portability issues
+- [Phase 03-04]: priority_score formula uses + not / — addition keeps severity and effort signals independent (per RESEARCH.md)
+- [Phase 03-04]: Effort weight inverted (XS=5, XL=1) so high effort = lower priority — keeps formula monotonic
 
 ### Pending Todos
 
@@ -118,6 +125,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-04-17T11:43:10.680Z
-Stopped at: Completed 03-01-PLAN.md
+Last session: 2026-04-17T11:47:48.764Z
+Stopped at: Completed 03-04-PLAN.md
 Resume file: None
