@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v2.1
 milestone_name: milestone
 status: executing
-stopped_at: Completed 03-03-PLAN.md
-last_updated: "2026-04-17T11:41:19.630Z"
+stopped_at: Completed 03-01-PLAN.md
+last_updated: "2026-04-17T11:43:10.684Z"
 last_activity: "2026-04-17 — Phase 02 Plan 02: created design-executor agent (AGENT-02); rewrote design/SKILL.md as thin orchestrator with wave coordination (STAGE-03)"
 progress:
   total_phases: 6
   completed_phases: 2
   total_plans: 15
-  completed_plans: 10
+  completed_plans: 12
   percent: 78
 ---
 
@@ -60,6 +60,8 @@ Progress: [████████░░] 78%
 | Phase 02 P03 | 3 | 2 tasks | 2 files |
 | Phase 02-core-agents-stage-orchestration P04 | 3 | 3 tasks | 7 files |
 | Phase 03-quality-gate-agents-pipeline-polish P03 | 2 min | 3 tasks | 4 files |
+| Phase 03-quality-gate-agents-pipeline-polish P02 | 5 | 3 tasks | 3 files |
+| Phase 03 P01 | 289 | 3 tasks | 3 files |
 
 ## Accumulated Context
 
@@ -99,6 +101,12 @@ Progress: [████████░░] 78%
 - [Phase 02-04]: test-fixture/ ships in-repo — reproducible, version-controlled, no filesystem dependency for smoke testing
 - [Phase 03-03]: design-pattern-mapper classifies by design concern (color-system, spacing-system, typography-system, component-styling) — never by code-architecture vocabulary
 - [Phase 03-03]: design-assumptions-analyzer runs optionally from plan stage (not discuss-phase); positioned after DESIGN-PATTERNS.md is available so it has richer context
+- [Phase 03-quality-gate-agents-pipeline-polish]: design-auditor is code-only (no Playwright-MCP); screenshot gap explicitly documented in DESIGN-AUDIT.md output
+- [Phase 03-quality-gate-agents-pipeline-polish]: design-integration-checker checks decision APPLICATION (D-XX applied in source) not export/import wiring — correct abstraction for design pipeline
+- [Phase 03-quality-gate-agents-pipeline-polish]: Integration-checker orphaned decisions = MAJOR gap; missing decisions = BLOCKER gap in verify loop
+- [Phase 03]: Migrated full discover interview logic verbatim into design-context-builder (AGENT-06) — no information lost from v2.1.0
+- [Phase 03]: design-context-checker (AGENT-07) uses Goal Observability as dimension 6 — adapted from gsd-ui-checker with Registry Safety replaced by Must-Have Testability
+- [Phase 03]: discover/SKILL.md reduced to 93-line thin orchestrator — inline interview replaced by agent spawn calls for context isolation
 
 ### Pending Todos
 
@@ -110,6 +118,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-04-17T11:41:14.139Z
-Stopped at: Completed 03-03-PLAN.md
+Last session: 2026-04-17T11:43:10.680Z
+Stopped at: Completed 03-01-PLAN.md
 Resume file: None
