@@ -1,48 +1,51 @@
 ---
 name: ultimate-design
-description: "Master design pipeline for Claude Code. Runs a 4-stage workflow: Discover → Plan → Design → Verify. Use when starting any design work, or to check pipeline status and advance to the next stage. Invoke without arguments for automatic routing, or with a stage name to jump directly: discover, plan, design, verify."
-argument-hint: "[discover|plan|design|verify|status]"
+description: "Master design pipeline for Claude Code. Includes a one-time scanner (scan) plus a 4-stage workflow: Discover → Plan → Design → Verify. Run 'scan' first in any new repo to map existing design system and generate a debt roadmap. Then use 'discover' to start the pipeline. Invoke without arguments for status and auto-routing."
+argument-hint: "[scan|discover|plan|design|verify|status]"
 user-invocable: true
 ---
 
 # Ultimate Design — Pipeline Router
 
-You are the entry point for a 4-stage design pipeline modeled on GSD:
+Entry point for the ultimate-design toolkit:
 
 ```
-Discover → Plan → Design → Verify
+scan → Discover → Plan → Design → Verify
 ```
 
-Each stage produces artifacts in `.design/` inside the current project. Read the pipeline state and route accordingly.
+`scan` is a one-time initializer. The pipeline stages are iterative — run them in order, or use `status` to resume where you left off.
 
-## Stage Definitions
+Each stage produces artifacts in `.design/` inside the current project.
 
-| Stage | Skill | Reads | Writes |
-|---|---|---|---|
-| **Discover** | `ultimate-design:discover` | Project files, user answers | `.design/DESIGN-CONTEXT.md` |
-| **Plan** | `ultimate-design:plan` | DESIGN-CONTEXT.md | `.design/DESIGN-PLAN.md` |
-| **Design** | `ultimate-design:design` | DESIGN-PLAN.md | `.design/DESIGN-SUMMARY.md` |
-| **Verify** | `ultimate-design:verify` | DESIGN-SUMMARY.md + DESIGN-CONTEXT.md | `.design/DESIGN-VERIFICATION.md` |
+## Command Reference
+
+| Command | Skill | Purpose |
+|---|---|---|
+| `scan` | `ultimate-design:scan` | Map existing design system, generate DESIGN.md + debt roadmap |
+| `discover` | `ultimate-design:discover` | Discovery interview + baseline audit → DESIGN-CONTEXT.md |
+| `plan` | `ultimate-design:plan` | Decompose into tasks → DESIGN-PLAN.md |
+| `design` | `ultimate-design:design` | Execute tasks → DESIGN-SUMMARY.md |
+| `verify` | `ultimate-design:verify` | Score + audit → DESIGN-VERIFICATION.md |
 
 ## Routing Logic
 
-When invoked without arguments (or with `status`), check `.design/` and auto-route:
+When invoked without arguments (or with `status`), show pipeline state and suggest next action:
 
 ```
-1. No .design/ directory → "No design session started. Run /ultimate-design:discover to begin."
-2. DESIGN-CONTEXT.md missing → Route to discover
-3. DESIGN-CONTEXT.md exists, DESIGN-PLAN.md missing → Route to plan
-4. DESIGN-PLAN.md exists, DESIGN-SUMMARY.md missing → Route to design
-5. DESIGN-SUMMARY.md exists, DESIGN-VERIFICATION.md missing → Route to verify
-6. DESIGN-VERIFICATION.md exists → Show summary + offer to start new session
+1. No DESIGN.md and no .design/ → Suggest scan first: "New repo detected — run /ultimate-design scan to map the design system."
+2. DESIGN.md exists, no DESIGN-CONTEXT.md → Suggest discover
+3. DESIGN-CONTEXT.md missing → Route to discover
+4. DESIGN-CONTEXT.md exists, DESIGN-PLAN.md missing → Route to plan
+5. DESIGN-PLAN.md exists, DESIGN-SUMMARY.md missing → Route to design
+6. DESIGN-SUMMARY.md exists, DESIGN-VERIFICATION.md missing → Route to verify
+7. DESIGN-VERIFICATION.md exists → Show summary + offer to start new session
 ```
 
 ## Status Display
 
-Before routing, show a status block:
-
 ```
 ━━━ Ultimate Design Pipeline ━━━
+[✓] Scan       → DESIGN.md + .design/DESIGN-DEBT.md
 [✓] Discover   → .design/DESIGN-CONTEXT.md
 [✓] Plan       → .design/DESIGN-PLAN.md
 [→] Design     ← current stage
@@ -50,17 +53,21 @@ Before routing, show a status block:
 ```
 
 Use `[✓]` for complete, `[→]` for current, `[ ]` for pending, `[!]` for gaps/errors.
+Show score delta if DESIGN.md baseline + DESIGN-VERIFICATION.md result both exist.
 
 ## Jump Mode
 
-If `$ARGUMENTS` is one of `discover`, `plan`, `design`, `verify` — invoke the corresponding skill directly via the Skill tool without checking pipeline state first:
+If `$ARGUMENTS` is a stage name — invoke it directly, no state check:
 
 ```
+/ultimate-design scan     → Skill("ultimate-design:scan")
 /ultimate-design discover → Skill("ultimate-design:discover")
 /ultimate-design plan     → Skill("ultimate-design:plan")
 /ultimate-design design   → Skill("ultimate-design:design")
 /ultimate-design verify   → Skill("ultimate-design:verify")
 ```
+
+Pass remaining arguments through: `/ultimate-design scan --quick` → `Skill("ultimate-design:scan", "--quick")`
 
 ## Do Not
 

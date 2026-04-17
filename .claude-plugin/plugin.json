@@ -1,6 +1,6 @@
 {
   "name": "ultimate-design",
-  "version": "2.0.0",
+  "version": "2.1.0",
   "description": "Self-contained 4-stage design pipeline: Discover → Plan → Design → Verify. Embeds NNG heuristics, WCAG thresholds, typographic systems, motion framework, and anti-pattern catalog directly — no sub-skill dependencies required. Optional: refero MCP for reference screenshots.",
   "author": {
     "name": "hegemonart",
