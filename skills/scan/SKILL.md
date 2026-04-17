@@ -168,21 +168,65 @@ For each finding: record the count, a sample file:line, and severity (BAN = P0, 
 
 If `--quick`, skip this step.
 
-```bash
-# Count components by directory
-find . -name "*.tsx" -o -name "*.jsx" -o -name "*.vue" 2>/dev/null | grep -v node_modules | grep -vE "\.test\.|\.spec\.|\.stories\." | xargs dirname | sort | uniq -c | sort -rn | head -20
+### Component pattern indicators
 
-# Find component pattern indicators
-grep -rEln "className=|class=|styled\." src/ --include="*.tsx" --include="*.jsx" --include="*.vue" 2>/dev/null | wc -l
+A bare `grep -rln "className" src/` produces false positives on type-only files, test files, utility helpers, and server-only modules — none of which are components. Instead, use a three-pass multi-signal filter. A file qualifies as a component only when **all three indicators** match:
+
+1. Has a JSX-like return: `grep -lE "return\s*\(" <file>`
+2. Has className or class attribute usage: `grep -lE "className=|class=" <file>`
+3. Has a component framework import: `grep -lE "from ['\"](react|preact|vue)" <file>`
+
+```bash
+# Component inventory — three-pass filter (requires all three signals)
+
+# Pass 1: files with JSX-like return statements
+grep -rlE "return\s*\(" src/ --include="*.tsx" --include="*.jsx" 2>/dev/null \
+  | grep -vE "\.test\.|\.spec\.|\.stories\." > /tmp/scan-pass1.txt
+
+# Pass 2: intersect with className/class presence
+grep -lE "className=|class=" $(cat /tmp/scan-pass1.txt) 2>/dev/null > /tmp/scan-pass2.txt
+
+# Pass 3: intersect with framework import (react, preact, or vue)
+grep -lE "from ['\"](react|preact|vue)" $(cat /tmp/scan-pass2.txt) 2>/dev/null > /tmp/components.txt
+
+# Count and list
+wc -l < /tmp/components.txt
+cat /tmp/components.txt
+```
+
+This produces a component inventory that excludes false positives. The resulting file list is the authoritative component set for the rest of this step.
+
+```bash
+# Count components by directory (from the filtered list)
+xargs dirname < /tmp/components.txt | sort | uniq -c | sort -rn | head -20
 
 # Look for design system component patterns
-grep -rEln "Button|Modal|Dialog|Toast|Tooltip|Badge|Card|Input|Select|Dropdown|Table|Tab|Accordion" src/ --include="*.tsx" --include="*.jsx" 2>/dev/null | grep -v node_modules | head -20
+grep -rEln "Button|Modal|Dialog|Toast|Tooltip|Badge|Card|Input|Select|Dropdown|Table|Tab|Accordion" \
+  $(cat /tmp/components.txt) 2>/dev/null | grep -v node_modules | head -20
 ```
 
 Identify:
 - Core UI primitives that exist (Button, Input, Modal, etc.)
 - Which have design system-level implementation vs. one-off styles
 - Which are candidates for design system extraction
+
+### --full mode per-file output
+
+If `--full` flag is set, emit one row per file in the component inventory:
+
+| File | Component Count | Styling Approach | Token Usage | Issues |
+|------|-----------------|------------------|-------------|--------|
+| src/components/Button.tsx | 1 | Tailwind | var(--primary), p-4, gap-2 | heading weight dup |
+| src/components/Card.tsx | 1 | CSS Module | styles.card, rgb(...) | hardcoded color |
+
+Columns:
+- **File**: relative path from repo root
+- **Component Count**: number of exported components in file (grep `export.*function\|export.*const.*=.*\(.*=>`)
+- **Styling Approach**: `Tailwind` | `CSS Module` | `styled-components` | `inline` | `mixed`
+- **Token Usage**: comma-separated tokens/values found (max 5, "+N more" if there are more)
+- **Issues**: short flags for known problems (e.g., `hardcoded color`, `off-grid spacing`, `heading weight dup`)
+
+Without `--full`, the component inventory is a summary count only (not per-file).
 
 ---
 
