@@ -60,7 +60,7 @@
 - [x] **CONN-02**: `connections/refero.md` — Refero MCP setup (migrated from `reference/refero.md`), fallback behavior when unavailable
 - [x] **CONN-03**: Figma MCP integrated into scan stage — reads design tokens if available, logs source provenance
 - [x] **CONN-04**: Figma MCP integrated into discover stage — pre-populates `<decisions>` from Figma variables when available
-- [ ] **CONN-05**: Refero MCP integrated into discover stage — pulls reference screenshots for R-01/R-02 collection with graceful fallback to awesome-design-md
+- [x] **CONN-05**: Refero MCP integrated into discover stage — pulls reference screenshots for R-01/R-02 collection with graceful fallback to awesome-design-md
 - [x] **CONN-06**: Connection availability detection in every stage — stages check for MCP presence before calling tools and document in STATE.md which connections were used
 
 ### Scan Polish
@@ -230,7 +230,7 @@
 | CONN-02 | Phase 4 | Complete |
 | CONN-03 | Phase 4 | Complete |
 | CONN-04 | Phase 4 | Complete |
-| CONN-05 | Phase 4 | Pending |
+| CONN-05 | Phase 4 | Complete |
 | CONN-06 | Phase 4 | Complete |
 | AGENT-12 | Phase 5 | Pending |
 | AGENT-13 | Phase 5 | Pending |

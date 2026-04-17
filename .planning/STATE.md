@@ -3,15 +3,15 @@ gsd_state_version: 1.0
 milestone: v2.1
 milestone_name: milestone
 status: executing
-stopped_at: Completed 04-02-PLAN.md
-last_updated: "2026-04-17T12:42:09.119Z"
+stopped_at: Completed 04-03-PLAN.md
+last_updated: "2026-04-17T12:50:00.000Z"
 last_activity: "2026-04-17 — Phase 03 Plan 04: three-pass component detection (SCAN-01), --full output table (SCAN-02), priority_score formula (SCAN-03)"
 progress:
   total_phases: 6
   completed_phases: 3
   total_plans: 18
-  completed_plans: 17
-  percent: 78
+  completed_plans: 18
+  percent: 81
 ---
 
 # Project State
@@ -26,11 +26,11 @@ See: .planning/PROJECT.md (updated 2026-04-17)
 ## Current Position
 
 Phase: 3 of 6 (Quality Gate Agents + Pipeline Polish)
-Plan: 4 of 6 in current phase (03-04 complete)
+Plan: 6 of 6 in current phase (04-03 complete — Phase 4 all plans done)
 Status: In progress
-Last activity: 2026-04-17 — Phase 03 Plan 04: three-pass component detection (SCAN-01), --full output table (SCAN-02), priority_score formula (SCAN-03)
+Last activity: 2026-04-17 — Phase 04 Plan 03: Refero MCP wired into design-context-builder (Area 5 three-tier fallback), discover/SKILL.md probe concretized
 
-Progress: [████████░░] 78%
+Progress: [████████░░] 81%
 
 ## Performance Metrics
 
@@ -68,6 +68,7 @@ Progress: [████████░░] 78%
 | Phase 03-quality-gate-agents-pipeline-polish P05 | 5 | 4 tasks | 5 files |
 | Phase 04-connections-layer P01 | 3 | 3 tasks | 3 files |
 | Phase 04 P02 | 2 | 3 tasks | 2 files |
+| Phase 04-connections-layer P03 | 5 | 2 tasks | 2 files |
 
 ## Accumulated Context
 
@@ -127,6 +128,10 @@ Progress: [████████░░] 78%
 - [Phase 04]: get_variable_defs chosen over get_design_context for structured variable mapping to D-XX decisions
 - [Phase 04]: Figma tools added to design-context-builder frontmatter only; discover orchestrator unchanged
 - [Phase 04]: Merge-not-replace pattern: Figma tokens supplement grep results in both scan Step 2A and discover Step 0
+- [Phase 04-03]: Refero tool name mcp__refero__search used in frontmatter + verify-at-runtime (ToolSearch) pattern for drift resilience
+- [Phase 04-03]: Three-tier fallback: awesome-design-md as middle tier (not WebFetch direct) — 68 curated archetypes preferred over ad-hoc URL fetching
+- [Phase 04-03]: Refero probe via ToolSearch presence only — no live search call needed (avoid token waste on probe)
+- [Phase 04-03]: discover/SKILL.md probe inline-copied from connections/connections.md (no include mechanism); canonical source noted in prose
 
 ### Pending Todos
 
@@ -138,6 +143,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-04-17T12:42:09.115Z
-Stopped at: Completed 04-02-PLAN.md
+Last session: 2026-04-17T12:50:00.000Z
+Stopped at: Completed 04-03-PLAN.md
 Resume file: None

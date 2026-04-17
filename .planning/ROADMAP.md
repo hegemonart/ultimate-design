@@ -16,7 +16,7 @@ Decimal phases appear between their surrounding integers in numeric order.
  (completed 2026-04-17)
 - [x] **Phase 2: Core Agents + Stage Orchestration** — 5 core agents (planner, executor, verifier, phase-researcher, plan-checker) + 4 stage wrapper rewrites (completed 2026-04-17)
 - [x] **Phase 3: Quality Gate Agents + Pipeline Polish** — 6 quality gate agents + existing backlog polish (completed 2026-04-17)
-- [ ] **Phase 4: Connections Layer** — Figma MCP, Refero MCP, extensibility pattern
+- [x] **Phase 4: Connections Layer** — Figma MCP, Refero MCP, extensibility pattern (completed 2026-04-17)
 - [ ] **Phase 5: Automation Agents + New Commands** — 3 automation agents + style + darkmode + compare
 - [ ] **Phase 6: Validation + Version Bump** — Plugin validate, smoke test, version 3.0.0
 
@@ -141,6 +141,6 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6
 | 1. Foundation + Distribution + Infrastructure | 5/5 | Complete   | 2026-04-17 |
 | 2. Core Agents + Stage Orchestration | 4/4 | Complete   | 2026-04-17 |
 | 3. Quality Gate Agents + Pipeline Polish | 6/6 | Complete   | 2026-04-17 |
-| 4. Connections Layer | 2/3 | In Progress|  |
+| 4. Connections Layer | 3/3 | Complete   | 2026-04-17 |
 | 5. Automation Agents + New Commands | 0/5 | Not started | - |
 | 6. Validation + Version Bump | 0/1 | Not started | - |
