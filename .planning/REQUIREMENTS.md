@@ -39,7 +39,7 @@
 
 ### Stage Wrapper Rewrites
 
-- [ ] **STAGE-01**: `skills/discover/SKILL.md` becomes a thin orchestrator that spawns design-context-builder + design-context-checker (no inline interview logic in the skill). Note: Phase 2 scope — minimal STATE.md wrapper preserving v2.1.0 interview logic verbatim; design-context-builder + design-context-checker spawns added in Phase 3 (AGENT-08).
+- [x] **STAGE-01**: `skills/discover/SKILL.md` becomes a thin orchestrator that spawns design-context-builder + design-context-checker (no inline interview logic in the skill). Note: Phase 2 scope — minimal STATE.md wrapper preserving v2.1.0 interview logic verbatim; design-context-builder + design-context-checker spawns added in Phase 3 (AGENT-08).
 - [x] **STAGE-02**: `skills/plan/SKILL.md` becomes an orchestrator that spawns design-phase-researcher (optional) + design-pattern-mapper + design-planner + design-plan-checker. Note: Phase 2 scope — spawns design-phase-researcher (optional) + design-planner + design-plan-checker; design-pattern-mapper spawn added in Phase 3 (AGENT-09).
 - [x] **STAGE-03**: `skills/design/SKILL.md` becomes an orchestrator that spawns design-executor agents per task with wave coordination and parallel/sequential routing
 - [x] **STAGE-04**: `skills/verify/SKILL.md` becomes an orchestrator that spawns design-auditor + design-verifier + design-integration-checker. Note: Phase 2 scope — spawns design-verifier only; design-auditor + design-integration-checker spawns added in Phase 3 (AGENT-10, AGENT-11).
@@ -198,7 +198,7 @@
 | AGENT-03 | Phase 2 | Complete |
 | AGENT-04 | Phase 2 | Complete |
 | AGENT-05 | Phase 2 | Complete |
-| STAGE-01 | Phase 2 | Pending |
+| STAGE-01 | Phase 2 | Complete |
 | STAGE-02 | Phase 2 | Complete |
 | STAGE-03 | Phase 2 | Complete |
 | STAGE-04 | Phase 2 | Complete |

@@ -14,7 +14,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 
 - [x] **Phase 1: Foundation + Distribution + Infrastructure** — Cross-platform bash, gitignore cleanup, state machine, agents/ + connections/ scaffolding
  (completed 2026-04-17)
-- [ ] **Phase 2: Core Agents + Stage Orchestration** — 5 core agents (planner, executor, verifier, phase-researcher, plan-checker) + 4 stage wrapper rewrites
+- [x] **Phase 2: Core Agents + Stage Orchestration** — 5 core agents (planner, executor, verifier, phase-researcher, plan-checker) + 4 stage wrapper rewrites (completed 2026-04-17)
 - [ ] **Phase 3: Quality Gate Agents + Pipeline Polish** — 6 quality gate agents + existing backlog polish
 - [ ] **Phase 4: Connections Layer** — Figma MCP, Refero MCP, extensibility pattern
 - [ ] **Phase 5: Automation Agents + New Commands** — 3 automation agents + style + darkmode + compare
@@ -139,7 +139,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
 | 1. Foundation + Distribution + Infrastructure | 5/5 | Complete   | 2026-04-17 |
-| 2. Core Agents + Stage Orchestration | 3/4 | In Progress|  |
+| 2. Core Agents + Stage Orchestration | 4/4 | Complete   | 2026-04-17 |
 | 3. Quality Gate Agents + Pipeline Polish | 0/6 | Not started | - |
 | 4. Connections Layer | 0/3 | Not started | - |
 | 5. Automation Agents + New Commands | 0/5 | Not started | - |
