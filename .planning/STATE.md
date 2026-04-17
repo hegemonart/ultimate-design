@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v2.1
 milestone_name: milestone
 status: executing
-stopped_at: Completed 05-04-PLAN.md
-last_updated: "2026-04-17T15:31:17.278Z"
+stopped_at: Completed 05-05-PLAN.md
+last_updated: "2026-04-17T15:34:51.451Z"
 last_activity: "2026-04-17 — Phase 04 Plan 03: Refero MCP wired into design-context-builder (Area 5 three-tier fallback), discover/SKILL.md probe concretized"
 progress:
   total_phases: 6
-  completed_phases: 4
+  completed_phases: 5
   total_plans: 23
-  completed_plans: 22
+  completed_plans: 23
   percent: 81
 ---
 
@@ -72,6 +72,7 @@ Progress: [████████░░] 81%
 | Phase 05-automation-agents-new-commands P02 | 1 | 2 tasks | 2 files |
 | Phase 05-automation-agents-new-commands P03 | 3 | 3 tasks | 3 files |
 | Phase 05-automation-agents-new-commands P04 | 2 | 2 tasks | 2 files |
+| Phase 05-automation-agents-new-commands P05 | 101 | 2 tasks | 2 files |
 
 ## Accumulated Context
 
@@ -144,6 +145,9 @@ Progress: [████████░░] 81%
 - [Phase 05-03]: darkmode and compare NOT added to root SKILL.md in plan 05-03 — incremental additions reserved for plans 05-04 and 05-05 (Pitfall 5)
 - [Phase 05-04]: darkmode is audit-only: does NOT invoke design-auditor (Pitfall 4), runs its own inline checks
 - [Phase 05-04]: DARKMODE-AUDIT prefix used for output artifact — distinct from pipeline DESIGN-*.md namespace
+- [Phase 05-05]: compare scoped to delta between DESIGN.md (baseline) and DESIGN-VERIFICATION.md (result) — no snapshot mechanism (V2-06 deferred)
+- [Phase 05-05]: Drift detection reads DESIGN-PLAN.md Type fields; regressed categories not covered by any task are flagged as DRIFT
+- [Phase 05-05]: COMPARE-REPORT prefix keeps output distinct from pipeline DESIGN-*.md namespace — no artifact collision
 
 ### Pending Todos
 
@@ -155,6 +159,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-04-17T15:31:17.274Z
-Stopped at: Completed 05-04-PLAN.md
+Last session: 2026-04-17T15:34:51.447Z
+Stopped at: Completed 05-05-PLAN.md
 Resume file: None

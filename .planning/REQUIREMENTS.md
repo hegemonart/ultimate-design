@@ -126,11 +126,11 @@
 
 ### compare Command
 
-- [ ] **COMP-01**: `compare` command exists at `skills/compare/SKILL.md` and is routed from root `SKILL.md`
-- [ ] **COMP-02**: Scoped to delta between existing `DESIGN.md` baseline score and current `DESIGN-VERIFICATION.md` scores (no snapshot mechanism required)
-- [ ] **COMP-03**: Outputs: score delta per category, anti-pattern delta (resolved vs new), must-have pass/fail change
-- [ ] **COMP-04**: Flags design drift: score regression in a category not covered by any explicit design task in `DESIGN-PLAN.md`
-- [ ] **COMP-05**: Produces `.design/COMPARE-REPORT.md`
+- [x] **COMP-01**: `compare` command exists at `skills/compare/SKILL.md` and is routed from root `SKILL.md`
+- [x] **COMP-02**: Scoped to delta between existing `DESIGN.md` baseline score and current `DESIGN-VERIFICATION.md` scores (no snapshot mechanism required)
+- [x] **COMP-03**: Outputs: score delta per category, anti-pattern delta (resolved vs new), must-have pass/fail change
+- [x] **COMP-04**: Flags design drift: score regression in a category not covered by any explicit design task in `DESIGN-PLAN.md`
+- [x] **COMP-05**: Produces `.design/COMPARE-REPORT.md`
 
 ### Validation
 
@@ -247,11 +247,11 @@
 | DARK-05 | Phase 5 | Complete |
 | DARK-06 | Phase 5 | Complete |
 | DARK-07 | Phase 5 | Complete |
-| COMP-01 | Phase 5 | Pending |
-| COMP-02 | Phase 5 | Pending |
-| COMP-03 | Phase 5 | Pending |
-| COMP-04 | Phase 5 | Pending |
-| COMP-05 | Phase 5 | Pending |
+| COMP-01 | Phase 5 | Complete |
+| COMP-02 | Phase 5 | Complete |
+| COMP-03 | Phase 5 | Complete |
+| COMP-04 | Phase 5 | Complete |
+| COMP-05 | Phase 5 | Complete |
 | VAL-01 | Phase 6 | Pending |
 | VAL-02 | Phase 6 | Pending |
 | VAL-03 | Phase 6 | Pending |
