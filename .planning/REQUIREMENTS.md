@@ -49,8 +49,8 @@
 - [ ] **AGENT-06**: `agents/design-context-builder.md` — detects existing design system state, asks only unanswered questions, produces DESIGN-CONTEXT.md with `<decisions>`, `<must_haves>`, `<canonical_refs>`, `<constraints>`, `<deferred>` sections
 - [ ] **AGENT-07**: `agents/design-context-checker.md` — validates DESIGN-CONTEXT.md before planning (6 quality dimensions: copy specificity, color contract, typography scale, spacing scale, registry safety, must-have testability)
 - [ ] **AGENT-08**: `agents/design-auditor.md` — retroactive audit against 6 pillars (copy, visuals, color, typography, spacing, experience) with 1–4 scores and priority fix list
-- [ ] **AGENT-09**: `agents/design-pattern-mapper.md` — maps existing design patterns in codebase before planning (colors in use, spacing tokens, component conventions) — brownfield-critical
-- [ ] **AGENT-10**: `agents/design-assumptions-analyzer.md` — surfaces hidden design assumptions with evidence quotes and confidence levels before discover asks questions
+- [x] **AGENT-09**: `agents/design-pattern-mapper.md` — maps existing design patterns in codebase before planning (colors in use, spacing tokens, component conventions) — brownfield-critical
+- [x] **AGENT-10**: `agents/design-assumptions-analyzer.md` — surfaces hidden design assumptions with evidence quotes and confidence levels before discover asks questions
 - [ ] **AGENT-11**: `agents/design-integration-checker.md` — verifies design decisions are wired through code post-execution (not just described in DESIGN-SUMMARY.md)
 
 ### Connections Layer
@@ -205,8 +205,8 @@
 | AGENT-06 | Phase 3 | Pending |
 | AGENT-07 | Phase 3 | Pending |
 | AGENT-08 | Phase 3 | Pending |
-| AGENT-09 | Phase 3 | Pending |
-| AGENT-10 | Phase 3 | Pending |
+| AGENT-09 | Phase 3 | Complete |
+| AGENT-10 | Phase 3 | Complete |
 | AGENT-11 | Phase 3 | Pending |
 | SCAN-01 | Phase 3 | Pending |
 | SCAN-02 | Phase 3 | Pending |
