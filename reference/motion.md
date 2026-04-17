@@ -184,3 +184,102 @@ This is the goal. Not "look at this animation" — "why does this feel so good t
 - [ ] Press feedback on all interactive elements
 - [ ] No bounce/elastic easing anywhere
 - [ ] All animations have a defined purpose
+
+---
+
+## Spring Physics
+
+Spring-based animation replaces duration-based tweening with physics parameters
+(stiffness, damping, mass). Output feels more organic and adapts to interruption.
+
+### React Spring
+
+```jsx
+import { useSpring, animated } from '@react-spring/web';
+
+const styles = useSpring({
+  from: { opacity: 0, transform: 'translateY(20px)' },
+  to:   { opacity: 1, transform: 'translateY(0px)' },
+  config: { tension: 170, friction: 26 }  // default preset
+});
+```
+
+React Spring presets:
+
+| Preset | tension | friction | Character |
+|--------|---------|----------|-----------|
+| default | 170 | 26 | balanced |
+| gentle | 120 | 14 | smooth, leisurely |
+| wobbly | 180 | 12 | playful bounce |
+| stiff | 210 | 20 | snappy |
+| slow | 280 | 60 | slow and deliberate |
+| molasses | 280 | 120 | very slow, no bounce |
+
+### Framer Motion
+
+```jsx
+<motion.div
+  animate={{ x: 100 }}
+  transition={{ type: "spring", stiffness: 100, damping: 15, mass: 1 }}
+/>
+```
+
+Parameter guidance:
+
+| Param | Range | Effect |
+|-------|-------|--------|
+| stiffness | 50–300 | higher = snappier arrival |
+| damping | 10–40 | higher = less oscillation |
+| mass | 0.5–2 | higher = more inertia, slower response |
+
+Rule of thumb: for UI micro-interactions use stiffness 150–250, damping 20–30, mass 1.
+
+---
+
+## Scroll-Triggered Animations
+
+Use IntersectionObserver for scroll-reveal effects — it replaces scroll-event
+listeners with a throttled browser-native API.
+
+### Basic pattern
+
+```js
+const observer = new IntersectionObserver((entries) => {
+  entries.forEach(entry => {
+    if (entry.isIntersecting) {
+      entry.target.classList.add('in-view');
+      // Optional: disconnect after first trigger
+      // observer.unobserve(entry.target);
+    }
+  });
+}, {
+  threshold: 0.1,
+  rootMargin: '0px 0px -100px 0px'  // trigger 100px before entering viewport bottom
+});
+
+document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+```
+
+### Threshold guidance
+
+| threshold | Meaning |
+|-----------|---------|
+| 0.0 | element enters viewport edge |
+| 0.1–0.25 | element partially visible (most common for reveals) |
+| 0.5 | element half-visible |
+| 1.0 | element fully visible |
+
+### Once vs repeat
+
+- **Once** — call `observer.unobserve(entry.target)` after first intersection.
+  Use for: hero reveals, one-shot entrance animations, stat counters.
+- **Repeat** — leave observer active. Use for: progress indicators, parallax effects,
+  sticky nav state changes.
+
+### Performance rules
+
+1. Animate only `transform` and `opacity` (GPU-accelerated). Avoid `top`, `left`, `width`, `height`.
+2. No debounce/throttle needed — IntersectionObserver is already throttled by the browser.
+3. For many elements, share a single observer instance and call `observe()` once per element.
+4. Prefer CSS transitions triggered by a class toggle over requestAnimationFrame loops.
+5. Use `will-change: transform, opacity` sparingly (only on elements that animate repeatedly).
