@@ -58,8 +58,8 @@
 - [x] **CONN-00**: `connections/` directory created with `connections.md` (index, capability matrix, extensibility guide for adding future connections)
 - [x] **CONN-01**: `connections/figma.md` — Figma MCP setup instructions + per-tool capability coverage (`get_variable_defs`, `get_design_context`, `get_screenshot`) + which stages use each
 - [x] **CONN-02**: `connections/refero.md` — Refero MCP setup (migrated from `reference/refero.md`), fallback behavior when unavailable
-- [ ] **CONN-03**: Figma MCP integrated into scan stage — reads design tokens if available, logs source provenance
-- [ ] **CONN-04**: Figma MCP integrated into discover stage — pre-populates `<decisions>` from Figma variables when available
+- [x] **CONN-03**: Figma MCP integrated into scan stage — reads design tokens if available, logs source provenance
+- [x] **CONN-04**: Figma MCP integrated into discover stage — pre-populates `<decisions>` from Figma variables when available
 - [ ] **CONN-05**: Refero MCP integrated into discover stage — pulls reference screenshots for R-01/R-02 collection with graceful fallback to awesome-design-md
 - [x] **CONN-06**: Connection availability detection in every stage — stages check for MCP presence before calling tools and document in STATE.md which connections were used
 
@@ -228,8 +228,8 @@
 | REF-05 | Phase 3 | Complete |
 | CONN-01 | Phase 4 | Complete |
 | CONN-02 | Phase 4 | Complete |
-| CONN-03 | Phase 4 | Pending |
-| CONN-04 | Phase 4 | Pending |
+| CONN-03 | Phase 4 | Complete |
+| CONN-04 | Phase 4 | Complete |
 | CONN-05 | Phase 4 | Pending |
 | CONN-06 | Phase 4 | Complete |
 | AGENT-12 | Phase 5 | Pending |

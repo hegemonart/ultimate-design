@@ -1,7 +1,7 @@
 ---
 name: design-context-builder
 description: Detects existing design system state via grep/glob, runs discovery interview asking ONLY unanswered questions, produces .design/DESIGN-CONTEXT.md. Spawned by the discover stage.
-tools: Read, Write, Bash, Grep, Glob, mcp__figma-desktop__get_variable_defs, mcp__figma-desktop__get_metadata
+tools: Read, Write, Bash, Grep, Glob, mcp__figma-desktop__get_variable_defs, mcp__figma-desktop__get_metadata, mcp__refero__search
 color: blue
 model: inherit
 ---
@@ -223,11 +223,79 @@ The NOT is equally important:
 - "NOT another purple-gradient AI product"
 - "NOT enterprise blue and gray"
 
-### Area 5 — Visual References
+### Area 5 — Visual References (Refero-augmented)
 
-> Name 2–3 sites, apps, or aesthetic references to draw from. Competitors, design inspiration, or "this vibe from another industry entirely."
+This area uses Refero MCP when available, with graceful fallback to local brand archetypes and finally WebFetch. Refero tool names may vary — verify via ToolSearch before calling.
 
-For each reference, record: title, source, and specifically what to borrow (color approach? layout? typography? density? interaction pattern?). Log as R-01, R-02, etc.
+Check `.design/STATE.md` `<connections>` for `refero:` status before proceeding.
+
+---
+
+**Tier 1 — Refero (if `refero: available` in `.design/STATE.md` `<connections>`)**
+
+ToolSearch first — Refero tools may be in the deferred tool set:
+
+```
+ToolSearch({ query: "refero", max_results: 10 })
+```
+
+Confirm the exact search tool name from results (expected: `mcp__refero__search` — may differ).
+
+Run at least 2 searches:
+
+1. **Structural query** — inferred from README / project scope (example: `"admin dashboard filters"`, `"onboarding flow"`, `"data table pagination"`)
+2. **Aesthetic query** — inferred from brand direction captured in Area 4, if any (example: `"brutalist editorial UI"`, `"warm developer tool dashboard"`)
+
+Select 2–3 results. Pre-populate references as:
+
+```
+R-01: [Refero result title] — source: refero — borrow: [inferred borrow rationale from result content]
+R-02: [Refero result title] — source: refero — borrow: [inferred borrow rationale]
+```
+
+Present to user: "I found these references from Refero. Confirm or replace?"
+
+---
+
+**Tier 2 — awesome-design-md (if `refero: not_configured` OR `refero: unavailable`)**
+
+Look in `~/.claude/libs/awesome-design-md/design-md/` — 68 brand archetypes, each with a full `DESIGN.md` token file.
+
+Pick 1–2 closest matches by inferred product category (e.g., B2B SaaS → Linear, Vercel; consumer → Airbnb, Spotify; editorial → NYT, Bloomberg).
+
+Pre-populate references as:
+
+```
+R-01: [Brand name] — source: awesome-design-md — borrow: [token values from that brand's DESIGN.md — color palette, spacing scale, or typography]
+```
+
+Add a note in `.design/DESIGN-CONTEXT.md` `<references>`:
+
+```
+Note: Refero unavailable — using local brand archetypes as references.
+```
+
+---
+
+**Tier 3 — WebFetch (last resort, if awesome-design-md unavailable)**
+
+If `~/.claude/libs/awesome-design-md/` is not installed or inaccessible:
+
+Ask the user for a getdesign.md URL. WebFetch it and extract design tokens.
+
+Pre-populate:
+
+```
+R-01: [URL] — source: webfetch — borrow: [extracted tokens: color palette, type scale, spacing units]
+```
+
+---
+
+**Caveats**
+
+- Refero tool name may differ from `mcp__refero__search` — always verify via ToolSearch before invoking. Do not hard-code the tool name.
+- Two or more references are required; single-reference borrowing provides insufficient range for a distinct visual direction.
+- Pre-populated references are starting points — the user may swap any of them during the interview.
 
 ### Area 6 — Constraints
 

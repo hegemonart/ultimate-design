@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v2.1
 milestone_name: milestone
 status: executing
-stopped_at: Completed 04-01-PLAN.md
-last_updated: "2026-04-17T12:36:56.776Z"
+stopped_at: Completed 04-02-PLAN.md
+last_updated: "2026-04-17T12:42:09.119Z"
 last_activity: "2026-04-17 — Phase 03 Plan 04: three-pass component detection (SCAN-01), --full output table (SCAN-02), priority_score formula (SCAN-03)"
 progress:
   total_phases: 6
   completed_phases: 3
   total_plans: 18
-  completed_plans: 16
+  completed_plans: 17
   percent: 78
 ---
 
@@ -67,6 +67,7 @@ Progress: [████████░░] 78%
 | Phase 03 P06 | 2 | 3 tasks | 3 files |
 | Phase 03-quality-gate-agents-pipeline-polish P05 | 5 | 4 tasks | 5 files |
 | Phase 04-connections-layer P01 | 3 | 3 tasks | 3 files |
+| Phase 04 P02 | 2 | 3 tasks | 2 files |
 
 ## Accumulated Context
 
@@ -123,6 +124,9 @@ Progress: [████████░░] 78%
 - [Phase 04-connections-layer]: Probe pattern: ToolSearch-first (deferred-tool-set safety), then get_metadata live call for Figma; ToolSearch-only for Refero
 - [Phase 04-connections-layer]: <connections> schema stays minimal (three-value status only); traceability via DESIGN.md source annotations
 - [Phase 04-connections-layer]: Probe prose is copied inline into each stage; connections/connections.md is canonical source (SKILL.md has no include mechanism)
+- [Phase 04]: get_variable_defs chosen over get_design_context for structured variable mapping to D-XX decisions
+- [Phase 04]: Figma tools added to design-context-builder frontmatter only; discover orchestrator unchanged
+- [Phase 04]: Merge-not-replace pattern: Figma tokens supplement grep results in both scan Step 2A and discover Step 0
 
 ### Pending Todos
 
@@ -134,6 +138,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-04-17T12:36:56.771Z
-Stopped at: Completed 04-01-PLAN.md
+Last session: 2026-04-17T12:42:09.115Z
+Stopped at: Completed 04-02-PLAN.md
 Resume file: None
