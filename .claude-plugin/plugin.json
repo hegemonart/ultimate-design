@@ -22,7 +22,7 @@
     "impeccable",
     "emil-design-eng"
   ],
-  "skills": "./",
+  "skills": ["./", "./skills/"],
   "hooks": "./hooks/hooks.json",
   "dependencies": [
     { "name": "impeccable", "marketplace": "impeccable" },
