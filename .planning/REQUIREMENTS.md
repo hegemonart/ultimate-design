@@ -102,7 +102,7 @@
 
 ### Automation Agents (Phase 3 of agent layer)
 
-- [ ] **AGENT-12**: `agents/design-fixer.md` — applies fix list from DESIGN-VERIFICATION.md gaps atomically with per-fix commits, enables verify→fix loop without manual re-planning
+- [x] **AGENT-12**: `agents/design-fixer.md` — applies fix list from DESIGN-VERIFICATION.md gaps atomically with per-fix commits, enables verify→fix loop without manual re-planning
 - [x] **AGENT-13**: `agents/design-advisor.md` — researches a single gray area with a 5-column comparison table + rationale (called from discover when gray areas need more than judgment)
 - [x] **AGENT-14**: `agents/design-doc-writer.md` — generates handoff docs / component specs from DESIGN-SUMMARY.md (powers the `style` command)
 
@@ -134,9 +134,9 @@
 
 ### Validation
 
-- [ ] **VAL-01**: `claude plugin validate .` passes clean after all v3 changes
-- [ ] **VAL-02**: Root `SKILL.md` argument-hint, Command Reference table, and Jump Mode section all updated for style/darkmode/compare
-- [ ] **VAL-03**: Plugin version bumped to 3.0.0 in all manifest files (`.claude-plugin/plugin.json`, `.claude-plugin/marketplace.json`)
+- [x] **VAL-01**: `claude plugin validate .` passes clean after all v3 changes
+- [x] **VAL-02**: Root `SKILL.md` argument-hint, Command Reference table, and Jump Mode section all updated for style/darkmode/compare
+- [x] **VAL-03**: Plugin version bumped to 3.0.0 in all manifest files (`.claude-plugin/plugin.json`, `.claude-plugin/marketplace.json`)
 
 ## v2 Requirements
 
@@ -232,7 +232,7 @@
 | CONN-04 | Phase 4 | Complete |
 | CONN-05 | Phase 4 | Complete |
 | CONN-06 | Phase 4 | Complete |
-| AGENT-12 | Phase 5 | Pending |
+| AGENT-12 | Phase 5 | Complete |
 | AGENT-13 | Phase 5 | Complete |
 | AGENT-14 | Phase 5 | Complete |
 | STYL-01 | Phase 5 | Complete |
@@ -252,9 +252,9 @@
 | COMP-03 | Phase 5 | Complete |
 | COMP-04 | Phase 5 | Complete |
 | COMP-05 | Phase 5 | Complete |
-| VAL-01 | Phase 6 | Pending |
-| VAL-02 | Phase 6 | Pending |
-| VAL-03 | Phase 6 | Pending |
+| VAL-01 | Phase 6 | Complete |
+| VAL-02 | Phase 6 | Complete |
+| VAL-03 | Phase 6 | Complete |
 
 **Coverage:**
 - v1 requirements: 73 total
