@@ -3,15 +3,15 @@ gsd_state_version: 1.0
 milestone: v2.1
 milestone_name: milestone
 status: executing
-stopped_at: Completed 04-02-PLAN.md
-last_updated: "2026-04-17T12:42:09.119Z"
-last_activity: "2026-04-17 — Phase 03 Plan 04: three-pass component detection (SCAN-01), --full output table (SCAN-02), priority_score formula (SCAN-03)"
+stopped_at: Completed 05-05-PLAN.md
+last_updated: "2026-04-17T15:38:34.110Z"
+last_activity: "2026-04-17 — Phase 04 Plan 03: Refero MCP wired into design-context-builder (Area 5 three-tier fallback), discover/SKILL.md probe concretized"
 progress:
   total_phases: 6
-  completed_phases: 3
-  total_plans: 18
-  completed_plans: 17
-  percent: 78
+  completed_phases: 5
+  total_plans: 23
+  completed_plans: 23
+  percent: 81
 ---
 
 # Project State
@@ -26,11 +26,11 @@ See: .planning/PROJECT.md (updated 2026-04-17)
 ## Current Position
 
 Phase: 3 of 6 (Quality Gate Agents + Pipeline Polish)
-Plan: 4 of 6 in current phase (03-04 complete)
+Plan: 6 of 6 in current phase (04-03 complete — Phase 4 all plans done)
 Status: In progress
-Last activity: 2026-04-17 — Phase 03 Plan 04: three-pass component detection (SCAN-01), --full output table (SCAN-02), priority_score formula (SCAN-03)
+Last activity: 2026-04-17 — Phase 04 Plan 03: Refero MCP wired into design-context-builder (Area 5 three-tier fallback), discover/SKILL.md probe concretized
 
-Progress: [████████░░] 78%
+Progress: [████████░░] 81%
 
 ## Performance Metrics
 
@@ -68,6 +68,11 @@ Progress: [████████░░] 78%
 | Phase 03-quality-gate-agents-pipeline-polish P05 | 5 | 4 tasks | 5 files |
 | Phase 04-connections-layer P01 | 3 | 3 tasks | 3 files |
 | Phase 04 P02 | 2 | 3 tasks | 2 files |
+| Phase 04-connections-layer P03 | 5 | 2 tasks | 2 files |
+| Phase 05-automation-agents-new-commands P02 | 1 | 2 tasks | 2 files |
+| Phase 05-automation-agents-new-commands P03 | 3 | 3 tasks | 3 files |
+| Phase 05-automation-agents-new-commands P04 | 2 | 2 tasks | 2 files |
+| Phase 05-automation-agents-new-commands P05 | 101 | 2 tasks | 2 files |
 
 ## Accumulated Context
 
@@ -127,6 +132,22 @@ Progress: [████████░░] 78%
 - [Phase 04]: get_variable_defs chosen over get_design_context for structured variable mapping to D-XX decisions
 - [Phase 04]: Figma tools added to design-context-builder frontmatter only; discover orchestrator unchanged
 - [Phase 04]: Merge-not-replace pattern: Figma tokens supplement grep results in both scan Step 2A and discover Step 0
+- [Phase 04-03]: Refero tool name mcp__refero__search used in frontmatter + verify-at-runtime (ToolSearch) pattern for drift resilience
+- [Phase 04-03]: Three-tier fallback: awesome-design-md as middle tier (not WebFetch direct) — 68 curated archetypes preferred over ad-hoc URL fetching
+- [Phase 04-03]: Refero probe via ToolSearch presence only — no live search call needed (avoid token waste on probe)
+- [Phase 04-03]: discover/SKILL.md probe inline-copied from connections/connections.md (no include mechanism); canonical source noted in prose
+- [Phase 05-02]: design-advisor returns inline text only (no file) — same pattern as design-plan-checker (Open Question 2 resolution)
+- [Phase 05-02]: Advisor spawned from design-context-builder agent, NOT from skills/discover/SKILL.md (Pitfall 6 preserved)
+- [Phase 05-02]: Builder incorporates advisor findings into DESIGN-CONTEXT.md <decisions> section — no separate .design/ADVISOR-*.md artifact
+- [Phase 05-02]: 5-column table format locked: Approach | Effort | Risk | User Control | Recommendation; exactly one Recommendation=yes per table
+- [Phase 05-03]: Single design-doc-writer agent handles both post-pipeline and pre-pipeline modes via pipeline_complete context field
+- [Phase 05-03]: style command is a standalone leaf — no STATE.md contract, not a pipeline stage, DESIGN-STYLE-*.md namespace distinct from pipeline DESIGN-*.md
+- [Phase 05-03]: darkmode and compare NOT added to root SKILL.md in plan 05-03 — incremental additions reserved for plans 05-04 and 05-05 (Pitfall 5)
+- [Phase 05-04]: darkmode is audit-only: does NOT invoke design-auditor (Pitfall 4), runs its own inline checks
+- [Phase 05-04]: DARKMODE-AUDIT prefix used for output artifact — distinct from pipeline DESIGN-*.md namespace
+- [Phase 05-05]: compare scoped to delta between DESIGN.md (baseline) and DESIGN-VERIFICATION.md (result) — no snapshot mechanism (V2-06 deferred)
+- [Phase 05-05]: Drift detection reads DESIGN-PLAN.md Type fields; regressed categories not covered by any task are flagged as DRIFT
+- [Phase 05-05]: COMPARE-REPORT prefix keeps output distinct from pipeline DESIGN-*.md namespace — no artifact collision
 
 ### Pending Todos
 
@@ -138,6 +159,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-04-17T12:42:09.115Z
-Stopped at: Completed 04-02-PLAN.md
+Last session: 2026-04-17T15:34:51.447Z
+Stopped at: Completed 05-05-PLAN.md
 Resume file: None

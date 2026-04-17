@@ -60,7 +60,7 @@
 - [x] **CONN-02**: `connections/refero.md` — Refero MCP setup (migrated from `reference/refero.md`), fallback behavior when unavailable
 - [x] **CONN-03**: Figma MCP integrated into scan stage — reads design tokens if available, logs source provenance
 - [x] **CONN-04**: Figma MCP integrated into discover stage — pre-populates `<decisions>` from Figma variables when available
-- [ ] **CONN-05**: Refero MCP integrated into discover stage — pulls reference screenshots for R-01/R-02 collection with graceful fallback to awesome-design-md
+- [x] **CONN-05**: Refero MCP integrated into discover stage — pulls reference screenshots for R-01/R-02 collection with graceful fallback to awesome-design-md
 - [x] **CONN-06**: Connection availability detection in every stage — stages check for MCP presence before calling tools and document in STATE.md which connections were used
 
 ### Scan Polish
@@ -102,41 +102,41 @@
 
 ### Automation Agents (Phase 3 of agent layer)
 
-- [ ] **AGENT-12**: `agents/design-fixer.md` — applies fix list from DESIGN-VERIFICATION.md gaps atomically with per-fix commits, enables verify→fix loop without manual re-planning
-- [ ] **AGENT-13**: `agents/design-advisor.md` — researches a single gray area with a 5-column comparison table + rationale (called from discover when gray areas need more than judgment)
-- [ ] **AGENT-14**: `agents/design-doc-writer.md` — generates handoff docs / component specs from DESIGN-SUMMARY.md (powers the `style` command)
+- [x] **AGENT-12**: `agents/design-fixer.md` — applies fix list from DESIGN-VERIFICATION.md gaps atomically with per-fix commits, enables verify→fix loop without manual re-planning
+- [x] **AGENT-13**: `agents/design-advisor.md` — researches a single gray area with a 5-column comparison table + rationale (called from discover when gray areas need more than judgment)
+- [x] **AGENT-14**: `agents/design-doc-writer.md` — generates handoff docs / component specs from DESIGN-SUMMARY.md (powers the `style` command)
 
 ### style Command
 
-- [ ] **STYL-01**: `style` command exists at `skills/style/SKILL.md` and is routed from root `SKILL.md`
-- [ ] **STYL-02**: `style` produces `.design/DESIGN-STYLE-[ComponentName].md` per component (not a flat file)
-- [ ] **STYL-03**: Post-pipeline mode: invokes design-doc-writer agent with DESIGN-SUMMARY.md as input
-- [ ] **STYL-04**: Pre-pipeline fallback mode: invokes design-doc-writer with DESIGN.md + source file for current-state spec
-- [ ] **STYL-05**: Output includes: spacing tokens, color tokens, typography scale, component states, AI-slop detection flag, token semantic health score (raw-hex-in-components ratio)
+- [x] **STYL-01**: `style` command exists at `skills/style/SKILL.md` and is routed from root `SKILL.md`
+- [x] **STYL-02**: `style` produces `.design/DESIGN-STYLE-[ComponentName].md` per component (not a flat file)
+- [x] **STYL-03**: Post-pipeline mode: invokes design-doc-writer agent with DESIGN-SUMMARY.md as input
+- [x] **STYL-04**: Pre-pipeline fallback mode: invokes design-doc-writer with DESIGN.md + source file for current-state spec
+- [x] **STYL-05**: Output includes: spacing tokens, color tokens, typography scale, component states, AI-slop detection flag, token semantic health score (raw-hex-in-components ratio)
 
 ### darkmode Command
 
-- [ ] **DARK-01**: `darkmode` command exists at `skills/darkmode/SKILL.md` and is routed from root `SKILL.md`
-- [ ] **DARK-02**: Detects dark mode implementation architecture (CSS custom properties, Tailwind `dark:`, JS class toggle) before auditing
-- [ ] **DARK-03**: Audits contrast of all text/background pairs in dark context (WCAG 4.5:1 body, 3:1 large)
-- [ ] **DARK-04**: Checks semantic token dark mode overrides exist for all color tokens used in light mode
-- [ ] **DARK-05**: Detects dark-specific anti-patterns: images/SVGs without dark variant, pure-black backgrounds (BAN-05 in dark context), forced-colors media query absence
-- [ ] **DARK-06**: Checks `color-scheme` meta property and `prefers-color-scheme` media query presence
-- [ ] **DARK-07**: Produces `.design/DARKMODE-AUDIT.md` (separate from DESIGN.md — read-only, no score writeback)
+- [x] **DARK-01**: `darkmode` command exists at `skills/darkmode/SKILL.md` and is routed from root `SKILL.md`
+- [x] **DARK-02**: Detects dark mode implementation architecture (CSS custom properties, Tailwind `dark:`, JS class toggle) before auditing
+- [x] **DARK-03**: Audits contrast of all text/background pairs in dark context (WCAG 4.5:1 body, 3:1 large)
+- [x] **DARK-04**: Checks semantic token dark mode overrides exist for all color tokens used in light mode
+- [x] **DARK-05**: Detects dark-specific anti-patterns: images/SVGs without dark variant, pure-black backgrounds (BAN-05 in dark context), forced-colors media query absence
+- [x] **DARK-06**: Checks `color-scheme` meta property and `prefers-color-scheme` media query presence
+- [x] **DARK-07**: Produces `.design/DARKMODE-AUDIT.md` (separate from DESIGN.md — read-only, no score writeback)
 
 ### compare Command
 
-- [ ] **COMP-01**: `compare` command exists at `skills/compare/SKILL.md` and is routed from root `SKILL.md`
-- [ ] **COMP-02**: Scoped to delta between existing `DESIGN.md` baseline score and current `DESIGN-VERIFICATION.md` scores (no snapshot mechanism required)
-- [ ] **COMP-03**: Outputs: score delta per category, anti-pattern delta (resolved vs new), must-have pass/fail change
-- [ ] **COMP-04**: Flags design drift: score regression in a category not covered by any explicit design task in `DESIGN-PLAN.md`
-- [ ] **COMP-05**: Produces `.design/COMPARE-REPORT.md`
+- [x] **COMP-01**: `compare` command exists at `skills/compare/SKILL.md` and is routed from root `SKILL.md`
+- [x] **COMP-02**: Scoped to delta between existing `DESIGN.md` baseline score and current `DESIGN-VERIFICATION.md` scores (no snapshot mechanism required)
+- [x] **COMP-03**: Outputs: score delta per category, anti-pattern delta (resolved vs new), must-have pass/fail change
+- [x] **COMP-04**: Flags design drift: score regression in a category not covered by any explicit design task in `DESIGN-PLAN.md`
+- [x] **COMP-05**: Produces `.design/COMPARE-REPORT.md`
 
 ### Validation
 
-- [ ] **VAL-01**: `claude plugin validate .` passes clean after all v3 changes
-- [ ] **VAL-02**: Root `SKILL.md` argument-hint, Command Reference table, and Jump Mode section all updated for style/darkmode/compare
-- [ ] **VAL-03**: Plugin version bumped to 3.0.0 in all manifest files (`.claude-plugin/plugin.json`, `.claude-plugin/marketplace.json`)
+- [x] **VAL-01**: `claude plugin validate .` passes clean after all v3 changes
+- [x] **VAL-02**: Root `SKILL.md` argument-hint, Command Reference table, and Jump Mode section all updated for style/darkmode/compare
+- [x] **VAL-03**: Plugin version bumped to 3.0.0 in all manifest files (`.claude-plugin/plugin.json`, `.claude-plugin/marketplace.json`)
 
 ## v2 Requirements
 
@@ -230,31 +230,31 @@
 | CONN-02 | Phase 4 | Complete |
 | CONN-03 | Phase 4 | Complete |
 | CONN-04 | Phase 4 | Complete |
-| CONN-05 | Phase 4 | Pending |
+| CONN-05 | Phase 4 | Complete |
 | CONN-06 | Phase 4 | Complete |
-| AGENT-12 | Phase 5 | Pending |
-| AGENT-13 | Phase 5 | Pending |
-| AGENT-14 | Phase 5 | Pending |
-| STYL-01 | Phase 5 | Pending |
-| STYL-02 | Phase 5 | Pending |
-| STYL-03 | Phase 5 | Pending |
-| STYL-04 | Phase 5 | Pending |
-| STYL-05 | Phase 5 | Pending |
-| DARK-01 | Phase 5 | Pending |
-| DARK-02 | Phase 5 | Pending |
-| DARK-03 | Phase 5 | Pending |
-| DARK-04 | Phase 5 | Pending |
-| DARK-05 | Phase 5 | Pending |
-| DARK-06 | Phase 5 | Pending |
-| DARK-07 | Phase 5 | Pending |
-| COMP-01 | Phase 5 | Pending |
-| COMP-02 | Phase 5 | Pending |
-| COMP-03 | Phase 5 | Pending |
-| COMP-04 | Phase 5 | Pending |
-| COMP-05 | Phase 5 | Pending |
-| VAL-01 | Phase 6 | Pending |
-| VAL-02 | Phase 6 | Pending |
-| VAL-03 | Phase 6 | Pending |
+| AGENT-12 | Phase 5 | Complete |
+| AGENT-13 | Phase 5 | Complete |
+| AGENT-14 | Phase 5 | Complete |
+| STYL-01 | Phase 5 | Complete |
+| STYL-02 | Phase 5 | Complete |
+| STYL-03 | Phase 5 | Complete |
+| STYL-04 | Phase 5 | Complete |
+| STYL-05 | Phase 5 | Complete |
+| DARK-01 | Phase 5 | Complete |
+| DARK-02 | Phase 5 | Complete |
+| DARK-03 | Phase 5 | Complete |
+| DARK-04 | Phase 5 | Complete |
+| DARK-05 | Phase 5 | Complete |
+| DARK-06 | Phase 5 | Complete |
+| DARK-07 | Phase 5 | Complete |
+| COMP-01 | Phase 5 | Complete |
+| COMP-02 | Phase 5 | Complete |
+| COMP-03 | Phase 5 | Complete |
+| COMP-04 | Phase 5 | Complete |
+| COMP-05 | Phase 5 | Complete |
+| VAL-01 | Phase 6 | Complete |
+| VAL-02 | Phase 6 | Complete |
+| VAL-03 | Phase 6 | Complete |
 
 **Coverage:**
 - v1 requirements: 73 total
