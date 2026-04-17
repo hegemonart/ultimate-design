@@ -51,13 +51,13 @@ Plans:
   3. `design` stage spawns design-executor per task with wave coordination; each task produces an atomic git commit and a `.design/tasks/task-NN.md`
   4. `verify` stage spawns design-verifier which iterates (gaps → fix → re-verify) instead of linear 5-phase execution
   5. End-to-end pipeline still works on a test project — no regressions vs v2.1.0 behavior
-**Plans**: TBD
+**Plans**: 4 plans
 
 Plans:
-- [ ] 02-01: design-planner agent + plan stage orchestrator rewrite
-- [ ] 02-02: design-executor agent + design stage orchestrator rewrite (wave coordination, atomic commits)
-- [ ] 02-03: design-verifier agent + verify stage orchestrator rewrite (iterative loop)
-- [ ] 02-04: design-phase-researcher + design-plan-checker agents (plan-stage quality gates)
+- [x] 02-01-PLAN.md — design-planner + design-phase-researcher + design-plan-checker agents, plan stage orchestrator rewrite (AGENT-01, AGENT-04, AGENT-05, STAGE-02)
+- [x] 02-02-PLAN.md — design-executor agent + design stage orchestrator rewrite with wave coordination and atomic commits (AGENT-02, STAGE-03)
+- [ ] 02-03-PLAN.md — design-verifier agent + verify stage orchestrator rewrite with gap-response loop (AGENT-03, STAGE-04)
+- [ ] 02-04-PLAN.md — discover minimal STATE.md wrapper + end-to-end smoke test on fixture (STAGE-01)
 
 ### Phase 3: Quality Gate Agents + Pipeline Polish
 **Goal**: Six quality-gate agents are integrated into the pipeline and every known rough edge in the polish backlog is resolved — the pipeline produces accurate results for Next.js App Router, Remix, SvelteKit, and Tailwind-only projects
@@ -139,7 +139,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
 | 1. Foundation + Distribution + Infrastructure | 5/5 | Complete   | 2026-04-17 |
-| 2. Core Agents + Stage Orchestration | 0/4 | Not started | - |
+| 2. Core Agents + Stage Orchestration | 3/4 | In Progress|  |
 | 3. Quality Gate Agents + Pipeline Polish | 0/6 | Not started | - |
 | 4. Connections Layer | 0/3 | Not started | - |
 | 5. Automation Agents + New Commands | 0/5 | Not started | - |
