@@ -1,7 +1,7 @@
 ---
 name: plan
-description: "Stage 2 of the Ultimate Design pipeline. Reads DESIGN-CONTEXT.md and produces DESIGN-PLAN.md — a wave-based task breakdown that routes each design chunk to the right sub-skill. Use --auto to skip confirmation. Use --research to run a deeper pre-planning reference pass first."
-argument-hint: "[--auto] [--research]"
+description: "Stage 2 of the Ultimate Design pipeline. Reads DESIGN-CONTEXT.md and produces DESIGN-PLAN.md — a wave-based task breakdown that routes each design chunk to the right sub-skill. Use --auto to skip confirmation. Use --research to run a deeper pre-planning reference pass first. Use --parallel to enable parallel execution hints in the plan (consumed by design --parallel)."
+argument-hint: "[--auto] [--research] [--parallel]"
 user-invocable: true
 ---
 
@@ -55,15 +55,19 @@ Group tasks by type:
 | Final polish pass | `impeccable-polish` |
 | Simplify / reduce | `impeccable-distill` |
 
-### Step 2 — Wave assignment
+### Step 2 — Wave assignment and parallelism analysis
 
 Assign tasks to execution waves:
 
-- **Wave 1:** Tasks with no dependencies on other tasks in this plan. Run in parallel.
+- **Wave 1:** Tasks with no dependencies on other tasks in this plan.
 - **Wave 2:** Tasks that depend on Wave 1 output (e.g., polish requires build; handoff requires final design).
 - **Wave 3+:** Only if genuinely sequential.
 
 Default: most design sessions are 2 waves — audit/generate in Wave 1, polish/handoff in Wave 2.
+
+**Per-task parallelism:** For each task, determine whether it can safely run in parallel with other Wave 1 tasks. A task is `parallel: true` if and only if its `touches:` set does not overlap with any other Wave 1 task's `touches:` set. If there is a file overlap, set `parallel: false` and note the conflict reason.
+
+If `$ARGUMENTS` contains `--parallel`, add this analysis to the plan header and per-task fields. If not, omit `parallel:` and `touches:` fields (they're only needed when design runs with `--parallel`).
 
 ### Step 3 — Must-haves
 
@@ -107,6 +111,7 @@ project: [name]
 created: [ISO 8601]
 waves: [N]
 context: .design/DESIGN-CONTEXT.md
+parallel_ready: true | false   # only present when planned with --parallel
 ---
 
 ## Wave 1
@@ -114,6 +119,9 @@ context: .design/DESIGN-CONTEXT.md
 ### Task 01 — [Task Name]
 Sub-skill: `[skill-name]`
 Scope: [What exactly this task covers — specific components, files, aspects]
+Touches: [comma-separated list of files/dirs this task will modify — e.g. src/components/Button.tsx, src/styles/tokens.css]
+Parallel: true | false         # only present when planned with --parallel; false if touches overlaps another Wave 1 task
+Conflict: [only if Parallel: false — name the other task(s) that share the same files]
 Read first:
   - .design/DESIGN-CONTEXT.md (decisions + brand)
   - [canonical_refs from context]

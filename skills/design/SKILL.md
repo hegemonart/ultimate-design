@@ -1,7 +1,7 @@
 ---
 name: design
-description: "Stage 3 of the Ultimate Design pipeline. Reads DESIGN-PLAN.md and executes each task in wave order by routing to the appropriate design sub-skill (impeccable, design:*, anthropic-skills:*, emil-design-eng). Produces DESIGN-SUMMARY.md. Add --wave N to run a specific wave only."
-argument-hint: "[--wave N]"
+description: "Stage 3 of the Ultimate Design pipeline. Reads DESIGN-PLAN.md and executes each task in wave order by routing to the appropriate design sub-skill. Produces DESIGN-SUMMARY.md. --parallel spawns Wave 1 tasks as isolated agents running concurrently (requires plan created with --parallel). --wave N runs a single wave only."
+argument-hint: "[--parallel] [--wave N]"
 user-invocable: true
 ---
 
@@ -9,105 +9,230 @@ user-invocable: true
 
 **Stage 3 of 4.** Reads `.design/DESIGN-PLAN.md`, executes tasks, writes `.design/DESIGN-SUMMARY.md`.
 
-You are the execution stage. Your job is to work through every task in the plan in wave order, invoking the specified sub-skill for each, and recording what was actually done.
-
 ## Prerequisites
 
-Read both:
-- `.design/DESIGN-PLAN.md` — your task list and must-haves
-- `.design/DESIGN-CONTEXT.md` — brand, decisions, constraints
+Read both before anything else:
+- `.design/DESIGN-PLAN.md` — task list, waves, must-haves
+- `.design/DESIGN-CONTEXT.md` — brand, decisions, constraints, canonical_refs
 
-If DESIGN-PLAN.md doesn't exist, tell the user:
+If DESIGN-PLAN.md doesn't exist:
 > "No plan found. Run `/ultimate-design:plan` first."
 
-Also read all files listed in DESIGN-CONTEXT.md's `<canonical_refs>`.
+If `--parallel` is passed but DESIGN-PLAN.md header has `parallel_ready: false` or is missing that field:
+> "Plan was not created with --parallel. Re-run `/ultimate-design:plan --parallel` to enable parallel execution metadata."
 
-## Wave Filtering
+Also read every file listed in `<canonical_refs>` from DESIGN-CONTEXT.md.
 
-If `$ARGUMENTS` contains `--wave N`, only execute tasks from that wave. Otherwise run all waves sequentially.
+Create `.design/tasks/` directory for per-task output files.
 
-## Execution Protocol
+---
 
-For each wave:
+## Execution Mode Decision
+
+```
+$ARGUMENTS contains --parallel?
+  YES → Parallel mode (Wave 1 tasks with Parallel: true run concurrently via Agent)
+  NO  → Sequential mode (all tasks run one by one via Skill tool)
+
+$ARGUMENTS contains --wave N?
+  YES → Only run tasks from Wave N, then stop
+  NO  → Run all waves in order
+```
+
+---
+
+## Sequential Mode (default)
+
+For each wave, in order:
 
 ### 1. Announce the wave
 
 ```
-━━━ Wave [N] — [N tasks] ━━━
+━━━ Wave [N] — [N tasks] — sequential ━━━
 [01] impeccable-audit
 [02] impeccable-typeset
-[03] design:accessibility-review
 Running...
 ```
 
-### 2. For each task in the wave
+### 2. For each task
 
-Execute in this order:
+**a.** Read every file in the task's `Read first:` list.
 
-**a. Read first**
-Read every file listed in the task's `read_first` before invoking the sub-skill.
-
-**b. Context injection**
-Before invoking the sub-skill, synthesize a context block from DESIGN-CONTEXT.md:
-- Brand tone words
-- Relevant decisions (only D-XX entries relevant to this task type)
-- Anti-patterns to avoid
-- References to draw from
-
-**c. Invoke the sub-skill**
-Use the Skill tool: `Skill("[skill-name]")` passing the context and the task's Action instruction as arguments.
-
-If the target skill is not installed (not listed in available skills), log:
+**b.** Build context block from DESIGN-CONTEXT.md:
 ```
-⚠ Task [NN] — [skill-name] not installed. Skipping. Add to your Claude Code setup to enable this task.
+Brand: [tone words]
+Decisions: [only D-XX entries relevant to this task type]
+Anti-patterns: [from <brand> anti-pattern field]
+References: [R-XX entries]
 ```
-Do not abort the whole wave — continue with remaining tasks.
 
-**d. Record outcome**
-After each task, write to the summary (append format) what was done, what files changed, and whether acceptance criteria passed.
+**c.** Invoke via Skill tool: `Skill("[sub-skill-name]", "[Action instruction] + [context block]")`
+
+If the sub-skill is not installed, log:
+```
+⚠ Task [NN] — [skill-name] not installed. Skipping.
+```
+Continue with remaining tasks — do not abort the wave.
+
+**d.** After each task, append to `.design/tasks/task-NN.md`:
+```markdown
+---
+task: NN
+skill: [skill-name]
+status: complete | skipped | deviation
+---
+[What was done, files changed, acceptance criteria results]
+```
 
 ### 3. Between waves
 
-After Wave 1 completes, show the user a mid-point summary and ask for a quick go/no-go before starting Wave 2:
+After Wave 1, show mid-point summary and ask go/no-go before Wave 2:
 
 ```
 ━━━ Wave 1 complete ━━━
-Completed: [N] tasks
-Issues: [any failures or skipped tasks]
+Done: [N] / Skipped: [N] / Deviations: [N]
 
-Ready to run Wave 2 ([N tasks])? (yes / adjust plan first)
+Ready for Wave 2? (yes / adjust first)
 ━━━━━━━━━━━━━━━━━━━━━
 ```
 
-If `--auto` in the original invocation (passed through from discover/plan), skip this checkpoint.
+Skip this checkpoint if `--auto` was passed at any earlier pipeline stage (check for presence of `.design/auto-mode` marker file).
 
-## What "invoking a sub-skill" means
+---
 
-The sub-skills (impeccable, design:critique, etc.) are invoked via the Skill tool. Pass them both:
-1. The task's Action instruction verbatim
-2. The context block derived from DESIGN-CONTEXT.md
+## Parallel Mode (--parallel)
 
-Example for an audit task:
-> "Audit the current dashboard page for issues. Brand: editorial chaos, pharmaceutical precision. Anti-patterns to avoid: glassmorphism, pure-black dark mode, Inter/Space Grotesk defaults. Produce a Before/After table."
+Only applies to Wave 1. Wave 2+ always runs sequentially after Wave 1 completes.
 
-The sub-skill executes its own logic. You track what it does and record it.
+### Step 1 — Pre-flight conflict check
 
-## Deviation Handling
+Read every Wave 1 task's `Parallel:` and `Touches:` fields from DESIGN-PLAN.md.
 
-If a sub-skill produces output that conflicts with DESIGN-CONTEXT.md decisions:
-- Flag the conflict in the summary
-- Do not silently override context decisions
-- Ask the user whether to accept the deviation or redo the task
+Partition Wave 1 tasks:
+
+| Partition | Condition | Execution |
+|---|---|---|
+| **Parallel batch** | `Parallel: true` | Spawn as concurrent agents |
+| **Sequential tail** | `Parallel: false` (file conflict) | Run after parallel batch finishes |
+
+Report the partition to the user before spawning:
+
+```
+━━━ Wave 1 — parallel mode ━━━
+Parallel batch (3 tasks — spawning concurrently):
+  [01] impeccable-audit       touches: src/components/
+  [02] design:accessibility-review  touches: src/styles/tokens.css
+  [03] anthropic-skills:copywriter  touches: src/copy/
+
+Sequential tail (1 task — file conflict with Task 01):
+  [04] impeccable-typeset     touches: src/components/ ← conflicts with Task 01
+
+Spawning agents...
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+```
+
+### Step 2 — Spawn parallel agents
+
+For each task in the parallel batch, spawn a single Agent call. Send ALL parallel-batch agents in one message (one Agent tool call per task, all in the same response) so they run concurrently.
+
+**Each agent prompt must be fully self-contained** — agents have no memory of this session. Include everything the agent needs:
+
+```
+You are executing a single design task as part of the Ultimate Design pipeline.
+
+== TASK ==
+Task: [NN] — [Task Name]
+Sub-skill to invoke: [skill-name]
+Scope: [task scope]
+Action: [verbatim Action field from plan]
+
+== DESIGN CONTEXT ==
+Brand tone: [word] · [word] · [word]
+Anti-pattern: [what NOT to do]
+Key decisions:
+  D-01: [decision]
+  D-02: [decision]
+References: [R-01, R-02]
+
+== FILES TO READ FIRST ==
+[list from task Read first field — full paths]
+
+== ACCEPTANCE CRITERIA ==
+[list from task]
+
+== OUTPUT REQUIRED ==
+When done, write your results to: .design/tasks/task-[NN].md
+
+Use this exact format:
+---
+task: NN
+skill: [skill-name]
+status: complete | skipped | deviation
+---
+
+## What was done
+[2–4 sentences]
+
+## Files changed
+- [path]
+
+## Acceptance criteria
+- [✓/✗] [criterion]
+
+## Deviations (if any)
+[description or "none"]
+
+Do not write to DESIGN-SUMMARY.md — the orchestrator merges all task files after you complete.
+Invoke the sub-skill now using the Skill tool, then write the output file.
+```
+
+Use `isolation: "worktree"` on each Agent call so agents work in separate git worktrees and cannot conflict on file writes.
+
+### Step 3 — Wait for all agents
+
+All parallel agents run concurrently. Wait for all to complete before continuing.
+
+After completion, read each `.design/tasks/task-NN.md` and show a merge summary:
+
+```
+━━━ Parallel batch complete ━━━
+[✓] Task 01 — impeccable-audit
+[✓] Task 02 — design:accessibility-review
+[⚠] Task 03 — anthropic-skills:copywriter (deviation — see task file)
+
+Merging worktrees...
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+```
+
+### Step 4 — Merge worktrees
+
+After all parallel agents finish, merge their worktree branches back into the main working directory. For each agent that used `isolation: "worktree"`, the worktree branch is returned in the Agent result.
+
+Merge strategy:
+- Each agent worked on non-overlapping files (guaranteed by the conflict check)
+- Accept all changes from all branches
+- If a merge conflict appears anyway (agent touched an unexpected file), flag it and ask the user to resolve before continuing
+
+### Step 5 — Run sequential tail
+
+After the parallel batch is merged, run any `Parallel: false` tasks sequentially using the standard Skill tool approach (same as Sequential Mode).
+
+### Step 6 — Wave 1 summary + Wave 2 checkpoint
+
+Same as Sequential Mode — show summary and ask go/no-go before Wave 2. Wave 2 always runs sequentially regardless of `--parallel` flag.
+
+---
 
 ## Output: DESIGN-SUMMARY.md
 
-Write `.design/DESIGN-SUMMARY.md` as tasks complete:
+After all waves complete, merge all `.design/tasks/task-NN.md` files into `.design/DESIGN-SUMMARY.md`:
 
 ```markdown
 ---
 project: [name]
 created: [ISO 8601]
 status: complete | partial
+mode: sequential | parallel
 waves_run: [N]
 ---
 
@@ -118,51 +243,42 @@ Sub-skill: `[skill]`
 Status: ✓ complete | ✗ skipped ([reason]) | ⚠ deviation ([details])
 
 **What was done:**
-[2–4 sentences describing the actual output]
+[from task file]
 
 **Files changed:**
-- [path/to/file]
+- [path]
 
 **Acceptance criteria:**
-- [✓] [criterion 1]
-- [✓] [criterion 2]
-- [✗] [criterion 3 — not met: reason]
+- [✓/✗] [criterion]
 
 ---
 
-### Task 02 — [Task Name]
-[same structure]
-
----
-
-## Wave 2
-
-[same structure]
+[repeat for each task]
 
 ---
 
 ## Deviations
 
-[Any cases where the output differed from the plan, with rationale]
+[Aggregated list of all deviations across tasks]
 
 ---
 
 ## Files Modified
 
-[Complete list of all files changed across all tasks]
+[Complete deduped list of all files changed]
 ```
+
+---
 
 ## After Completion
 
 ```
 ━━━ Design stage complete ━━━
 Saved: .design/DESIGN-SUMMARY.md
+Mode: [sequential | parallel]
 Tasks: [N complete] / [M total]
 Deviations: [N]
 
 Next: /ultimate-design:verify
-  → Checks must-haves and asks you to validate the visual results.
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 ```
-
-Do not move to verify automatically — the user may want to review changes first.
