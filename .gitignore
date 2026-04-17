@@ -3,3 +3,8 @@
 
 # OS
 .DS_Store
+
+# Development planning artifacts (not part of plugin distribution)
+.planning/
+.claude/memory/
+.claude/settings.local.json
