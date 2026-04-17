@@ -51,7 +51,48 @@ Emit `## RESEARCH COMPLETE` when done.
 
 Wait for `## RESEARCH COMPLETE`. Update STATE.md task_progress 1/3.
 
-# TODO(phase-3): spawn design-pattern-mapper here before design-planner (AGENT-09 — Phase 3)
+## Step 1.5 — Pattern Mapping (mandatory, brownfield protection)
+
+```
+Task("design-pattern-mapper", """
+<required_reading>
+@.design/STATE.md
+@.design/DESIGN-CONTEXT.md
+@reference/audit-scoring.md
+</required_reading>
+
+You are design-pattern-mapper. Grep the codebase for existing design patterns
+(color tokens, spacing scale, typography conventions, component styling) and
+write .design/DESIGN-PATTERNS.md. Classify by design concern — NOT by code
+architecture (no controllers, services, middleware vocabulary).
+
+Output file: .design/DESIGN-PATTERNS.md
+Emit `## MAPPING COMPLETE` when done.
+""")
+```
+
+Wait for `## MAPPING COMPLETE`. Update STATE.md task_progress 1/3.
+
+## Step 1.6 — Assumptions Analysis (optional, same flag as research)
+
+If assumptions analysis enabled (skip if auto_mode):
+
+```
+Task("design-assumptions-analyzer", """
+<required_reading>
+@.design/STATE.md
+@.design/DESIGN-CONTEXT.md
+@.design/DESIGN-PATTERNS.md
+</required_reading>
+
+You are design-assumptions-analyzer. Surface hidden design assumptions with
+confidence levels and evidence citations.
+
+Emit `## ANALYSIS COMPLETE` when done.
+""")
+```
+
+Wait for `## ANALYSIS COMPLETE`.
 
 ## Step 2 — Plan
 
@@ -61,7 +102,9 @@ Task("design-planner", """
 @.design/STATE.md
 @.design/DESIGN-CONTEXT.md
 @reference/audit-scoring.md
+@.design/DESIGN-PATTERNS.md
 [@.design/DESIGN-RESEARCH.md — only include if research step ran]
+[@.design/DESIGN-ASSUMPTIONS.md — only include if assumptions analysis ran]
 </required_reading>
 
 You are the design-planner agent. Read DESIGN-CONTEXT.md and produce .design/DESIGN-PLAN.md

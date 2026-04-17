@@ -258,7 +258,6 @@ You MUST NOT:
 - Spawn other agents (you are the worker, not an orchestrator)
 - Skip the Wave structure (every task must be in a Wave section)
 - Write vague or process-step acceptance criteria
-- Reference `design-pattern-mapper` as an input (that agent exists in Phase 3, not yet available)
 - Include implementation code in the plan (the plan describes what to do, not how to code it)
 - Ask the user for clarifications mid-execution (you are single-shot; make reasonable assumptions and note them in the Deferred section)
 
