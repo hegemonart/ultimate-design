@@ -1,13 +1,26 @@
 ---
 name: discover
-description: "Stage 1 of the Ultimate Design pipeline. Reads existing project files, runs a baseline design audit, conducts a structured discovery interview to capture scope/audience/goals/brand/references/constraints, identifies gray areas, and produces DESIGN-CONTEXT.md. Use --auto to infer all answers from code without questions."
+description: "Stage 1.5 of 4 — interactive discovery to produce DESIGN-CONTEXT.md. Wraps state machine integration around existing v2.1.0 interview logic. Phase 3 will replace inline interview with design-context-builder + design-context-checker."
 argument-hint: "[--auto]"
 user-invocable: true
 ---
 
 # Ultimate Design — Discover
 
-**Stage 1 of 4.** Produces `.design/DESIGN-CONTEXT.md`.
+**Stage 1.5 of 4.** Produces `.design/DESIGN-CONTEXT.md`.
+
+---
+
+## State Integration
+
+1. Read `.design/STATE.md`.
+   - If missing: create minimal skeleton from `reference/STATE-TEMPLATE.md` with stage=discover, status=in_progress, task_progress=0/1, and log warning: "STATE.md not found — created fresh. If this is a resumed session, run /ultimate-design:scan first."
+   - If present and stage==discover and status==in_progress: RESUME — continue existing interview; do not reset.
+   - Otherwise: normal transition — set frontmatter stage=discover, <position> stage=discover, status=in_progress, task_progress=0/1.
+2. Update <connections> by probing MCP availability.
+3. Update last_checkpoint. Write STATE.md.
+
+<!-- TODO(phase-3): replace the inline interview below with spawned agent calls to design-context-builder (AGENT-06) and design-context-checker (AGENT-07) — these agents land in Phase 3 (Plan 03-01). The builder runs the interview; the checker validates completeness. -->
 
 ---
 
@@ -331,6 +344,14 @@ Written as user-verifiable statements, not process steps.]
 
 ---
 
+## State Update (exit)
+
+1. Set <position> status=completed, task_progress=1/1.
+2. Set <timestamps> discover_completed_at=<ISO 8601 now>.
+3. Update last_checkpoint. Write STATE.md.
+
+---
+
 ## After Writing
 
 ```
@@ -346,3 +367,5 @@ Next: /ultimate-design:plan
 ```
 
 Do not proceed to planning automatically unless `--auto` was passed.
+
+## DISCOVER COMPLETE
