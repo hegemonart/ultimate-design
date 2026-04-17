@@ -144,6 +144,53 @@ Produce a color inventory table:
 
 ---
 
+## Step 2A — Figma Token Augmentation
+
+**Skip this step if `figma` is `not_configured` or `unavailable` in `.design/STATE.md` `<connections>`.** Fall back to the grep-based token extraction from Step 2 alone — no error, no warning. Scan continues normally.
+
+### If `figma: available`
+
+Call `mcp__figma-desktop__get_variable_defs` (no arguments — returns all variables in the active Figma file).
+
+> If no Figma file is open, the call errors. Treat any error as a graceful skip: update STATE.md `<connections>` to `figma: unavailable` and continue with Step 2 results only.
+
+**For each variable returned, apply the following translation:**
+
+| Variable type | Name pattern | Output |
+|---------------|--------------|--------|
+| `COLOR` | any | Add row to color inventory table |
+| `FLOAT` | `spacing/*` | Add row to spacing system |
+| `FLOAT` | `font-size/*` or `typography/*` | Add row to typography system |
+
+Record both the variable **NAME** and resolved value — not just the value. `get_variable_defs` returns resolved values only (no alias chains); the name often carries semantic meaning the value cannot.
+
+**Multi-mode (Light/Dark):** when `valuesByMode` has multiple entries, extract all values and note dark-mode existence in the DESIGN.md color section.
+
+### Merge, don't replace
+
+Keep grep-derived tokens from Step 2 AND Figma tokens. Both sets appear in DESIGN.md:
+
+- **Figma-only tokens** (in Figma, not in CSS): annotate as "design intention not yet implemented"
+- **Code-only tokens** (in CSS, not in Figma): annotate as "implementation drift or local override"
+- **Matching tokens**: show Figma value alongside CSS value; flag any discrepancy
+
+### DESIGN.md annotations required
+
+When this step runs successfully:
+
+1. Change the token layer section header from "CSS custom properties" to "CSS custom properties + Figma variables"
+2. Add to DESIGN.md frontmatter:
+   - `figma_variables_used: true`
+   - `figma_source: [list of collection names returned by get_variable_defs]`
+
+### Caveats
+
+- `get_variable_defs` returns **resolved values only** — no alias chains. Always record the variable NAME alongside the value; the name carries semantic meaning not present in the hex/float alone.
+- **Multi-mode:** when Light and Dark mode values differ, record both. Note dark-mode variable presence in the DESIGN.md color section.
+- **No file open:** if `get_variable_defs` errors (most commonly because no Figma file is open), skip this step entirely and update STATE.md `<connections>` to `figma: unavailable`. Do not error the scan stage.
+
+---
+
 ## Step 3 — Extract Typography System
 
 ```bash
