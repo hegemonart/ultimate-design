@@ -167,3 +167,63 @@ Test: Can you tell which element is a heading just from the weight/family, witho
   font-variant-numeric: tabular-nums;
 }
 ```
+
+---
+
+## Brand Archetype Quick Guide
+
+Pick the archetype closest to the project brief; use the recommended pairing
+as a starting point (adjust for specific constraints).
+
+| Archetype | Character | Recommended Pairing |
+|-----------|-----------|---------------------|
+| SaaS / productivity | clear, neutral, utilitarian | Inter (UI) + Inter (body) — single family |
+| Consumer / editorial | warm, opinionated, expressive | Fraunces or GT Sectra (display) + Inter (body) |
+| Enterprise / finance | authoritative, conservative | IBM Plex Sans (UI) + IBM Plex Serif (body) |
+| Developer tools | technical, efficient | Geist (UI) + Geist Mono (code) |
+| Bold / expressive | high-energy, distinctive | Söhne or Mona Sans (display) + Inter (body) |
+
+**Selection heuristic:** If the brief uses words like "professional", "trustworthy", "clean" → SaaS or Enterprise. If "warm", "editorial", "narrative" → Consumer. If "bold", "energetic", "distinctive" → Bold. If "technical", "efficient", "fast" → Dev tools.
+
+---
+
+## Variable Fonts
+
+Variable fonts expose typographic axes that can be animated or set per-context
+via `font-variation-settings`. Prefer variable fonts over static family fallbacks
+when available — one file covers all weights and widths.
+
+### Common axes
+
+| Axis | Range | Purpose |
+|------|-------|---------|
+| wght | 100–900 | Weight (Thin → Black) |
+| wdth | 50%–150% | Width (Condensed → Extended) |
+| ital | 0 / 1 | Italic toggle (discrete in most) |
+| opsz | font-size value | Optical size (auto-applies when `font-optical-sizing: auto`) |
+
+### @font-face format
+
+```css
+@font-face {
+  font-family: 'InterVariable';
+  src: url('/fonts/InterVariable.woff2') format('woff2-variations');
+  font-weight: 100 900;
+  font-style: normal;
+}
+```
+
+### Usage via font-variation-settings
+
+```css
+.heading { font-variation-settings: "wght" 700, "opsz" 32; }
+.body    { font-variation-settings: "wght" 400; }
+```
+
+### Fallback strategy
+
+Always include a non-variable fallback of the same family in the font stack:
+
+```css
+font-family: 'InterVariable', 'Inter', -apple-system, system-ui, sans-serif;
+```
