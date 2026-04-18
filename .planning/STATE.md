@@ -3,8 +3,8 @@ gsd_state_version: 1.0
 milestone: v1.0.0
 milestone_name: milestone
 status: executing
-stopped_at: Phase 13.3 Plan 02 complete (SessionStart update-check.sh hook + hooks.json registration)
-last_updated: "2026-04-19T22:02:00.000Z"
+stopped_at: Phase 13.3 Plan 03 complete (design-update-checker Haiku enrichment agent)
+last_updated: "2026-04-19T22:10:00.000Z"
 last_activity: 2026-04-19
 progress:
   total_phases: 19
@@ -25,13 +25,13 @@ See: .planning/PROJECT.md (updated 2026-04-17)
 
 ## Current Position
 
-Phase: 13.3 (Plugin Update Checker) — IN PROGRESS (plan 02 of 06 complete)
+Phase: 13.3 (Plugin Update Checker) — IN PROGRESS (plan 03 of 06 complete)
 Last shipped: **v1.0.7** at https://github.com/hegemonart/get-design-done/releases/tag/v1.0.7
 Target version (13.3 closeout): v1.0.7.3
-Next plan: 13.3-03 (design-update-checker agent — cold path for /gdd:check-update --prompt)
+Next plan: 13.3-04 (skills/check-update/SKILL.md — binds --prompt to design-update-checker)
 Last activity: 2026-04-19
 
-Resume file: .planning/phases/13.3-plugin-update-checker/13.3-03-PLAN.md
+Resume file: .planning/phases/13.3-plugin-update-checker/13.3-04-PLAN.md
 
 Progress: [████████████████░░░░] 74% (14/19 phases complete through v1.0.7)
 
@@ -112,6 +112,7 @@ Progress: [████████████████░░░░] 74% (14
 | Phase 10.1 P04 | 20 min | 8 tasks | 8 files |
 | Phase 13.3 P01 | ~2 min | 1 tasks | 1 files |
 | Phase 13.3 P02 | ~4 min | 2 tasks | 2 files |
+| Phase 13.3 P03 | ~3 min | 1 tasks | 1 files |
 
 ## Accumulated Context
 
@@ -227,6 +228,9 @@ Progress: [████████████████░░░░] 74% (14
 - [Phase 13.3-02]: SessionStart hook ordering — bootstrap (index 0) initializes .design/; update-check (index 1) reads .design/ and writes update-cache.json / update-available.md; update-check has its own `mkdir -p .design` belt+suspenders so hooks are independent-order-safe
 - [Phase 13.3-02]: Four-gate banner render — is_newer=true → not dismissed → stage ∉ {plan,design,verify} → atomic render; every failed gate removes existing banner then silently exits 0
 - [Phase 13.3-02]: Silent-by-default logger — `log()` writes to stderr only when `GDD_UPDATE_DEBUG=1`; SessionStart produces no stdout/stderr under normal operation
+- [Phase 13.3-03]: Haiku-tier cold-path enrichment agent (design-update-checker) ships as inline-text-only summarizer — reads .design/update-cache.json + optional prompt release_body, returns 3-5-line user-impact narrative, ends with ## UPDATE-CHECKER COMPLETE marker; tools=Read/Grep/Glob only for minimum injection surface (mitigates T-13.3.03-01)
+- [Phase 13.3-03]: Classification-boundary discipline — agent echoes hook-classified delta verbatim; does NOT recompute or override even when release body suggests discrepancy (flag-don't-override pattern); keeps hot-path hook authoritative per D-10
+- [Phase 13.3-03]: Inline-text-only pattern extended beyond discover/plan agents (design-advisor, design-plan-checker) to the update-checker domain — caller skill captures response text, no .design/ artifact produced
 
 ### Roadmap Evolution
 
@@ -243,6 +247,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-04-19T22:02:00.000Z
-Stopped at: Phase 13.3 Plan 02 complete — SessionStart update-check.sh hook (238 lines, shellcheck-clean, source-safe) + hooks.json registration as SessionStart[1]
-Resume file: .planning/phases/13.3-plugin-update-checker/13.3-03-PLAN.md
+Last session: 2026-04-19T22:10:00.000Z
+Stopped at: Phase 13.3 Plan 03 complete — agents/design-update-checker.md (117 lines, Haiku-tier, reads-only, writes:[], inline-text contract, ## UPDATE-CHECKER COMPLETE marker)
+Resume file: .planning/phases/13.3-plugin-update-checker/13.3-04-PLAN.md
