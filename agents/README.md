@@ -42,6 +42,10 @@ Every agent file begins with a YAML frontmatter block. All fields except `model`
 | `tools` | comma-separated list | `Read`, `Write`, `Edit`, `Bash`, `Grep`, `Glob`, `Task`, `WebFetch`, `TodoWrite`, `mcp__*` | Claude tools the agent may use — list only what is needed |
 | `color` | enum | `yellow`, `green`, `blue`, `red` | Terminal display color for the agent's output |
 | `model` | enum (optional) | `inherit`, `sonnet`, `haiku` | Omit to use the project's configured profile default. Use `inherit` to bypass the profile and use the highest available model (quality-tier work) |
+| `parallel-safe` | enum | `always`, `never`, `conditional-on-touches`, `auto` | Whether stages may dispatch this agent in parallel with siblings. `conditional-on-touches` means safe only when `Touches:` do not overlap |
+| `typical-duration-seconds` | int | e.g. `30`, `60`, `120` | Expected wall-clock duration. Used by parallelism planner to decide whether savings clear `min_estimated_savings_seconds` |
+| `reads-only` | bool | `true`/`false` | True when the agent never writes any file |
+| `writes` | list | e.g. `[".design/DESIGN-PLAN.md"]` | Files / globs the agent may write. `[]` for read-only agents |
 
 Example frontmatter block:
 
@@ -177,6 +181,20 @@ Output format: markdown table, then a one-line summary, then `## VERIFY COMPLETE
 Constraints: do not modify any file other than .design/example-output.md.
 """)
 ```
+
+---
+
+## Size Budgets
+
+Agents should be kept small — long instruction bodies burn context at every spawn and drift from their single-responsibility role. Per-tier soft limits:
+
+| Tier | Examples | Limit |
+|---|---|---|
+| Orchestrator | `design-planner`, `design-executor`, `design-verifier` | ≤ 300 lines |
+| Worker | `design-auditor`, `design-fixer`, `design-doc-writer`, `design-pattern-mapper`, `design-context-builder` | ≤ 200 lines |
+| Checker | `design-integration-checker`, `design-plan-checker`, `design-context-checker`, `design-advisor`, `design-assumptions-analyzer`, `design-phase-researcher` | ≤ 150 lines |
+
+Global ceiling: **no single agent file exceeds 600 lines** under any circumstances. When an agent approaches its tier limit, extract repeated prose into `reference/*.md` and `@`-include it from the prompt rather than inlining.
 
 ---
 

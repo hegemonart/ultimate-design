@@ -3,6 +3,13 @@ name: design-executor
 description: Executes one plan task from DESIGN-PLAN.md, writes .design/tasks/task-NN.md, and makes an atomic git commit. Applies deviation rules for in-context issues. Spawned by the design stage per task.
 tools: Read, Write, Edit, Bash, Grep, Glob
 color: yellow
+size_budget: XL
+parallel-safe: conditional-on-touches
+typical-duration-seconds: 60
+reads-only: false
+writes:
+  - ".design/tasks/*.md"
+  - "src/**"
 ---
 
 # design-executor

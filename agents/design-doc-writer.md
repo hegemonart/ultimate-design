@@ -4,6 +4,11 @@ description: Generates a component handoff doc (DESIGN-STYLE-[ComponentName].md)
 tools: Read, Write, Grep, Glob
 color: yellow
 model: sonnet
+parallel-safe: always
+typical-duration-seconds: 45
+reads-only: false
+writes:
+  - ".design/DESIGN-STYLE-*.md"
 ---
 
 # design-doc-writer

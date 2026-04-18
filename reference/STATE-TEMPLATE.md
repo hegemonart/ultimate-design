@@ -22,7 +22,8 @@ Copy the block below (between the `==== BEGIN TEMPLATE ====` and `==== END TEMPL
 ==== BEGIN TEMPLATE ====
 ---
 pipeline_state_version: 1.0
-stage: scan
+stage: brief
+cycle: ""
 wave: 1
 started_at: <ISO 8601 timestamp — set once at scan entry>
 last_checkpoint: <ISO 8601 timestamp — updated at each stage exit>
@@ -31,7 +32,7 @@ last_checkpoint: <ISO 8601 timestamp — updated at each stage exit>
 # Pipeline State — <project name>
 
 <position>
-stage: scan
+stage: brief
 wave: 1
 task_progress: 0/0
 status: initialized
@@ -60,11 +61,30 @@ refero: not_configured
 <!-- Format: [stage] [ISO date]: [description] -->
 </blockers>
 
+<parallelism_decision>
+<!-- Written by each stage orchestrator after computing parallelism verdict -->
+<!-- Format:
+stage: explore
+verdict: parallel | serial
+reason: "2 mappers, disjoint Touches, savings est. 45s"
+agents: ["token-mapper", "component-taxonomy-mapper"]
+-->
+</parallelism_decision>
+
+<todos>
+<!-- Mirror of .design/TODO.md counts for quick lookup by /gdd:progress and /gdd:stats. -->
+<!-- Format:
+pending: 0
+in_progress: 0
+done: 0
+-->
+</todos>
+
 <timestamps>
 started_at: <ISO 8601>
 last_checkpoint: <ISO 8601>
-scan_completed_at: ~
-discover_completed_at: ~
+brief_completed_at: ~
+explore_completed_at: ~
 plan_completed_at: ~
 design_completed_at: ~
 verify_completed_at: ~
@@ -81,7 +101,8 @@ verify_completed_at: ~
 | Field | Type | Set by | Purpose |
 |-------|------|--------|---------|
 | `pipeline_state_version` | float | fixed at `1.0` | Forward-compat marker for future format changes |
-| `stage` | enum | every stage at entry | Current stage: `scan`, `discover`, `plan`, `design`, `verify` |
+| `stage` | enum | every stage at entry | Current stage — one of: `brief|explore|plan|design|verify` |
+| `cycle` | string | lifecycle commands | Cycle identifier for Wave B multi-cycle projects (default: empty string) |
 | `wave` | int | every stage | Wave number within current stage |
 | `started_at` | ISO 8601 | scan at creation | Immutable — never updated after creation |
 | `last_checkpoint` | ISO 8601 | every stage at exit | Updated on every stage transition and on mid-stage checkpoint |

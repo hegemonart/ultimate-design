@@ -4,6 +4,12 @@ description: Goal-backward verification of design outcomes against .design/STATE
 tools: Read, Write, Bash, Grep, Glob
 color: green
 model: inherit
+size_budget: XL
+parallel-safe: never
+typical-duration-seconds: 90
+reads-only: false
+writes:
+  - ".design/DESIGN-VERIFICATION.md"
 ---
 
 # design-verifier

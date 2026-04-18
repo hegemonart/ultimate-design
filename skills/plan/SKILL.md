@@ -1,13 +1,13 @@
 ---
 name: plan
-description: "Stage 2 of 4 — reads DESIGN-CONTEXT.md, spawns design-phase-researcher (optional) + design-planner + design-plan-checker, writes DESIGN-PLAN.md. Thin orchestrator."
+description: "Stage 3 of 5 — reads DESIGN-CONTEXT.md, spawns design-phase-researcher (optional) + design-planner + design-plan-checker, writes DESIGN-PLAN.md. Thin orchestrator."
 argument-hint: "[--auto] [--parallel]"
 user-invocable: true
 ---
 
 # Get Design Done — Plan
 
-**Stage 2 of 4.** Thin orchestrator. All planning intelligence lives in agents/design-planner.md.
+**Stage 3 of 5** in the get-design-done pipeline. Thin orchestrator. All planning intelligence lives in agents/design-planner.md.
 
 ## State Integration
 
@@ -25,6 +25,13 @@ Abort with a clear error only if the user is trying to plan without DESIGN-CONTE
 Parse $ARGUMENTS:
 - `--auto` → auto_mode=true (skip approvals, skip optional research)
 - `--parallel` → parallel_mode=true (planner fills Touches:/Parallel: fields)
+
+## Parallelism Decision (before any multi-agent spawn)
+
+- Read `.design/config.json` `parallelism` (or defaults from `reference/config-schema.md`).
+- Apply rules from `reference/parallelism-rules.md`.
+- Plan's pipeline is inherently sequential (researcher → pattern-mapper → planner → checker). Expected verdict: **serial** (rule 1).
+- Write `<parallelism_decision>` to STATE.md with the verdict and reason before spawning agents.
 
 ## Step 1 — Optional Research (skip if auto_mode)
 
@@ -105,6 +112,9 @@ Task("design-planner", """
 @.design/DESIGN-PATTERNS.md
 [@.design/DESIGN-RESEARCH.md — only include if research step ran]
 [@.design/DESIGN-ASSUMPTIONS.md — only include if assumptions analysis ran]
+[@.design/sketches/*/WINNER.md — include all completed sketch winners if present]
+[@.design/spikes/*/FINDINGS.md — include all completed spike findings if present]
+[@./.claude/skills/design-*-conventions.md — include all project-local design conventions if present]
 </required_reading>
 
 You are the design-planner agent. Read DESIGN-CONTEXT.md and produce .design/DESIGN-PLAN.md
@@ -170,6 +180,15 @@ Print user-facing summary:
 ## PLAN COMPLETE
 
 ---
+
+## Exploration artifacts & project-local conventions
+
+When building the planner spawn prompt, also glob for:
+- `.design/sketches/*/WINNER.md` — winning sketch rationale (informs directional tasks)
+- `.design/spikes/*/FINDINGS.md` — spike verdicts (inform task feasibility)
+- `./.claude/skills/design-*-conventions.md` — project-local design conventions
+
+Include each matching file in `<files_to_read>` / `<required_reading>` so the planner sees them when creating tasks. Spike findings from `.design/spikes/` inform task feasibility; sketch winners inform directional choice; project-local conventions override defaults.
 
 ## --research mode (removed)
 

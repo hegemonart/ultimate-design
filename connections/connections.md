@@ -21,6 +21,11 @@ Each cell describes what the connection contributes at that pipeline stage, or `
 |-----------|------|----------|------|--------|--------|
 | Figma | token augmentation via `get_variable_defs` (CONN-03) | decisions pre-populate via `get_variable_defs` (CONN-04) | — | — | — |
 | Refero | — | reference search via `mcp__refero__search`; fallback → awesome-design-md (CONN-05) | — | — | — |
+| token-mapper | tokens map → `.design/map/tokens.md` (consumed by explore) | — | — | — | — |
+| component-taxonomy-mapper | components map → `.design/map/components.md` | — | — | — | — |
+| visual-hierarchy-mapper | hierarchy map → `.design/map/visual-hierarchy.md` | — | — | — | — |
+| a11y-mapper | static a11y map → `.design/map/a11y.md` | — | — | — | — |
+| motion-mapper | motion map → `.design/map/motion.md` | — | — | — | — |
 | Storybook (future) | — | — | — | — | components |
 | Linear (future) | — | — | — | — | tickets |
 | GitHub (future) | — | — | commits | — | PRs |

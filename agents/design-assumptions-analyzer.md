@@ -4,6 +4,10 @@ description: Reads codebase and DESIGN-CONTEXT.md to surface hidden design assum
 tools: Read, Bash, Grep, Glob
 color: blue
 model: inherit
+parallel-safe: always
+typical-duration-seconds: 30
+reads-only: true
+writes: []
 ---
 
 # design-assumptions-analyzer

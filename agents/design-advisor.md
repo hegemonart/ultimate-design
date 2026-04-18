@@ -4,6 +4,10 @@ description: Researches a single gray area and produces a 5-column comparison ta
 tools: Read, Grep, Glob, WebSearch
 color: blue
 model: sonnet
+parallel-safe: always
+typical-duration-seconds: 30
+reads-only: true
+writes: []
 ---
 
 # design-advisor

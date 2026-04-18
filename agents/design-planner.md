@@ -4,6 +4,12 @@ description: Reads DESIGN-CONTEXT.md and produces DESIGN-PLAN.md with wave-order
 tools: Read, Write, Grep, Glob
 color: green
 model: inherit
+size_budget: LARGE
+parallel-safe: never
+typical-duration-seconds: 120
+reads-only: false
+writes:
+  - ".design/DESIGN-PLAN.md"
 ---
 
 # design-planner

@@ -4,6 +4,11 @@ description: Greps codebase for existing design patterns (color tokens, spacing 
 tools: Read, Write, Bash, Grep, Glob
 color: green
 model: inherit
+parallel-safe: always
+typical-duration-seconds: 45
+reads-only: false
+writes:
+  - ".design/DESIGN-PATTERNS.md"
 ---
 
 # design-pattern-mapper

@@ -4,6 +4,12 @@ description: Retrospective 6-pillar audit (copy, visual hierarchy, color, typogr
 tools: Read, Write, Bash, Grep, Glob
 color: green
 model: inherit
+size_budget: XL
+parallel-safe: always
+typical-duration-seconds: 45
+reads-only: false
+writes:
+  - ".design/DESIGN-AUDIT.md"
 ---
 
 # design-auditor

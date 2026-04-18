@@ -4,6 +4,10 @@ description: Validates DESIGN-PLAN.md will achieve DESIGN-CONTEXT.md brief goals
 tools: Read, Bash, Grep, Glob
 color: green
 model: sonnet
+parallel-safe: always
+typical-duration-seconds: 30
+reads-only: true
+writes: []
 ---
 
 # design-plan-checker

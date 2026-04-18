@@ -4,6 +4,10 @@ description: Pre-plan research on design patterns for the project type (SaaS, da
 tools: Read, Write, Bash, Grep, Glob, WebSearch
 color: blue
 model: sonnet
+parallel-safe: always
+typical-duration-seconds: 60
+reads-only: true
+writes: []
 ---
 
 # design-phase-researcher

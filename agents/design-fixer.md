@@ -4,6 +4,11 @@ description: Applies BLOCKER and MAJOR gaps from DESIGN-VERIFICATION.md to sourc
 tools: Read, Write, Edit, Bash, Grep, Glob
 color: red
 model: inherit
+parallel-safe: conditional-on-touches
+typical-duration-seconds: 60
+reads-only: false
+writes:
+  - "src/**"
 ---
 
 # design-fixer

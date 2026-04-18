@@ -4,6 +4,12 @@ description: Detects existing design system state via grep/glob, runs discovery 
 tools: Read, Write, Bash, Grep, Glob, mcp__figma-desktop__get_variable_defs, mcp__figma-desktop__get_metadata, mcp__refero__search
 color: blue
 model: inherit
+size_budget: XL
+parallel-safe: never
+typical-duration-seconds: 180
+reads-only: false
+writes:
+  - ".design/DESIGN-CONTEXT.md"
 ---
 
 # design-context-builder
@@ -20,8 +26,6 @@ You have zero session memory. Everything you need is in the prompt and the files
 
 Do not modify any file outside `.design/`. Never touch `src/`, `reference/`, or `agents/`.
 
----
-
 ## Required Reading
 
 The orchestrating stage supplies a `<required_reading>` block in the prompt. Read every listed file before taking any other action. Typical contents:
@@ -29,8 +33,6 @@ The orchestrating stage supplies a `<required_reading>` block in the prompt. Rea
 - `.design/STATE.md` — current pipeline position and project metadata
 - `reference/audit-scoring.md` — scoring framework for baseline audit
 - `reference/anti-patterns.md` — grep patterns for BAN/SLOP violations
-
----
 
 ## Step 0 — Figma Pre-population
 
@@ -83,16 +85,7 @@ Note: Decisions D-XX through D-YY pre-populated from Figma variables (source: fi
       These are starting points — the interview (Step 1+) may override or remove them.
 ```
 
-### Caveats
-
-- **ToolSearch first** — Figma tools are deferred; without ToolSearch they may not be in context.
-- **Resolved values only** — `get_variable_defs` does not return alias chains. Record variable names alongside values.
-- **No file open** — `get_variable_defs` errors if no Figma file is open. Skip Step 0 and update `figma: unavailable` in STATE.md `<connections>`. Do not error the agent.
-- **Starting points, not locked decisions** — pre-populated D-XX decisions are marked `tentative`. The interview in Step 1+ may override or remove any of them. User confirmation supersedes Figma data.
-
 Proceed to Step 1 regardless of whether Step 0 ran or was skipped.
-
----
 
 ## Step 1 — Auto-Detect Design System State
 
@@ -174,8 +167,6 @@ find src -name "*.tsx" -path "*/components/*" 2>/dev/null | head -8
 
 If `.design/DESIGN-CONTEXT.md` exists and has `status: complete`, present to user: "A completed design context exists. Resume from it, or start fresh?" Do not overwrite without confirmation.
 
----
-
 ## Step 2 — Discovery Interview
 
 For each area below, **skip if auto-detect gave a confident answer** — state the inference and allow correction. Ask only when auto-detection returned nothing or conflicting signals.
@@ -229,8 +220,6 @@ This area uses Refero MCP when available, with graceful fallback to local brand 
 
 Check `.design/STATE.md` `<connections>` for `refero:` status before proceeding.
 
----
-
 **Tier 1 — Refero (if `refero: available` in `.design/STATE.md` `<connections>`)**
 
 ToolSearch first — Refero tools may be in the deferred tool set:
@@ -255,47 +244,21 @@ R-02: [Refero result title] — source: refero — borrow: [inferred borrow rati
 
 Present to user: "I found these references from Refero. Confirm or replace?"
 
----
-
 **Tier 2 — awesome-design-md (if `refero: not_configured` OR `refero: unavailable`)**
 
-Look in `~/.claude/libs/awesome-design-md/design-md/` — 68 brand archetypes, each with a full `DESIGN.md` token file.
+Look in `~/.claude/libs/awesome-design-md/design-md/` — 68 brand archetypes, each with a full `DESIGN.md` token file. Pick 1–2 closest matches by inferred product category (e.g., B2B SaaS → Linear, Vercel; consumer → Airbnb, Spotify; editorial → NYT, Bloomberg).
 
-Pick 1–2 closest matches by inferred product category (e.g., B2B SaaS → Linear, Vercel; consumer → Airbnb, Spotify; editorial → NYT, Bloomberg).
+Pre-populate: `R-01: [Brand name] — source: awesome-design-md — borrow: [token values — color palette, spacing scale, typography]`
 
-Pre-populate references as:
-
-```
-R-01: [Brand name] — source: awesome-design-md — borrow: [token values from that brand's DESIGN.md — color palette, spacing scale, or typography]
-```
-
-Add a note in `.design/DESIGN-CONTEXT.md` `<references>`:
-
-```
-Note: Refero unavailable — using local brand archetypes as references.
-```
-
----
+Add a note in `<references>`: `Note: Refero unavailable — using local brand archetypes as references.`
 
 **Tier 3 — WebFetch (last resort, if awesome-design-md unavailable)**
 
-If `~/.claude/libs/awesome-design-md/` is not installed or inaccessible:
-
 Ask the user for a getdesign.md URL. WebFetch it and extract design tokens.
 
-Pre-populate:
+Pre-populate: `R-01: [URL] — source: webfetch — borrow: [extracted tokens: color palette, type scale, spacing units]`
 
-```
-R-01: [URL] — source: webfetch — borrow: [extracted tokens: color palette, type scale, spacing units]
-```
-
----
-
-**Caveats**
-
-- Refero tool name may differ from `mcp__refero__search` — always verify via ToolSearch before invoking. Do not hard-code the tool name.
-- Two or more references are required; single-reference borrowing provides insufficient range for a distinct visual direction.
-- Pre-populated references are starting points — the user may swap any of them during the interview.
+Note: Refero tool name may differ — always verify via ToolSearch. Two or more references are required.
 
 ### Area 6 — Constraints
 
@@ -368,8 +331,6 @@ Incorporate the advisor's response:
 
 If the user rejects the advisor's recommendation, record the user's chosen approach instead and note the divergence in the decision entry.
 
----
-
 ## Auto Mode
 
 If the prompt context contains `auto_mode: true`:
@@ -385,46 +346,34 @@ If the prompt context contains `auto_mode: true`:
 - Skip gray area sign-off
 - Write DESIGN-CONTEXT.md immediately
 
----
-
 ## Step 3 — Design Direction Statement
 
 After all areas are confirmed, synthesize and present for user sign-off:
 
 ```
 ━━━ Design Direction ━━━
-
 Direction: [one-sentence characterization — what this design is trying to be]
-
 Tone: [word] · [word] · [word]
 NOT: [the thing to explicitly avoid]
-
 Goals locked:
   G-01: [Observable, verifiable outcome]
   G-02: [...]
-
 Decisions locked:
   D-01: [Typography: e.g., "Move from ad-hoc px sizes to a 1.25 modular scale based at 16px"]
   D-02: [Color: e.g., "Replace AI-default indigo palette with warm ochre primary + slate neutrals"]
   D-03: [Layout: e.g., "Enforce 8pt grid — audit and fix all spacing values not in the 4/8/12/16/24/32/48/64 series"]
-
 References to draw from:
   R-01: [Title] — borrow: [what specifically]
   R-02: [Title] — borrow: [what specifically]
-
 Gray areas resolved:
   GRAY-01: [Decision made]
-
 Baseline design score: [N]/100 ([grade])
   Key issues found: [top 3 auto-detected problems]
-
 Does this direction feel right? Any adjustments?
 ━━━━━━━━━━━━━━━━━━━━━━━━
 ```
 
 Iterate until the user confirms. Then write the artifact.
-
----
 
 ## Output: .design/DESIGN-CONTEXT.md
 
@@ -529,8 +478,6 @@ Written as user-verifiable statements, not process steps.]
 </deferred>
 ```
 
----
-
 ## Constraints
 
 You MUST NOT:
@@ -539,7 +486,5 @@ You MUST NOT:
 - Spawn other agents
 - Skip the Design Direction Statement step (unless `auto_mode: true`)
 - Write vague goals — push back until G-XX entries are observable and verifiable
-
----
 
 ## CONTEXT COMPLETE

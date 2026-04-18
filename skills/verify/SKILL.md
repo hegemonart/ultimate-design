@@ -1,13 +1,13 @@
 ---
 name: verify
-description: "Stage 4 of 4 — spawns design-auditor, design-verifier, and design-integration-checker in sequence; interprets pass/gap result; handles gap-response loop with inline fix (Phase 5 will add AGENT-12 remediation agent). Thin orchestrator."
+description: "Stage 5 of 5 — spawns design-auditor, design-verifier, and design-integration-checker in sequence; interprets pass/gap result; handles gap-response loop with inline fix (Phase 5 will add AGENT-12 remediation agent). Thin orchestrator."
 argument-hint: "[--auto]"
 user-invocable: true
 ---
 
 # Get Design Done — Verify
 
-**Stage 4 of 4.** Thin orchestrator. Verification intelligence lives in three agents: design-auditor, design-verifier, and design-integration-checker.
+**Stage 5 of 5** in the get-design-done pipeline. Thin orchestrator. Verification intelligence lives in three agents: design-auditor, design-verifier, and design-integration-checker.
 
 ---
 
@@ -28,6 +28,13 @@ Abort only if no `.design/` directory exists (user has not run prior stages). Ou
 - `--auto` → `auto_mode=true` (no interactive prompts; skip visual UAT interactive steps; on gaps: save-and-exit rather than prompt for fix)
 
 ---
+
+## Parallelism Decision (before agent spawns)
+
+- Read `.design/config.json` `parallelism` (or defaults from `reference/config-schema.md`).
+- Apply rules from `reference/parallelism-rules.md`.
+- `design-verifier` depends on `design-auditor` output (rule 1) → serial between those two. `design-integration-checker` is independent of the auditor's *file* output but runs after verifier in the current sequence; if config opts in, `design-auditor` and `design-integration-checker` can parallelize (disjoint writes). Default: serial.
+- Write `<parallelism_decision>` to STATE.md before spawning.
 
 ## Step 1 — Spawn Auditor + Verifier + Integration Checker
 

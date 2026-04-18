@@ -1,13 +1,13 @@
 ---
 name: design
-description: "Stage 3 of 4 — reads DESIGN-PLAN.md, spawns design-executor per task with wave coordination and parallel/sequential routing. Thin orchestrator."
+description: "Stage 4 of 5 — reads DESIGN-PLAN.md, spawns design-executor per task with wave coordination and parallel/sequential routing. Thin orchestrator."
 argument-hint: "[--auto] [--parallel]"
 user-invocable: true
 ---
 
 # Get Design Done — Design
 
-**Stage 3 of 4.** Thin orchestrator. All design execution intelligence lives in `agents/design-executor.md`.
+**Stage 4 of 5** in the get-design-done pipeline. Thin orchestrator. All design execution intelligence lives in `agents/design-executor.md`.
 
 ---
 
@@ -31,6 +31,18 @@ Abort only if `.design/DESIGN-PLAN.md` is missing:
 
 ---
 
+## Pre-execution — Directionally-open check
+
+Scan DESIGN-PLAN.md for tasks marked as "directionally open" (exploration-appropriate — e.g., tasks whose acceptance criteria read "explore N directions" or "pick a visual approach"). If any are found, print:
+
+> "Tasks [IDs] appear directionally open — consider running `/gdd:sketch` first to explore variants before implementation."
+
+Skip if `auto_mode=true`.
+
+## Pre-execution — Project-local conventions
+
+When spawning the executor, include any `./.claude/skills/design-*-conventions.md` files in `<required_reading>` so the executor sees project-local design conventions (typography, color, layout, motion, component, interaction decisions codified from prior sketch wrap-ups).
+
 ## Step 1 — Parse DESIGN-PLAN.md
 
 Read `.design/DESIGN-PLAN.md`. Partition tasks by `## Wave N` heading. Within each wave, partition by `Parallel: true` vs `Parallel: false`. Compute `total_tasks` for `task_progress` denominator.
@@ -38,6 +50,15 @@ Read `.design/DESIGN-PLAN.md`. Partition tasks by `## Wave N` heading. Within ea
 If resuming: skip tasks where `.design/tasks/task-NN.md` already exists.
 
 ---
+
+## Parallelism Decision (per wave, before spawning)
+
+For each wave:
+1. Read `.design/config.json` `parallelism` (or defaults from `reference/config-schema.md`).
+2. Collect candidates in the wave; check `Touches:`, `writes:`, `parallel-safe`, and `typical-duration-seconds` fields.
+3. Apply rules in order from `reference/parallelism-rules.md` (hard → soft). Overlapping Touches split into sequential sub-waves.
+4. Write `<parallelism_decision>` to STATE.md per wave (stage: design, wave: N).
+5. If `parallel`: spawn all candidates via concurrent `Task()` calls in one response. If `serial`: spawn sequentially.
 
 ## Step 2 — Wave-by-Wave Execution
 

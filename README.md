@@ -40,6 +40,30 @@ Invoke without arguments for pipeline status and auto-routing to the next stage.
 @get-design-done compare       — Delta between baseline and verification result → .design/COMPARE-REPORT.md
 ```
 
+## Commands
+
+All commands are invoked as `/gdd:<name>`.
+
+**Pipeline stages**: `brief`, `explore`, `plan`, `design`, `verify`, `audit`
+
+**Lifecycle**: `new-project`, `new-cycle`, `complete-cycle`
+
+**Ergonomics**: `progress`, `health`, `todo`, `stats`, `next`, `help`
+
+**Capture**: `note`, `plant-seed`, `add-backlog`, `review-backlog`
+
+**Exploration**: `sketch`, `sketch-wrap-up`, `spike`, `spike-wrap-up`, `map`
+
+**Execution**: `do`, `fast`, `quick`, `ship`, `undo`, `pr-branch`, `debug`
+
+**Session**: `pause`, `resume`, `list-assumptions`, `discuss`
+
+**Standalone**: `style`, `darkmode`, `compare`
+
+**Settings**: `settings`, `update`, `reapply-patches`
+
+See the root `SKILL.md` for one-line descriptions of each command.
+
 ## Pipeline overview
 
 Each stage is orchestrated by a thin skill that spawns specialized agents:
