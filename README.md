@@ -442,13 +442,15 @@ Full command reference with argument specs: [`SKILL.md`](SKILL.md).
 
 All connections are optional — the pipeline degrades gracefully when any connection is unavailable.
 
-### Figma MCP
+### Figma MCP (reads + writes)
 
-When the official Figma Desktop MCP is active, `explore` reads Figma variables and pre-populates design decisions from your file. Falls back to code-only analysis. Setup: [`connections/figma.md`](connections/figma.md).
+One remote MCP covers both reads and writes as of v1.0.7.1. When it is active, `explore` reads Figma variables and pre-populates design decisions from your file, and `design-figma-writer` writes decisions back via `use_figma` — annotates frames, tokenizes local styles, registers Code Connect mappings. Proposal → confirm discipline with `--dry-run` and `--confirm-shared` guards. Falls back to code-only analysis when the MCP is not configured. One install command unlocks both:
 
-### Figma Writer MCP
+```
+claude mcp add figma --transport http https://mcp.figma.com/v1/sse
+```
 
-`design-figma-writer` writes decisions back to Figma via the remote `use_figma` MCP — annotates frames, tokenizes local styles, registers Code Connect mappings. Proposal → confirm discipline with `--dry-run` and `--confirm-shared` guards. Setup: [`connections/figma.md`](connections/figma.md) (covers both reads and writes — single remote MCP since v1.0.7.1).
+Setup: [`connections/figma.md`](connections/figma.md). If you previously installed the local `figma-desktop` MCP, you can remove it — its read tools are now exposed on the remote server.
 
 ### Refero MCP
 
