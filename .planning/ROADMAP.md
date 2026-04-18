@@ -295,7 +295,7 @@ Every orchestrator spawn point calls the decision engine and writes its verdict 
 **Plans**: 7 plans (6 feature + 1 closeout)
 
 Plans:
-- [ ] 08-01-PLAN.md — `connections/preview.md` + availability probe + verify/compare/darkmode stage integration for visual evidence (VIS-01, VIS-02, VIS-03, VIS-04, VIS-05)
+- [x] 08-01-PLAN.md — `connections/preview.md` + availability probe + verify/compare/darkmode stage integration for visual evidence (VIS-01, VIS-02, VIS-03, VIS-04, VIS-05)
 - [x] 08-02-PLAN.md — `connections/storybook.md` + explore/verify integration (stories.json as inventory, addon-a11y as verify input, per-story state coverage gate) + design-stage `.stories.tsx` scaffolding (STB-01, STB-02, STB-03)
 - [x] 08-03-PLAN.md — `connections/chromatic.md` + verify delta-narration + plan-stage change-risk scoping (CHR-01, CHR-02)
 - [x] 08-04-PLAN.md — `agents/design-figma-writer.md` (annotate + tokenize + mappings modes) + proposal→confirm UX + dry-run + shared-file guard (FWR-01, FWR-02, FWR-03, FWR-04)

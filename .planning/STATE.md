@@ -4,14 +4,14 @@ milestone: v1.0.0
 milestone_name: milestone
 status: executing
 stopped_at: Completed 08-02-PLAN.md
-last_updated: "2026-04-18T02:57:59.328Z"
+last_updated: "2026-04-18T03:01:10.105Z"
 last_activity: 2026-04-18
 progress:
   total_phases: 15
   completed_phases: 6
   total_plans: 55
-  completed_plans: 31
-  percent: 56
+  completed_plans: 32
+  percent: 58
 ---
 
 # Project State
@@ -26,7 +26,7 @@ See: .planning/PROJECT.md (updated 2026-04-17)
 ## Current Position
 
 Phase: 12 (Test Coverage) — EXECUTING
-Plan: 6 of 7
+Plan: 7 of 7
 Status: Ready to execute
 Last activity: 2026-04-18
 
@@ -79,6 +79,7 @@ Progress: [████████░░] 81%
 | Phase 12 P02 | 5 min | 2 tasks | 8 files |
 | Phase 08 P02 | 258 | 3 tasks | 5 files |
 | Phase 08 P03 | 246 | 2 tasks | 5 files |
+| Phase 08-visual-design-connections P01 | 372 | 4 tasks | 6 files |
 
 ## Accumulated Context
 
@@ -164,6 +165,9 @@ Progress: [████████░░] 81%
 - [Phase ?]: title-grouping-for-inventory: group index.json entries by title field; each unique title is one component
 - [Phase ?]: no-parameters-caveat: Storybook 8 index.json excludes parameters; a11y config lives in .storybook/preview.ts
 - [Phase ?]: [Phase 08-03]: Two-step CLI probe for Chromatic; baseline first-run: status new = baseline established, NOT regression
+- [Phase 08-01]: [Phase 08-01]: Preview probe uses preview_list (lightweight) not preview_start — avoids spinning up a browser as a side effect of probing
+- [Phase 08-01]: [Phase 08-01]: preview_screenshot output saved to .design/screenshots/ by file path; base64 never embedded inline in md files (prevents 500KB+ verification files)
+- [Phase 08-01]: [Phase 08-01]: scan/SKILL.md is authoritative probe stage for all 7 connections; downstream stages read STATE.md rather than re-probing
 
 ### Pending Todos
 
@@ -175,6 +179,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-04-18T02:57:45.458Z
+Last session: 2026-04-18T03:00:19.203Z
 Stopped at: Completed 08-02-PLAN.md
 Resume file: None
