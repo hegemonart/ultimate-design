@@ -267,6 +267,32 @@ Every proposal requires explicit user review via `/gdd:apply-reflections`. The d
 ### Global skills
 Cross-project conventions live in `~/.claude/gdd/global-skills/`. Once you accept a `[GLOBAL-SKILL]` proposal, that convention auto-loads in every future gdd session across all projects.
 
+## Testing
+
+`get-design-done` ships with a locked test suite. Every push and PR runs the full suite across a cross-platform matrix — Node 22/24 × Linux/macOS/Windows.
+
+### Run tests locally
+
+```bash
+npm test
+```
+
+The test runner is Node's built-in `node:test` + `node:assert/strict` — zero third-party test dependencies.
+
+### What's covered
+
+- **Infrastructure** — test runner, CI workflow, shared helpers, regression baselines locked per phase
+- **Agent hygiene** — frontmatter completeness, line-count tier budgets (XXL/XL/LARGE/DEFAULT), `Required Reading` path validity, `/gdd:` namespace consistency (no stale `/design:` references)
+- **System contracts** — `.design/config.json` schema, command↔skill parity, hooks integrity, atomic writes to `.design/STATE.md`, frontmatter parser edge cases, model-profile resolution, `/gdd:health` output shape, worktree safety, semver bump sequence, STATE-TEMPLATE drift
+- **Pipeline + data** — end-to-end pipeline smoke on `test-fixture/`, mapper JSON-schema validation (tokens, components, a11y, motion, hierarchy), parallelism-engine decision table, `Touches:` field parsing, cycle lifecycle (`/gdd:new-cycle` → stage progression → `/gdd:complete-cycle`), `.design/intel/` incremental-update correctness, regression-baseline drift detector
+- **Feature correctness** — `/gdd:sketch` variant determinism, 8-connection probe contracts with mocked MCPs (figma / refero / preview / storybook / chromatic / graphify / claude-design / pinterest), `design-figma-writer` dry-run discipline, `design-reflector` proposal-only shape, deprecated-name redirects, NNG heuristic coverage, `gdd-read-injection-scanner` hook behavior, optimization-layer schema enforcement
+
+### CI
+
+GitHub Actions runs the suite on every push and every PR. A green build is required before merge — see `.github/workflows/ci.yml` for the exact matrix.
+
+From v1.0.6 forward, every PR MUST pass `npm test` before it merges to `main`. Baselines in `test-fixture/baselines/phase-<N>/` lock each phase's structural state; if a PR introduces drift, re-lock explicitly (see `test-fixture/baselines/phase-6/README.md` for the re-lock procedure) rather than relaxing the test.
+
 ## Distribution
 
 **Ships with the plugin:**

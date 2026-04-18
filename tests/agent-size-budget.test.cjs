@@ -8,6 +8,7 @@ const { REPO_ROOT, readFrontmatter, countLines } = require('./helpers.cjs');
 const AGENTS_DIR = path.join(REPO_ROOT, 'agents');
 
 const TIER_LIMITS = {
+  XXL: 700,
   XL: 500,
   LARGE: 350,
   DEFAULT: 250,
@@ -27,14 +28,14 @@ for (const agentFile of agentFiles) {
 
     assert.ok(
       limit !== undefined,
-      `agents/${agentFile}: unknown size_budget tier "${tier}". Valid values: XL, LARGE, DEFAULT`
+      `agents/${agentFile}: unknown size_budget tier "${tier}". Valid values: XXL, XL, LARGE, DEFAULT`
     );
 
     const lineCount = countLines(filePath);
     assert.ok(
       lineCount <= limit,
       `agents/${agentFile}: ${lineCount} lines exceeds ${tier} budget of ${limit} lines.\n` +
-      `To raise: add size_budget: XL to frontmatter AND include rationale in the PR description.`
+      `To raise: add size_budget: XL (or XXL for >500) to frontmatter AND include rationale in the PR description.`
     );
   });
 }

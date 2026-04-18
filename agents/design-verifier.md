@@ -5,8 +5,8 @@ tools: Read, Write, Bash, Grep, Glob
 color: green
 model: inherit
 default-tier: haiku
-tier-rationale: "Runs a deterministic 5-pass scoring rubric; Haiku handles structured grading without quality loss"
-size_budget: XL
+tier-rationale: "Verifier runs structured goal-backward checks — cheap Haiku is sufficient and fast"
+size_budget: XXL
 parallel-safe: never
 typical-duration-seconds: 90
 reads-only: false

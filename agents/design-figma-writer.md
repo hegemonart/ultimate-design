@@ -5,7 +5,8 @@ tools: Read, Write, Bash, Grep, Glob, mcp__figma__use_figma, mcp__figma-desktop_
 color: purple
 model: inherit
 default-tier: sonnet
-tier-rationale: "Emits Figma-formatted output from existing spec; structured transformation"
+tier-rationale: "Writer proposes + executes Figma write-backs — Sonnet handles structured proposal synthesis well"
+size_budget: LARGE
 ---
 
 @reference/shared-preamble.md

@@ -1,0 +1,23 @@
+{
+  "generated": "2026-04-18T00:00:00Z",
+  "components": [
+    {
+      "file": "src/App.jsx",
+      "component": "App",
+      "role": "definition",
+      "line": 4
+    },
+    {
+      "file": "src/App.jsx",
+      "component": "Card",
+      "role": "reference",
+      "line": 18
+    },
+    {
+      "file": "src/App.jsx",
+      "component": "Button",
+      "role": "reference",
+      "line": 32
+    }
+  ]
+}

@@ -1,0 +1,26 @@
+{
+  "generated": "2026-04-18T00:00:00Z",
+  "a11y": [
+    {
+      "file": "src/App.jsx",
+      "signal": "aria-label",
+      "kind": "aria",
+      "line": 14,
+      "context": "<button aria-label=\"Close dialog\">"
+    },
+    {
+      "file": "src/App.jsx",
+      "signal": "keyboard-nav",
+      "kind": "keyboard",
+      "line": 22,
+      "context": "onKeyDown handler on interactive div"
+    },
+    {
+      "file": "src/App.css",
+      "signal": "focus-visible",
+      "kind": "focus",
+      "line": 48,
+      "context": ":focus-visible outline style"
+    }
+  ]
+}

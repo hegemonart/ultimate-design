@@ -4,7 +4,7 @@ description: "Feeds the Graphify knowledge graph from .design/intel/ slices. Con
 tools: Bash, Read, Write
 color: green
 default-tier: haiku
-tier-rationale: "Read-only graph-state sync; schema-matching work, no reasoning required"
+tier-rationale: "Sync operation is deterministic JSON → graph DB — cheap Haiku is enough"
 parallel-safe: false
 typical-duration-seconds: 20
 reads-only: false
