@@ -64,6 +64,89 @@ Step B1 — ToolSearch check:
 
 Note: scan probes **both** connections because the State Integration block is the authoritative connection-detection point for the entire pipeline. Scan itself does not use Refero, but it writes the Refero status so downstream stages (discover) do not need to re-probe from scratch.
 
+### Phase 8 Connection Probes
+
+Run all 5 Phase 8 probes at scan entry. Results are written to STATE.md `<connections>` so downstream stages (verify, compare, darkmode, plan, design) do not re-probe unless needed.
+
+**preview:**
+
+```
+Step P1 — ToolSearch check:
+  ToolSearch({ query: "Claude_Preview", max_results: 5 })
+  → Empty result      → preview: not_configured
+  → Non-empty result  → proceed to Step P2
+
+Step P2 — Live tool call:
+  call mcp__Claude_Preview__preview_list
+  → Success           → preview: available
+  → Error             → preview: unavailable
+
+Write: preview: <status> to STATE.md <connections>
+```
+
+**storybook:**
+
+```
+Step B1 — Project detection:
+  Bash: ls .storybook/ 2>/dev/null || grep '"storybook"' package.json 2>/dev/null
+  → Found → storybook_project: true → proceed to Step B2
+  → Not found → storybook: not_configured
+
+Step B2 — Dev server detection:
+  Bash: curl -sf http://localhost:6006/index.json 2>/dev/null | head -1
+  → Returns JSON → storybook: available
+  → Fails → Bash: curl -sf http://localhost:6006/stories.json 2>/dev/null | head -1
+      → Returns JSON → storybook: available (compat endpoint)
+      → Fails → storybook: unavailable
+
+Write: storybook: <status> to STATE.md <connections>
+```
+
+**chromatic:**
+
+```
+Step C1 — CLI presence:
+  Bash: command -v chromatic 2>/dev/null || npx chromatic --version 2>/dev/null
+  → found → proceed to Step C2
+  → not found → chromatic: not_configured
+
+Step C2 — Token check:
+  Bash: test -n "${CHROMATIC_PROJECT_TOKEN}"
+  → true → chromatic: available
+  → false → chromatic: unavailable
+
+Write: chromatic: <status> to STATE.md <connections>
+```
+
+**figma_writer:**
+
+```
+ToolSearch({ query: "select:mcp__figma__use_figma", max_results: 1 })
+→ Empty result      → figma_writer: not_configured
+→ Non-empty result  → figma_writer: available
+
+Write: figma_writer: <status> to STATE.md <connections>
+Note: ToolSearch-only probe (same pattern as Refero). No live call at scan time.
+```
+
+**graphify:**
+
+```
+Step G1 — Config check:
+  Bash: node "$HOME/.claude/get-shit-done/bin/gsd-tools.cjs" graphify status
+  → Error or { enabled: false } → graphify: not_configured
+  → { enabled: true }           → proceed to Step G2
+
+Step G2 — Graph file check:
+  Bash: test -f graphify-out/graph.json
+  → Present → graphify: available
+  → Absent  → graphify: unavailable
+
+Write: graphify: <status> to STATE.md <connections>
+```
+
+After all 5 probes, STATE.md `<connections>` contains all 5 status entries. Downstream plans (08-02 through 08-05) read these values without re-probing.
+
 ### Write STATE.md
 
 Update `.design/STATE.md` with probe results:
@@ -72,6 +155,11 @@ Update `.design/STATE.md` with probe results:
 <connections>
 figma: <available | unavailable | not_configured>
 refero: <available | not_configured>
+preview: <available | unavailable | not_configured>
+storybook: <available | unavailable | not_configured>
+chromatic: <available | unavailable | not_configured>
+figma_writer: <available | not_configured>
+graphify: <available | unavailable | not_configured>
 </connections>
 ```
 
