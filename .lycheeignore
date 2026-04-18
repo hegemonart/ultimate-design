@@ -5,3 +5,5 @@
 ^mailto:.*
 ^https://localhost.*
 ^http://localhost.*
+^https://mcp\.figma\.com/.*
+^https://mcp\.pinterest\.com/.*
