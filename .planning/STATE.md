@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v1.0.0
 milestone_name: milestone
 status: Executing Phase 13.2
-stopped_at: Completed 13.2-01-PLAN.md
-last_updated: "2026-04-18T21:46:10.000Z"
-last_activity: 2026-04-18 -- Phase 13.2 Plan 01 complete (authority whitelist + snapshot schema)
+stopped_at: Completed 13.2-02-PLAN.md
+last_updated: "2026-04-18T21:58:38.000Z"
+last_activity: 2026-04-18 -- Phase 13.2 Plan 02 complete (design-authority-watcher agent + mock-feed fixtures)
 progress:
   total_phases: 21
   completed_phases: 1
   total_plans: 17
-  completed_plans: 10
+  completed_plans: 11
   percent: 55
 ---
 
@@ -26,12 +26,12 @@ See: .planning/PROJECT.md (updated 2026-04-17)
 ## Current Position
 
 Phase: 13.2 (external-authority-watcher) — EXECUTING
-Plan: 2 of 4 (13.2-01 complete)
+Plan: 3 of 4 (13.2-01, 13.2-02 complete)
 Released: **v1.0.7** at https://github.com/hegemonart/get-design-done/releases/tag/v1.0.7
 Next phase: 14 (AI-Native Design Tool Connections) — not yet started
-Last activity: 2026-04-18 -- Phase 13.2 Plan 01 complete (authority whitelist + snapshot schema)
+Last activity: 2026-04-18 -- Phase 13.2 Plan 02 complete (design-authority-watcher agent + mock-feed fixtures)
 
-Resume file: .planning/phases/13.2-external-authority-watcher/13.2-02-PLAN.md
+Resume file: .planning/phases/13.2-external-authority-watcher/13.2-03-PLAN.md
 
 Progress: [████████████████░░░░] 74% (14/19 phases complete through v1.0.7)
 
@@ -111,6 +111,7 @@ Progress: [████████████████░░░░] 74% (14
 | Phase 10.1 P03 | 58 min | 5 tasks | 29 files |
 | Phase 10.1 P04 | 20 min | 8 tasks | 8 files |
 | Phase 13.2 P01 | 11 min | 2 tasks | 3 files |
+| Phase 13.2 P02 | 7 min | 2 tasks | 8 files |
 
 ## Accumulated Context
 
@@ -225,6 +226,13 @@ Progress: [████████████████░░░░] 74% (14
 - [Phase 13.2-01]: authority-snapshot schema-level DoS mitigation: `maxItems:200` on feed entries enforces D-14 retention at validation time (mitigates T-13.2-03 snapshot-growth DoS)
 - [Phase 13.2-01]: scripts/validate-schemas.cjs hardened via `-c ajv-formats` to enforce `format: "date-time"` declarations rather than reject them under ajv strict mode — no-op for existing schemas (none declare formats), future-proof for any new schema that does
 - [Phase 13.2-01]: scripts/validate-schemas.cjs PAIRS array is NOT auto-discovery — new schemas under reference/schemas/ must be manually wired into the PAIRS array to get CI enforcement (CONTEXT.md D-12's "picked up automatically" claim was incorrect; fixed inline as Rule 2 deviation)
+- [Phase 13.2-02]: agent-size-budget TIER_LIMITS gains `M: 300` line cap — accommodates Worker-tier agents between S (150) and LARGE (350); matches CONTEXT D-05 "body ≈ 200–300 lines" target with modest headroom; no-op for existing agents (none declare `M`)
+- [Phase 13.2-02]: Phase-6 regression baseline drift protocol — new agents require a single append to `test-fixture/baselines/phase-6/agent-list.txt` in sorted position; the sibling `agent-frontmatter-snapshot.json` stays unchanged because that check only asserts existing agents retain their fields, not that new agents be added
+- [Phase 13.2-02]: Authority-watcher classification table encodes D-17 verbatim in agent body — regex pipes intentionally unescaped inside backticks (prompt-readable regex notation); MD060 markdownlint noise is pre-existing class, not a regression
+- [Phase 13.2-02]: Watcher uses `shasum -a 256` over `sha256sum` for portability (macOS default vs GNU coreutils); both emit identical 64-char lowercase hex per D-13 contract and the schema `^[0-9a-f]{64}$` pattern
+- [Phase 13.2-02]: Skip-regex takes precedence over kind-based classification — a component-system release titled "Sponsored: shipping X" correctly routes to `skip` rather than `pattern-guidance`; skip row is evaluated LAST in the decision table
+- [Phase 13.2-02]: named-practitioner upgrade predicate is link-host-based (w3.org, developer.apple.com, m3.material.io, fluent2.microsoft.design) — makes the craft-tip → pattern-guidance upgrade auditable rather than topic-heuristic
+- [Phase 13.2-02]: Fetch-notes footer is conditional — present only when `fetch_notes` is non-empty, so error-free runs emit a byte-identical report tail for Plan 13.2-04 diff-test determinism
 
 ### Roadmap Evolution
 
@@ -241,6 +249,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-04-18T21:46:10.000Z
-Stopped at: Completed 13.2-01-PLAN.md
-Resume file: .planning/phases/13.2-external-authority-watcher/13.2-02-PLAN.md
+Last session: 2026-04-18T21:58:38.000Z
+Stopped at: Completed 13.2-02-PLAN.md
+Resume file: .planning/phases/13.2-external-authority-watcher/13.2-03-PLAN.md
