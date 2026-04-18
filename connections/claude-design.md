@@ -118,11 +118,20 @@ At scan stage entry:
   2. Check $ARGUMENTS for --from-handoff <path> flag
   3. Check project root for claude-design-handoff.html
 
-  → Bundle path found AND file exists → claude_design: available
-  → No bundle path, no file            → claude_design: not_configured
+  → Bundle path found AND file exists           → claude_design: available
+  → Bundle path provided but file missing/bad   → claude_design: unavailable
+  → No bundle path, no file                      → claude_design: not_configured
 ```
 
 Write result to STATE.md `<connections>` at scan entry.
+
+**Verdict summary:**
+
+| Value | Meaning |
+|-------|---------|
+| `available` | A handoff bundle path was supplied and the file exists/parses |
+| `unavailable` | A handoff path was configured but the file is missing, unreadable, or malformed |
+| `not_configured` | No handoff bundle was supplied and none was discovered in the conventional location |
 
 ---
 
