@@ -3,8 +3,8 @@ gsd_state_version: 1.0
 milestone: v1.0.0
 milestone_name: milestone
 status: executing
-stopped_at: Completed 12-02-PLAN.md
-last_updated: "2026-04-18T02:57:21.309Z"
+stopped_at: Completed 08-02-PLAN.md
+last_updated: "2026-04-18T02:57:59.328Z"
 last_activity: 2026-04-18
 progress:
   total_phases: 15
@@ -77,6 +77,8 @@ Progress: [████████░░] 81%
 | Phase 05-automation-agents-new-commands P05 | 101 | 2 tasks | 2 files |
 | Phase 12-test-coverage P01 | 8 min | 3 tasks | 3 files |
 | Phase 12 P02 | 5 min | 2 tasks | 8 files |
+| Phase 08 P02 | 258 | 3 tasks | 5 files |
+| Phase 08 P03 | 246 | 2 tasks | 5 files |
 
 ## Accumulated Context
 
@@ -158,6 +160,10 @@ Progress: [████████░░] 81%
 - [Phase ?]: [Phase 12-02]: Phase 6 baseline locks 14 agents, 12 skill dirs, 3 connection docs at plugin v1.0.0
 - [Phase ?]: [Phase 12-02]: Baseline captures manifest + frontmatter snapshot — lower maintenance burden than full file copies
 - [Phase ?]: [Phase 12-02]: Version test uses >= baseline — allows future phases to bump version without re-lock
+- [Phase ?]: HTTP-probe-over-MCP: Storybook has no dedicated MCP; probe is two-phase HTTP curl to localhost:6006
+- [Phase ?]: title-grouping-for-inventory: group index.json entries by title field; each unique title is one component
+- [Phase ?]: no-parameters-caveat: Storybook 8 index.json excludes parameters; a11y config lives in .storybook/preview.ts
+- [Phase ?]: [Phase 08-03]: Two-step CLI probe for Chromatic; baseline first-run: status new = baseline established, NOT regression
 
 ### Pending Todos
 
@@ -169,6 +175,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-04-18T02:56:59.755Z
-Stopped at: Completed 12-02-PLAN.md
+Last session: 2026-04-18T02:57:45.458Z
+Stopped at: Completed 08-02-PLAN.md
 Resume file: None
