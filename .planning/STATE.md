@@ -3,8 +3,8 @@ gsd_state_version: 1.0
 milestone: v1.0.0
 milestone_name: milestone
 status: executing
-stopped_at: Phase 13.3 Plan 01 complete (schema extension for update_dismissed)
-last_updated: "2026-04-19T21:54:05.000Z"
+stopped_at: Phase 13.3 Plan 02 complete (SessionStart update-check.sh hook + hooks.json registration)
+last_updated: "2026-04-19T22:02:00.000Z"
 last_activity: 2026-04-19
 progress:
   total_phases: 19
@@ -25,13 +25,13 @@ See: .planning/PROJECT.md (updated 2026-04-17)
 
 ## Current Position
 
-Phase: 13.3 (Plugin Update Checker) — IN PROGRESS (plan 01 of 06 complete)
+Phase: 13.3 (Plugin Update Checker) — IN PROGRESS (plan 02 of 06 complete)
 Last shipped: **v1.0.7** at https://github.com/hegemonart/get-design-done/releases/tag/v1.0.7
 Target version (13.3 closeout): v1.0.7.3
-Next plan: 13.3-02 (hooks/update-check.sh SessionStart hook)
+Next plan: 13.3-03 (design-update-checker agent — cold path for /gdd:check-update --prompt)
 Last activity: 2026-04-19
 
-Resume file: .planning/phases/13.3-plugin-update-checker/13.3-02-PLAN.md
+Resume file: .planning/phases/13.3-plugin-update-checker/13.3-03-PLAN.md
 
 Progress: [████████████████░░░░] 74% (14/19 phases complete through v1.0.7)
 
@@ -111,6 +111,7 @@ Progress: [████████████████░░░░] 74% (14
 | Phase 10.1 P03 | 58 min | 5 tasks | 29 files |
 | Phase 10.1 P04 | 20 min | 8 tasks | 8 files |
 | Phase 13.3 P01 | ~2 min | 1 tasks | 1 files |
+| Phase 13.3 P02 | ~4 min | 2 tasks | 2 files |
 
 ## Accumulated Context
 
@@ -221,6 +222,11 @@ Progress: [████████████████░░░░] 74% (14
 - [Phase 10.1-04]: Three gate agents use distinct colors (green, blue, cyan) mirroring their gated counterparts for terminal readability
 - [Phase 13.3-01]: update_dismissed is an optional top-level string in config.schema.json (not required) — users who never dismiss never write it; description string documents both writers (slash command --dismiss and hook --dismiss path)
 - [Phase 13.3-01]: Schema addition pattern locked — insert new property block after the last existing sibling, keep $id/$schema/title/additionalProperties unchanged, verify with ajv-cli positive + negative + regression fixtures before commit
+- [Phase 13.3-02]: Source-safe Bash hook pattern — main control flow wrapped in `if [ "${BASH_SOURCE[0]}" = "$0" ]; then ... fi` so unit tests can source the script to exercise pure functions (classify_delta, normalize_semver) without triggering fetch / cache / render side effects; acceptance criterion exercises this by sourcing the hook and calling classify_delta
+- [Phase 13.3-02]: python3-only body extraction — when python3 is absent the hook writes empty changelog_excerpt silently; no awk/sed JSON-decoding fallback (per plan revision; matches D-04 silent-on-failure posture)
+- [Phase 13.3-02]: SessionStart hook ordering — bootstrap (index 0) initializes .design/; update-check (index 1) reads .design/ and writes update-cache.json / update-available.md; update-check has its own `mkdir -p .design` belt+suspenders so hooks are independent-order-safe
+- [Phase 13.3-02]: Four-gate banner render — is_newer=true → not dismissed → stage ∉ {plan,design,verify} → atomic render; every failed gate removes existing banner then silently exits 0
+- [Phase 13.3-02]: Silent-by-default logger — `log()` writes to stderr only when `GDD_UPDATE_DEBUG=1`; SessionStart produces no stdout/stderr under normal operation
 
 ### Roadmap Evolution
 
@@ -237,6 +243,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-04-19T21:54:05.000Z
-Stopped at: Phase 13.3 Plan 01 complete — config.schema.json extended with optional `update_dismissed` string
-Resume file: .planning/phases/13.3-plugin-update-checker/13.3-02-PLAN.md
+Last session: 2026-04-19T22:02:00.000Z
+Stopped at: Phase 13.3 Plan 02 complete — SessionStart update-check.sh hook (238 lines, shellcheck-clean, source-safe) + hooks.json registration as SessionStart[1]
+Resume file: .planning/phases/13.3-plugin-update-checker/13.3-03-PLAN.md
