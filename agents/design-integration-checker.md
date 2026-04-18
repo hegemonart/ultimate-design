@@ -4,12 +4,16 @@ description: Verifies D-XX design decisions from DESIGN-CONTEXT.md are actually 
 tools: Read, Bash, Grep, Glob
 color: blue
 model: inherit
+default-tier: haiku
+tier-rationale: "Cross-artifact link-integrity scan; structured input, structured output"
 size_budget: LARGE
 parallel-safe: always
 typical-duration-seconds: 30
 reads-only: true
 writes: []
 ---
+
+@reference/shared-preamble.md
 
 # design-integration-checker
 

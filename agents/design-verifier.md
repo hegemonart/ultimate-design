@@ -4,6 +4,8 @@ description: Goal-backward verification of design outcomes against .design/STATE
 tools: Read, Write, Bash, Grep, Glob
 color: green
 model: inherit
+default-tier: haiku
+tier-rationale: "Runs a deterministic 5-pass scoring rubric; Haiku handles structured grading without quality loss"
 size_budget: XL
 parallel-safe: never
 typical-duration-seconds: 90
@@ -11,6 +13,8 @@ reads-only: false
 writes:
   - ".design/DESIGN-VERIFICATION.md"
 ---
+
+@reference/shared-preamble.md
 
 # design-verifier
 
