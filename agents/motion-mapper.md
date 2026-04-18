@@ -4,12 +4,16 @@ description: "Maps motion and animation patterns — CSS transitions, framer-mot
 tools: Read, Write, Bash, Grep, Glob
 color: cyan
 model: inherit
+default-tier: sonnet
+tier-rationale: "Inventories motion patterns; open-ended visual reasoning across files"
 parallel-safe: auto
 typical-duration-seconds: 30
 reads-only: false
 writes:
   - ".design/map/motion.md"
 ---
+
+@reference/shared-preamble.md
 
 # motion-mapper
 

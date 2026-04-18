@@ -4,6 +4,8 @@ description: Retrospective 6-pillar audit (copy, visual hierarchy, color, typogr
 tools: Read, Write, Bash, Grep, Glob
 color: green
 model: inherit
+default-tier: sonnet
+tier-rationale: "Emits structured findings from code inspection; Sonnet balances depth with cost"
 size_budget: XL
 parallel-safe: always
 typical-duration-seconds: 45
@@ -11,6 +13,8 @@ reads-only: false
 writes:
   - ".design/DESIGN-AUDIT.md"
 ---
+
+@reference/shared-preamble.md
 
 # design-auditor
 

@@ -4,8 +4,12 @@ description: Writes design decisions back to Figma — annotations, token bindin
 tools: Read, Write, Bash, Grep, Glob, mcp__figma__use_figma, mcp__figma-desktop__get_variable_defs, mcp__figma-desktop__get_metadata
 color: purple
 model: inherit
+default-tier: sonnet
+tier-rationale: "Writer proposes + executes Figma write-backs — Sonnet handles structured proposal synthesis well"
 size_budget: LARGE
 ---
+
+@reference/shared-preamble.md
 
 # design-figma-writer
 

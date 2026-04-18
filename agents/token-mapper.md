@@ -4,12 +4,16 @@ description: "Maps design tokens — colors, spacing, typography, shadows — fr
 tools: Read, Write, Bash, Grep, Glob
 color: cyan
 model: inherit
+default-tier: sonnet
+tier-rationale: "Extracts design tokens from source; pattern recognition across files"
 parallel-safe: auto
 typical-duration-seconds: 45
 reads-only: false
 writes:
   - ".design/map/tokens.md"
 ---
+
+@reference/shared-preamble.md
 
 # token-mapper
 

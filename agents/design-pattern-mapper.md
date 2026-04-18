@@ -4,12 +4,16 @@ description: Greps codebase for existing design patterns (color tokens, spacing 
 tools: Read, Write, Bash, Grep, Glob
 color: green
 model: inherit
+default-tier: sonnet
+tier-rationale: "Catalogs design patterns present in codebase; open-ended classification"
 parallel-safe: always
 typical-duration-seconds: 45
 reads-only: false
 writes:
   - ".design/DESIGN-PATTERNS.md"
 ---
+
+@reference/shared-preamble.md
 
 # design-pattern-mapper
 

@@ -2,16 +2,16 @@
 gsd_state_version: 1.0
 milestone: v1.0.0
 milestone_name: milestone
-status: verifying
-stopped_at: Merged Phase 10 into main
-last_updated: "2026-04-18T12:00:00.000Z"
+status: executing
+stopped_at: Phase 10.1 Plan 04 complete
+last_updated: "2026-04-18T15:51:15.000Z"
 last_activity: 2026-04-18
 progress:
   total_phases: 15
   completed_phases: 9
   total_plans: 55
-  completed_plans: 45
-  percent: 82
+  completed_plans: 47
+  percent: 85
 ---
 
 # Project State
@@ -21,16 +21,18 @@ progress:
 See: .planning/PROJECT.md (updated 2026-04-17)
 
 **Core value:** Any developer can run the full pipeline on a real project and receive measurable, specific design improvement — not generic AI advice.
-**Current focus:** Phase 12 — Test Coverage
+**Current focus:** Phase 10.1 — Optimization Layer + Cost Governance (INSERTED, retroactive v1.0.4.1)
 
 ## Current Position
 
-Phase: 12 (Test Coverage) — EXECUTING
-Plan: 7 of 7
-Status: Phase complete — ready for verification
+Phase: 10.1 (Optimization Layer + Cost Governance) — EXECUTING
+Plan: 4 of 6 complete (Plans 01, 02, 03, 04, 05 done; 06 remaining)
+Status: Plan 10.1-04 complete — 3 Haiku gate agents + streaming synthesize skill + 4 orchestrator wirings shipped
 Last activity: 2026-04-18
 
-Progress: [████████░░] 81%
+Resume file: .planning/phases/10.1-optimization-layer-cost-governance/10.1-06-PLAN.md
+
+Progress: [████████▌░] 85%
 
 ## Performance Metrics
 
@@ -81,6 +83,8 @@ Progress: [████████░░] 81%
 | Phase 08 P03 | 246 | 2 tasks | 5 files |
 | Phase 08-visual-design-connections P01 | 372 | 4 tasks | 6 files |
 | Phase 08 P05 | 190 | 2 tasks | 5 files |
+| Phase 10.1 P03 | 58 min | 5 tasks | 29 files |
+| Phase 10.1 P04 | 20 min | 8 tasks | 8 files |
 
 ## Accumulated Context
 
@@ -175,6 +179,20 @@ Progress: [████████░░] 81%
 - [Phase 10-04]: ARM tier vocabulary
 - [Phase 10-04]: Flow diagram uses Mermaid flowchart TD
 - [Phase 10-04]: Researcher MUST produce ARM + Flow Diagram in DESIGN-CONTEXT.md
+- [Phase 10.1-03]: Per-agent tier map locked (D-13): 5 haiku + 16 sonnet + 5 opus = 26 agents
+- [Phase 10.1-03]: Override precedence (D-04) documented: budget.json.tier_overrides > frontmatter default-tier > hardcoded sonnet fallback
+- [Phase 10.1-03]: Cache-aligned body ordering (D-17): shared-preamble import is first non-blank body line; verified on all 26 agents
+- [Phase 10.1-03]: Shared preamble scope (D-16) is universal — no agent-specific language; 82 lines covering framework identity, required reading discipline, writes protocol, deviation handling, hook awareness, ordering convention
+- [Phase 10.1-04]: Gate JSON contract locked — single line {spawn: bool, rationale: string ≤200 chars} + ## GATE COMPLETE marker, no prose wrapper, no fence
+- [Phase 10.1-04]: Rationale content boundary — paths and regex-family names only, no file content (threat-model T-10.1-04-03)
+- [Phase 10.1-04]: Synthesize hard-coded to Haiku 4.5 per D-14; budget.json.tier_overrides.synthesize can override but orchestrators should not re-route to Sonnet (structure-preserving merge)
+- [Phase 10.1-04]: Synthesize fallback on Haiku failure = naive \n---\n concat with synthesize_fallback:true telemetry flag (fail-open)
+- [Phase 10.1-04]: Verify orchestrator gates both 1b (verifier) and 1c (integration-checker); 1a (auditor) and 1d (re-verify fix loop) remain mandatory
+- [Phase 10.1-04]: Discover gates context-checker but not context-builder (builder is the only source of DESIGN-CONTEXT.md; gate would always say spawn:true on first run)
+- [Phase 10.1-04]: Plan Step 1.7 conditional on ≥2 research agents running — if only one, synthesis adds no value and is skipped
+- [Phase 10.1-04]: Map Step 3.5 skipped when --only <name> restricts dispatch to a single mapper
+- [Phase 10.1-04]: Per-mapper .design/map/*.md files preserved on disk even after DESIGN-PATTERNS.md synthesis — drill-down evidence unchanged
+- [Phase 10.1-04]: Three gate agents use distinct colors (green, blue, cyan) mirroring their gated counterparts for terminal readability
 
 ### Pending Todos
 
@@ -186,6 +204,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-04-18T12:00:00.000Z
-Stopped at: Merged Phase 10 into main
-Resume file: None
+Last session: 2026-04-18T15:51:15.000Z
+Stopped at: Completed 10.1-04-PLAN.md
+Resume file: .planning/phases/10.1-optimization-layer-cost-governance/10.1-06-PLAN.md

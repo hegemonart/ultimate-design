@@ -4,12 +4,16 @@ description: Applies BLOCKER and MAJOR gaps from DESIGN-VERIFICATION.md to sourc
 tools: Read, Write, Edit, Bash, Grep, Glob
 color: red
 model: inherit
+default-tier: sonnet
+tier-rationale: "Applies targeted fixes to a localized artifact; structured input, structured diff output"
 parallel-safe: conditional-on-touches
 typical-duration-seconds: 60
 reads-only: false
 writes:
   - "src/**"
 ---
+
+@reference/shared-preamble.md
 
 # design-fixer
 

@@ -3,12 +3,16 @@ name: gdd-graphify-sync
 description: "Feeds the Graphify knowledge graph from .design/intel/ slices. Converts intel store graph.json nodes and edges into Graphify-compatible format and upserts them. Run after gdd-intel-updater to keep the semantic graph current."
 tools: Bash, Read, Write
 color: green
+default-tier: haiku
+tier-rationale: "Sync operation is deterministic JSON → graph DB — cheap Haiku is enough"
 parallel-safe: false
 typical-duration-seconds: 20
 reads-only: false
 writes:
   - .design/intel/graph.json
 ---
+
+@reference/shared-preamble.md
 
 # gdd-graphify-sync
 

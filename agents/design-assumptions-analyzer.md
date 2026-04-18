@@ -4,11 +4,15 @@ description: Reads codebase and DESIGN-CONTEXT.md to surface hidden design assum
 tools: Read, Bash, Grep, Glob
 color: blue
 model: inherit
+default-tier: opus
+tier-rationale: "Surfaces load-bearing assumptions before planning; one wrong assumption derails the phase"
 parallel-safe: always
 typical-duration-seconds: 30
 reads-only: true
 writes: []
 ---
+
+@reference/shared-preamble.md
 
 # design-assumptions-analyzer
 

@@ -3,6 +3,8 @@ name: gdd-intel-updater
 description: "Incremental intel store updater. Runs build-intel.cjs for changed files, then re-derives only the affected slices. Call after any skill/agent/reference edit to keep .design/intel/ current."
 tools: Bash, Read, Write, Glob
 color: purple
+default-tier: sonnet
+tier-rationale: "Incremental intel updater re-derives slices from changed files — Sonnet handles structured JSON munging"
 parallel-safe: false
 typical-duration-seconds: 15
 reads-only: false
@@ -18,6 +20,8 @@ writes:
   - .design/intel/debt.json
   - .design/intel/graph.json
 ---
+
+@reference/shared-preamble.md
 
 # gdd-intel-updater
 

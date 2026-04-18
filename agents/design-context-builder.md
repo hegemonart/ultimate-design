@@ -6,6 +6,8 @@ required_reading:
   - connections/storybook.md
 color: blue
 model: inherit
+default-tier: sonnet
+tier-rationale: "Builder runs discovery interview and writes canonical DESIGN-CONTEXT.md — Sonnet balances quality and budget"
 size_budget: XXL
 parallel-safe: never
 typical-duration-seconds: 180
@@ -13,6 +15,8 @@ reads-only: false
 writes:
   - ".design/DESIGN-CONTEXT.md"
 ---
+
+@reference/shared-preamble.md
 
 # design-context-builder
 
