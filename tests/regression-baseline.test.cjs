@@ -3,6 +3,7 @@ const test = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('fs');
 const path = require('path');
+const { execSync } = require('child_process');
 const { REPO_ROOT } = require('./helpers.cjs');
 
 const BASELINE_DIR = path.join(REPO_ROOT, 'test-fixture', 'baselines', 'phase-6');
@@ -15,9 +16,33 @@ function readBaselineLines(filename) {
   return readBaseline(filename).split('\n').map(l => l.trim()).filter(Boolean).sort();
 }
 
-test('baseline: agent-list matches agents/ directory', () => {
+/**
+ * List files tracked by git under a given directory prefix.
+ * Returns an array of filenames (basename only, no subdirs).
+ */
+function gitTrackedFiles(dirPrefix) {
+  const output = execSync(`git ls-files ${dirPrefix}`, { cwd: REPO_ROOT, encoding: 'utf8' });
+  return output.trim().split('\n').filter(Boolean).map(f => path.basename(f));
+}
+
+/**
+ * List unique direct subdirectory names tracked by git under a given directory prefix.
+ */
+function gitTrackedSubdirs(dirPrefix) {
+  const output = execSync(`git ls-files ${dirPrefix}`, { cwd: REPO_ROOT, encoding: 'utf8' });
+  const seen = new Set();
+  for (const line of output.trim().split('\n').filter(Boolean)) {
+    // e.g. "skills/design/SKILL.md" -> relative to dirPrefix -> "design/SKILL.md" -> first segment "design"
+    const relative = line.slice(dirPrefix.length).replace(/^\//, '');
+    const subdir = relative.split('/')[0];
+    if (subdir) seen.add(subdir);
+  }
+  return [...seen].sort();
+}
+
+test('baseline: agent-list matches committed agents/ files', () => {
   const expected = readBaselineLines('agent-list.txt');
-  const actual = fs.readdirSync(path.join(REPO_ROOT, 'agents'))
+  const actual = gitTrackedFiles('agents/')
     .filter(f => f.startsWith('design-') && f.endsWith('.md'))
     .sort();
   assert.deepEqual(actual, expected,
@@ -25,14 +50,9 @@ test('baseline: agent-list matches agents/ directory', () => {
   );
 });
 
-test('baseline: skill-list matches skills/ directory', () => {
+test('baseline: skill-list matches committed skills/ directories', () => {
   const expected = readBaselineLines('skill-list.txt');
-  const actual = fs.readdirSync(path.join(REPO_ROOT, 'skills'))
-    .filter(name => {
-      const fullPath = path.join(REPO_ROOT, 'skills', name);
-      return fs.statSync(fullPath).isDirectory();
-    })
-    .sort();
+  const actual = gitTrackedSubdirs('skills/');
   assert.deepEqual(actual, expected,
     `Skill list drift detected. Re-lock if intentional.`
   );
