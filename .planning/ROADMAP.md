@@ -58,6 +58,10 @@ Decimal phases appear between their surrounding integers in numeric order.
 - [ ] **Phase 17: Component Benchmark Corpus — Waves 3–5 + Pipeline Integration** — Completes the corpus: **Wave 3 (6 feedback: Toast, Alert, Progress, Skeleton, Badge, Chip)**, **Wave 4 (9 nav & data: Menu, Navbar, Sidebar, Breadcrumbs, Pagination, Table, List, Tree, Command-palette)**, **Wave 5 (5 advanced: Date-picker, Slider, File-upload, Rich-text editor, Stepper)** = 20 more specs, 35 total. Wires the corpus into the pipeline: `design-auditor` scores **component-spec conformance** (detects implementations, compares against canonical spec); `design-executor` `type:components` consults specs pre-flight; `design-doc-writer` scaffolds handoff docs from specs; `design-pattern-mapper` gains a convergence detector reporting codebase↔spec deltas.
 - [ ] **Phase 18: Advanced Craft References — Motion, Typography, Layout Engines** — `reference/variable-fonts-loading.md` (axes, `font-display` trade-offs, subsetting, fallback metric overrides, FOIT/FOUT), `reference/image-optimization.md` (WebP/AVIF/JPEG-XL matrix, srcset math, LQIP/BlurHash, CDN transforms, fetchpriority), `reference/css-grid-layout.md` (Grid templates, subgrid, container queries, fluid typography with `clamp()`, logical properties, safe-area insets), `reference/motion-advanced.md` (spring physics, stagger, scroll-driven animation, FLIP, View Transitions API — extends not replaces current motion.md). Can run in parallel with Phases 16–17.
 - [ ] **Phase 19: Platform, Inclusive Design & UX Research References** — Final knowledge-layer phase. `reference/platforms.md` (iOS/Android/web/visionOS/watchOS conventions, safe areas, gestures, haptics), `reference/rtl-cjk-cultural.md` (RTL mirroring rules, CJK/Arabic/Devanagari typography, cultural color meanings, inclusive imagery), `reference/onboarding-progressive-disclosure.md` (empty-state vs. tour vs. checklist, feature discovery, Aha-moment mapping), `reference/user-research.md` (method matrix, card/tree/5-second tests, A/B sample-size, analytics-informed design), `reference/information-architecture.md` (nav pattern catalog, menu depth, scent-of-information, wayfinding), `reference/form-patterns.md` (label position, inline-validation timing, error recovery, multi-step, password UX, autocomplete/inputmode hints), `reference/data-visualization.md` (chart-choice matrix, color-blind-safe palettes, annotation, dashboard patterns). Can run in parallel with Phases 16–18.
+- [ ] **Phase 20: GDD SDK Foundation — State Core, Lockfiles, Mutation Events, Stage Migration** — `gdd-state` Node module: typed STATE.md parser/mutator, **lockfile with PID cleanup** (atomicity for concurrent agents — closes the race condition risk introduced by Phase 10.1's parallelism layer), atomic read-modify-write primitive. 4 transition gates as pure functions (brief→explore, explore→plan, plan→design, design→verify) — replaces prose-only assertions in stage skills. **MCP server** `gdd-state` exposing typed tools: `gdd_state__get`, `__update_progress`, `__transition_stage`, `__add_blocker`, `__add_decision`, `__add_must_have`, `__set_status`, `__checkpoint`, `__probe_connections`, `__frontmatter_update`, `__config_update`. Event stream foundation: file-append `.design/telemetry/events.jsonl` with typed event schema, EventEmitter bus. `prompt-sanitizer` (strips `AskUserQuestion`, `/gdd:`, `@file:`, `STOP`, "wait for user" — preps prompts for headless use in Phase 21). `GDDError` + `ErrorClassification` taxonomy (throw for "fix your input"; `data.error` for "couldn't complete in this state"). **Migration:** all 5 stage skills (brief, explore, plan, design, verify) + utility skills (pause, resume, progress, health, todo, settings) + reflector + budget hook + injection scanner rewritten to call typed MCP tools instead of ad-hoc Read+regex+Write.
+- [ ] **Phase 21: GDD SDK Headless — Pipeline Runner, Parallel Researchers, Cross-Harness MCP** — `session-runner` (Anthropic Agent SDK headless wrapper with budget/turn caps + transcript capture), `context-engine` (per-stage file manifest + markdown-aware truncation + cache-friendly preserves frontmatter + headings + first-paragraph), `tool-scoping` (per-stage allowed-tools enforcement at session creation — Verify=read-only, Explore=read+web, Design=read/write), structured `logger`. `pipeline-runner` state machine in code: brief → explore → plan → design → verify with retry-once primitive, halt logic, human-gate callbacks, config-driven step skipping. **Parallel research bootstrap** — `gdd-sdk init` spawns concurrent researchers (design-system-audit, brand-context, accessibility-baseline, competitive-references) for new-project setup, mirroring GSD's `init-runner` pattern but design-domain-specific. **Parallel mappers + discussants** — `explore-parallel-runner` spawns token-mapper / component-taxonomy-mapper / a11y-mapper / visual-hierarchy-mapper concurrently with streaming synthesizer collation (replaces today's buffered output); `discuss-parallel-runner` runs discussant variants in parallel for multi-angle questioning. `gdd-sdk` CLI binary (`run`, `stage`, `query`, `audit`, `init` subcommands). **Cross-harness MCP layer** — tool-name maps in `references/codex-tools.md` + `references/gemini-tools.md`, `AGENTS.md` + `GEMINI.md` entry points so the same SDK runs unchanged on Codex CLI and Gemini CLI via MCP. E2E headless integration test: full pipeline run without Claude Code interactive harness.
+- [ ] **Phase 22: GDD SDK Observability — Event Stream, Transports, Telemetry Integration, Self-Improvement Wiring** — Typed event stream expansion (`stage_start`, `stage_complete`, `wave_start`, `wave_complete`, `blocker_added`, `decision_added`, `must_have_added`, `parallelism_verdict`, `cost_update`, `rate_limit`, `api_retry`, `compact_boundary`, `mcp_probe`, `reflection_proposed`, `connection_status_change`). **CLI transport** (stdout JSONL with filter language for tail-style consumption). **WebSocket transport** (live event stream for external dashboards/observers, with token auth — opens path to web UIs and IDE integrations). Existing `.design/telemetry/costs.jsonl` becomes one event-stream sink; typed reader/aggregator for `events.jsonl` + `costs.jsonl` + `agent-metrics.json`. **Wire existing features into the event stream:** Phase 11 reflector becomes code-level pipeline reading events + telemetry → emitting typed reflection proposals; Phase 13.2 authority-watcher RSS diff rides on event stream; Phase 13.3 update-checker becomes cross-harness typed primitive; Phase 10.1 read-injection-scanner + cache-warmer + `gdd-router` + budget-enforcer all become code primitives with audit logs (still wrap as CC hooks for backwards-compat). Connection probes (`figma`, `refero`, `pinterest`, `claude_design`, `paper`, `pencil`) as code-level primitives with retry policy + exponential backoff + fallback chain (figma → cache → mock).
+- [ ] **Phase 23: GDD SDK Domain Primitives — Knowledge Layer SDK, Visual & Token Engines, Distribution** — **Knowledge layer SDK:** intel store (`.design/intel/`) typed reader/writer; knowledge graph (`.planning/graphs/`) typed query layer; skill manifest registry with capability matching; project-local skills (`./.claude/skills/`) auto-discovery; cycle/workstream model. **Visual + token primitives:** image diff primitive (regression baseline drift), screenshot capture orchestration (Playwright + Claude Preview MCP wrapper), visual baseline manager (`.design/baselines/`), design-token reader (multi-source: CSS vars / JS const / Tailwind config / Figma variables), token diff + applier (for darkmode/brand variants). **Pipeline primitives:** `Touches:` analyzer + parallelism decision engine in code (replaces prompt-encoded version from Phase 10.1); audit aggregator (collects findings from N audit-agents, scores, prioritizes); per-stage budget allocator (reads `.design/budget.json`, hard-stops at limits); reference resolver (`type:forms` task → `reference/form-patterns.md`); pause/resume context serializer. **Domain primitives:** NNG heuristic checker (code-level), anti-pattern catalog matcher (regex signature registry), WCAG threshold validator, handoff bundle parser (claude-design-html / claude-design-bundle / manual), spec↔code↔visual triangulation verifier (gates on Phase 16–17 component specs; ships placeholder if not yet landed), git operations primitive (atomic commit, branch state, deviation handling). **Distribution:** package as `@hegemonart/gdd-sdk` separate npm package + keep MCP server in plugin. Migration guide for plugin consumers. Headless-mode operations guide. API reference + MCP tools reference. Final regression baseline locks the SDK contract.
 
 ## Phase Details
 
@@ -775,6 +779,244 @@ Plans:
 **Wave C — closeout (1 plan):**
 - [ ] 19-08-PLAN.md — **Phase closeout**: refresh README.md (full knowledge-coverage note, 18-reference index); refresh plugin.json + marketplace.json (version, description, keywords — add "i18n", "user-research", "information-architecture", "form-patterns", "data-viz"); append CHANGELOG.md v1.0.13 entry; lock final regression baseline at `test-fixture/baselines/phase-19/`. **Knowledge-layer complete** — plugin now has full coverage across the 2026-04-18 audit's identified gaps (MAN-21, MAN-22)
 
+### Phase 20: GDD SDK Foundation — State Core, Lockfiles, Mutation Events, Stage Migration
+**Goal**: STATE.md mutation safety becomes a tested, typed boundary instead of a per-skill prose contract. All 5 stage skills + utility skills + hooks call typed MCP tools for state operations. Race conditions from Phase 10.1's parallelism layer are closed by lockfile + atomic read-modify-write.
+**Depends on**: Phase 13 (CI/CD baseline) — needed for SDK CI matrix. Soft dependency on Phase 13.1/13.2/13.3 (consolidated/inserted decimal phases).
+**Target version**: v1.0.14
+**Requirements**: SDK-01 through SDK-12 (to be defined during plan-phase)
+
+**Success Criteria** (what must be TRUE):
+  1. **`gdd-state` Node module** exists with typed parser/mutator for STATE.md (`<position>`, `<decisions>`, `<must_haves>`, `<connections>`, `<blockers>`, `<parallelism_decision>`, `<timestamps>`, frontmatter), exports a single `read()` / `mutate()` / `transition()` API. Lockfile uses sibling `.lock` file with PID; stale locks cleared on PID-dead OR file-age threshold (mirrors GSD `state-mutation.ts` D2 pattern).
+  2. **4 transition gates** exist as pure functions in `gdd-state/gates.ts` — `briefToExplore`, `exploreToPlan`, `planToDesign`, `designToVerify` — each takes a parsed STATE and returns `{ pass: boolean; blockers: string[] }`. Tested against fixture STATE.md files for both pass and fail cases.
+  3. **MCP server `gdd-state`** ships in plugin (`connections/gdd-state.md` + server entrypoint), exposes 11 tools: `gdd_state__get`, `__update_progress`, `__transition_stage`, `__add_blocker`, `__resolve_blocker`, `__add_decision`, `__add_must_have`, `__set_status`, `__checkpoint`, `__probe_connections`, `__frontmatter_update`, `__config_update`. JSON Schema for every input/output. Mutation tools emit typed events to `events.jsonl`.
+  4. **Event stream foundation** — `.design/telemetry/events.jsonl` append-only with typed event schema (`{type, timestamp, sessionId, stage?, cycle?, payload}`). EventEmitter bus in `gdd-state/event-stream.ts`. Existing `costs.jsonl` keeps its shape; SDK adds events as a parallel stream.
+  5. **`prompt-sanitizer`** module strips `@file:`, `/gdd:`, `AskUserQuestion(...)`, `STOP`, "wait for user", "ask the user" patterns. Tests cover ≥20 representative skill snippets. Required by Phase 21's headless runner.
+  6. **`GDDError` taxonomy** — `ValidationError` (throw, "fix your input"), `StateConflictError` (throw, "lockfile contention or transition guard failed"), `OperationFailedError` (return as `data.error`, "couldn't complete in this state"). Mirrors GSD `errors.ts` discipline.
+  7. **All 5 stage skills migrated** — `skills/{brief,explore,plan,design,verify}/SKILL.md` rewritten so STATE.md operations call MCP tools instead of `Read+regex+Write`. Same prompt content, different state-mutation surface. Tests/regression baseline confirm zero behavior drift.
+  8. **Utility skills migrated** — `pause`, `resume`, `progress`, `health`, `todo`, `settings` use typed `gdd_state__get` and related tools.
+  9. **Hooks migrated** — `budget-enforcer.js`, `gdd-read-injection-scanner.js`, `context-exhaustion.js` consume typed events; reflector skill (Phase 11) reads typed proposals from event stream.
+  10. **Race-condition test exists** — spawn 4 concurrent agents that all attempt to update `task_progress` and `<blockers>` at the same time; assert no STATE.md corruption, no lost writes, lockfile is properly released after each.
+  11. README / plugin.json / marketplace.json updated; CHANGELOG v1.0.14 entry; regression baseline at `test-fixture/baselines/phase-20/`.
+
+**Plans**: 14 plans across 4 waves (parallelism-heavy — Wave A is 4 disjoint module builds, Wave C is 5 disjoint skill migrations).
+
+**Wave A — foundational modules (4 plans, parallel-safe: disjoint files):**
+- [ ] 20-01-PLAN.md — `gdd-state` Node module: parser + mutator + lockfile + atomic RMW + unit tests (SDK-01, SDK-02)
+- [ ] 20-02-PLAN.md — 4 transition gates as pure functions + fixture-based tests (SDK-03)
+- [ ] 20-03-PLAN.md — `prompt-sanitizer` module + tests (SDK-04)
+- [ ] 20-04-PLAN.md — `GDDError` + `ErrorClassification` taxonomy + tests (SDK-05)
+
+**Wave B — shared API surface (2 plans, parallel-safe after Wave A):**
+- [ ] 20-05-PLAN.md — MCP server `gdd-state` exposing 11 typed tools, JSON Schema, mutation-event emission (SDK-06, SDK-07)
+- [ ] 20-06-PLAN.md — Event stream foundation: `events.jsonl` append-only, typed event schema, EventEmitter bus (SDK-08)
+
+**Wave C — skill migration (5 plans, parallel-safe: disjoint stage SKILLs):**
+- [ ] 20-07-PLAN.md — Migrate `skills/brief/SKILL.md` to MCP tools (SDK-09)
+- [ ] 20-08-PLAN.md — Migrate `skills/explore/SKILL.md` to MCP tools (SDK-09)
+- [ ] 20-09-PLAN.md — Migrate `skills/plan/SKILL.md` to MCP tools (SDK-09)
+- [ ] 20-10-PLAN.md — Migrate `skills/design/SKILL.md` to MCP tools (SDK-09)
+- [ ] 20-11-PLAN.md — Migrate `skills/verify/SKILL.md` to MCP tools (SDK-09)
+
+**Wave D — utility migration + closeout (3 plans):**
+- [ ] 20-12-PLAN.md — Migrate utility skills (`pause`, `resume`, `progress`, `health`, `todo`, `settings`) to typed `gdd_state__get` (SDK-10)
+- [ ] 20-13-PLAN.md — Migrate hooks (`budget-enforcer.js`, `gdd-read-injection-scanner.js`, `context-exhaustion.js`) + reflector to event-stream consumers (SDK-11)
+- [ ] 20-14-PLAN.md — **Phase closeout**: race-condition test (4 concurrent agents on STATE.md), regression baseline at `test-fixture/baselines/phase-20/`, README / plugin.json / marketplace.json refresh, CHANGELOG v1.0.14 entry (SDK-12)
+
+### Phase 21: GDD SDK Headless — Pipeline Runner, Parallel Researchers, Cross-Harness MCP
+**Goal**: Pipeline runs headless without Claude Code. Pipeline state machine lives in code, not in stage-skill prose. Parallel research/mappers/discussants are a code-level primitive. The same SDK runs unchanged on Claude Code, Codex CLI, and Gemini CLI via MCP.
+**Depends on**: Phase 20 (state core, MCP server, prompt-sanitizer).
+**Target version**: v1.0.15
+**Requirements**: SDK-13 through SDK-24 (to be defined during plan-phase)
+
+**Success Criteria** (what must be TRUE):
+  1. **`session-runner`** wraps Anthropic Agent SDK `query()` with budget cap, turn cap, transcript capture, structured error mapping. Single SDK invocation point.
+  2. **`context-engine`** has per-stage file manifest (Brief={STATE,BRIEF}; Explore={STATE,BRIEF,DESIGN-CONTEXT}; Plan={STATE,DESIGN-PLAN,DESIGN-CONTEXT,RESEARCH}; Design={STATE,DESIGN-PLAN}; Verify={STATE,DESIGN-PLAN,SUMMARY}). Markdown-aware truncation preserves frontmatter + headings + first paragraph for files >8KB.
+  3. **`tool-scoping`** enforces per-stage allowed-tools at session creation: Verify=read-only (`Read`,`Grep`,`Glob`,`Bash`); Explore=read+web (`Read`,`Grep`,`Glob`,`Bash`,`WebSearch`,`WebFetch`); Design=read/write (`Read`,`Write`,`Edit`,`Bash`,`Grep`,`Glob`); Brief/Plan=read+write but no shell-mutation. Per-stage agent frontmatter overrides via `parseAgentTools()`.
+  4. **Structured logger** — leveled (`debug`/`info`/`warn`/`error`), structured fields, JSONL when running headless.
+  5. **`pipeline-runner` state machine** — `brief → explore → plan → design → verify` with retry-once primitive per stage, halt logic, human-gate callbacks, config-driven step skipping (mirrors GSD `phase-runner.ts` shape but adapted to GDD stages). Tested with mocked `session-runner`.
+  6. **`gdd-sdk init`** — new-project bootstrap that spawns 4 parallel researchers via `session-runner`: `design-system-audit` (existing tokens/components inventory), `brand-context` (voice/tone/archetype scan), `accessibility-baseline` (current WCAG conformance), `competitive-references` (peer products in domain). Streaming synthesizer collates output.
+  7. **`explore-parallel-runner`** spawns the 4 mappers (token, component-taxonomy, a11y, visual-hierarchy) concurrently; output streams through synthesizer instead of being buffered. Honors Phase 10.1's `parallelism_safe` agent frontmatter.
+  8. **`discuss-parallel-runner`** spawns N discussant variants concurrently (different angles: user-journey, technical-constraint, brand-fit, accessibility), aggregates questions for the user.
+  9. **`gdd-sdk` CLI binary** — `gdd-sdk run` (full pipeline), `gdd-sdk stage <name>` (single stage), `gdd-sdk query` (typed state ops), `gdd-sdk audit`, `gdd-sdk init`. Ships as `bin/gdd-sdk` in the plugin npm package.
+  10. **Cross-harness MCP layer** — `references/codex-tools.md` + `references/gemini-tools.md` map CC tool names (`Read`/`Write`/etc.) to harness equivalents (`shell`/`apply_patch` for Codex; `read_file`/`write_file` for Gemini). `AGENTS.md` (Codex) and `GEMINI.md` (Gemini) entry points auto-load tool maps + describe how to invoke skills. MCP server `gdd-state` works unchanged on both.
+  11. **E2E headless integration test** — `gdd-sdk run` on a fixture project completes brief → verify with no human in loop, produces same artifacts as interactive CC run on identical fixture.
+  12. README / plugin.json / marketplace.json updated; CHANGELOG v1.0.15 entry; regression baseline at `test-fixture/baselines/phase-21/`.
+
+**Plans**: 12 plans across 4 waves.
+
+**Wave A — runner foundations (4 plans, parallel-safe: disjoint modules):**
+- [ ] 21-01-PLAN.md — `session-runner` (Anthropic Agent SDK headless wrapper) + tests (SDK-13)
+- [ ] 21-02-PLAN.md — `context-engine` (per-stage manifest + markdown-aware truncation) + tests (SDK-14)
+- [ ] 21-03-PLAN.md — `tool-scoping` (per-stage allowed-tools enforcement at session creation) + tests (SDK-15)
+- [ ] 21-04-PLAN.md — Structured `logger` (leveled, structured fields, JSONL headless mode) + tests (SDK-16)
+
+**Wave B — pipeline + parallel runners (4 plans, parallel-safe: disjoint runners after Wave A):**
+- [ ] 21-05-PLAN.md — `pipeline-runner` state machine (brief→verify with retry/halt/callbacks) + integration tests (SDK-17)
+- [ ] 21-06-PLAN.md — `explore-parallel-runner` (4 mappers concurrent + streaming synthesizer) + tests (SDK-18)
+- [ ] 21-07-PLAN.md — `discuss-parallel-runner` (N discussant variants concurrent + aggregator) + tests (SDK-19)
+- [ ] 21-08-PLAN.md — `gdd-sdk init` parallel research bootstrap (4 concurrent researchers + synthesizer) + tests (SDK-20)
+
+**Wave C — distribution + portability (3 plans, parallel-safe after Wave B):**
+- [ ] 21-09-PLAN.md — `gdd-sdk` CLI binary (`run`, `stage`, `query`, `audit`, `init` subcommands) + tests (SDK-21)
+- [ ] 21-10-PLAN.md — Cross-harness MCP layer: `references/codex-tools.md`, `references/gemini-tools.md`, `AGENTS.md`, `GEMINI.md`; smoke-test on Codex + Gemini fixtures (SDK-22, SDK-23)
+- [ ] 21-11-PLAN.md — E2E headless integration test: full pipeline on `test-fixture/` without CC (SDK-24)
+
+**Wave D — closeout (1 plan):**
+- [ ] 21-12-PLAN.md — **Phase closeout**: README + plugin.json + marketplace.json refresh, CHANGELOG v1.0.15, regression baseline at `test-fixture/baselines/phase-21/`
+
+### Phase 22: GDD SDK Observability — Event Stream, Transports, Telemetry Integration, Self-Improvement Wiring
+**Goal**: Every meaningful pipeline event is typed and broadcastable. External tools (CI, dashboards, IDE integrations) can subscribe via CLI or WebSocket transports. Existing self-improvement features (reflector, authority watcher, update checker, cache warmer, router, budget) become code primitives consuming the event stream — no more prompt-encoded heuristics.
+**Depends on**: Phase 20 (event stream foundation, state core). Soft dependency on Phase 21 (pipeline runner emits events). **Can run in parallel with Phase 21 Waves A–B** — event stream module is independent of pipeline-runner internals.
+**Target version**: v1.0.16
+**Requirements**: SDK-25 through SDK-36 (to be defined during plan-phase)
+
+**Success Criteria** (what must be TRUE):
+  1. **Typed event schema expansion** — events: `stage_start`, `stage_complete`, `wave_start`, `wave_complete`, `task_started`, `task_complete`, `blocker_added`, `blocker_resolved`, `decision_added`, `must_have_added`, `must_have_status_change`, `parallelism_verdict`, `cost_update`, `rate_limit`, `api_retry`, `compact_boundary`, `mcp_probe`, `connection_status_change`, `reflection_proposed`, `cache_warm`, `budget_enforcement`. Each has TypeScript interface + JSON Schema.
+  2. **CLI transport** — `gdd-sdk events` subcommand streams JSONL to stdout with filter language (`--type stage_complete --stage design`). Tail-style consumption.
+  3. **WebSocket transport** — opt-in flag `--ws-port 8765` opens local WS server broadcasting all events; token auth via `--ws-token <hex>`. Opens path to web UIs and IDE integrations.
+  4. **Telemetry reader/aggregator** — typed reader for `events.jsonl` + `costs.jsonl` + `agent-metrics.json` with rollup helpers (per-stage, per-cycle, per-agent).
+  5. **Existing telemetry sinks become event-stream subscribers** — `costs.jsonl` writer subscribes to `cost_update`; `agent-metrics.json` writer subscribes to `task_complete`. Single source of truth (event stream); existing files remain backwards-compat sinks.
+  6. **Reflector pipeline ported to events** — Phase 11 reflector becomes a code-level pipeline that subscribes to `cost_update` + `task_complete` + `reflection_proposed` events, runs proposal generators, emits typed `reflection_proposed` events back into the stream. `/gdd:apply-reflections` reads from event stream instead of re-scanning files.
+  7. **Authority watcher ported** — Phase 13.2's RSS-diff logic moves into `gdd-sdk/authority-watcher` module emitting `authority_update` events. `agents/design-authority-watcher.md` consumes events instead of running its own polling.
+  8. **Update checker as cross-harness primitive** — Phase 13.3's update-check logic moves into `gdd-sdk/update-checker` that emits `update_available` events. SessionStart hook stays as a CC-specific bridge; Codex/Gemini call the typed primitive directly.
+  9. **Read-injection scanner as primitive** — Phase 12's logic moves into `gdd-sdk/injection-scanner`; CC hook (`hooks/gdd-read-injection-scanner.js`) becomes a thin event-stream bridge.
+  10. **Cache warmer + router + budget enforcer as primitives** — Phase 10.1 logic ported with audit logs; CC hooks remain as bridges. `gdd-router`'s intent classifier becomes a typed function with an event-stream emitting `routing_decision`.
+  11. **Connection probes as code primitives** — `gdd-sdk/connections` module wraps figma, refero, pinterest, claude_design, paper, pencil with retry policy + exponential backoff + fallback chain (`figma → cache → mock`). Emits `connection_status_change` events.
+  12. README / plugin.json / marketplace.json updated; CHANGELOG v1.0.16 entry; regression baseline at `test-fixture/baselines/phase-22/`.
+
+**Plans**: 12 plans across 4 waves.
+
+**Wave A — event stream + transports (5 plans, parallel-safe: disjoint modules):**
+- [ ] 22-01-PLAN.md — Typed event schema expansion + interfaces + JSON Schema + tests (SDK-25)
+- [ ] 22-02-PLAN.md — CLI transport (`gdd-sdk events` with filter language) + tests (SDK-26)
+- [ ] 22-03-PLAN.md — WebSocket transport (opt-in flag, token auth, broadcast) + tests (SDK-27)
+- [ ] 22-04-PLAN.md — Telemetry reader/aggregator (typed reader for events.jsonl + costs.jsonl + agent-metrics.json with rollup helpers) + tests (SDK-28)
+- [ ] 22-05-PLAN.md — Connection probes as code primitives (retry + backoff + fallback chain) + tests (SDK-29)
+
+**Wave B — wire existing features into event stream (6 plans, parallel-safe after Wave A):**
+- [ ] 22-06-PLAN.md — Reflector pipeline ported to events (subscribes + emits reflection_proposed) + tests (SDK-30)
+- [ ] 22-07-PLAN.md — Authority watcher (Phase 13.2) ported to event stream + tests (SDK-31)
+- [ ] 22-08-PLAN.md — Update checker (Phase 13.3) as cross-harness typed primitive + tests (SDK-32)
+- [ ] 22-09-PLAN.md — Read-injection scanner as typed primitive + CC-hook bridge (SDK-33)
+- [ ] 22-10-PLAN.md — Cache warmer + budget enforcer as primitives + CC-hook bridges + tests (SDK-34)
+- [ ] 22-11-PLAN.md — `gdd-router` intent classifier as code primitive emitting routing_decision events + tests (SDK-35)
+
+**Wave C — closeout (1 plan):**
+- [ ] 22-12-PLAN.md — **Phase closeout**: README + plugin.json + marketplace.json refresh, CHANGELOG v1.0.16, regression baseline at `test-fixture/baselines/phase-22/` (SDK-36)
+
+### Phase 23: GDD SDK Domain Primitives — Knowledge Layer SDK, Visual & Token Engines, Distribution
+**Goal**: Lift GDD-specific domain knowledge into typed primitives — knowledge layer (intel/graph/skill manifest), visual engine (image diff, screenshots, baselines), design tokens, parallelism engine, NNG/anti-pattern/WCAG checkers, handoff parsers. Distribute SDK as separate npm package; ship migration + ops guides.
+**Depends on**: Phase 22 (event stream — primitives emit events). Soft dependency on Phase 16–17 (component-spec conformance scorer needs the corpus; ships placeholder if not yet landed).
+**Target version**: v1.0.17
+**Requirements**: SDK-37 through SDK-52 (to be defined during plan-phase)
+
+**Success Criteria** (what must be TRUE):
+  1. **Intel store SDK** — typed reader/writer for `.design/intel/` (files, exports, symbols, tokens, components, patterns, dependencies). Replaces ad-hoc Read+regex patterns in skills.
+  2. **Knowledge graph SDK** — typed query layer for `.planning/graphs/` (graphify output). Cypher-style query helpers.
+  3. **Skill manifest registry** — typed registry of all skills with capability matching (`findSkillsBy({stage:'design', capability:'figma-write'})`). Project-local skills (`./.claude/skills/`) auto-discovered at SDK init.
+  4. **Cycle/workstream model** — typed `Cycle` + `Workstream` interfaces; cycle history + transitions + active-cycle resolver.
+  5. **Image diff primitive** — pixel-diff + perceptual diff (SSIM) for `test-fixture/baselines/` regression detection. Replaces Phase 12 baseline-drift test's ad-hoc diff.
+  6. **Screenshot capture orchestration** — wraps Playwright + Claude Preview MCP; standardizes capture parameters (viewport sizes, dark/light mode, RTL); writes to `.design/baselines/<cycle>/<surface>.png`.
+  7. **Visual baseline manager** — typed `BaselineStore` with `record()`, `compare()`, `accept()`, `reject()`. Backs `/gdd:audit` regression checks.
+  8. **Design-token reader** (multi-source) — CSS vars, JS const exports, Tailwind config, Figma variables. Returns unified `Token{ name, value, source, scope }` shape.
+  9. **Token diff + applier** — `diffTokens(current, proposed)` and `applyTokenSet(set, targets)` for darkmode/brand-variant operations.
+  10. **`Touches:` analyzer + parallelism decision engine** — pure function: `analyzeTouches(plans) → {parallel: PlanGroup[], serial: Plan[]}`. Replaces prompt-encoded version from Phase 10.1. Honors `parallel-safe` frontmatter.
+  11. **Audit aggregator** — collects findings from N audit-agents, dedupes, scores by severity (P0–P3 from `reference/audit-scoring.md`), prioritizes. Returns typed `AuditReport`.
+  12. **Per-stage budget allocator** — reads `.design/budget.json`, allocates per-stage limits, hard-stops at limits via event-stream emission.
+  13. **Reference resolver** — `resolveReferenceFor(taskType) → reference[]` (e.g., `type:forms` → `reference/form-patterns.md` + `reference/accessibility.md`). Single source of truth for the type→reference mapping today scattered in skills.
+  14. **Pause/resume context serializer** — typed `PauseContext` with serialization to `.design/pause/<timestamp>.json`; `resume()` restores state without re-running completed waves. Replaces today's prose-only pause/resume.
+  15. **NNG heuristic checker** — code-level checks against `reference/heuristics.md`'s 10 NNG heuristics; returns `HeuristicViolation[]` with severity + grep signatures.
+  16. **Anti-pattern catalog matcher** — regex registry from `reference/anti-patterns.md`; `matchAntipatterns(file) → AntipatternMatch[]`.
+  17. **WCAG threshold validator** — code-level checks (contrast ratios, target sizes, focus visibility) per `reference/accessibility.md`; returns `WCAGViolation[]`.
+  18. **Handoff bundle parser** — typed parser for `claude-design-html`, `claude-design-bundle`, `manual` formats. Used by `/gdd:handoff` and Phase 9 entry point.
+  19. **Spec↔code↔visual triangulation verifier** — when Phase 16–17 components land, verifies implementation matches spec AND visual matches baseline. Ships placeholder API if Phase 16–17 hasn't landed yet.
+  20. **Git operations primitive** — atomic-commit, branch-state check, deviation-handling helpers (mirrors GSD `commit.ts`).
+  21. **Distribution** — `@hegemonart/gdd-sdk` published as separate npm package containing the SDK code; main plugin (`@hegemonart/get-design-done`) depends on it. MCP server `gdd-state` ships in plugin (not in SDK package — it's a runtime, not a library).
+  22. **Migration guide** — `docs/MIGRATION.md` for plugin consumers upgrading from pre-Phase-20 STATE.md ad-hoc patterns to typed MCP tools.
+  23. **Headless mode operations guide** — `docs/HEADLESS.md` covering CI integration (GitHub Actions example), cross-harness setup, budget tuning, transport configuration.
+  24. **API reference** — `docs/SDK-API.md` (auto-generated from TSDoc) and `docs/MCP-TOOLS.md` (JSON Schema reference for all 11+ MCP tools).
+  25. README / plugin.json / marketplace.json updated; CHANGELOG v1.0.17 entry; regression baseline at `test-fixture/baselines/phase-23/`. **SDK milestone complete** — plugin now has full programmatic surface + cross-harness portability + observability.
+
+**Plans**: 16 plans across 4 waves (heaviest parallelism in roadmap — Wave A is 6 disjoint primitive builds, Wave B is 6 disjoint domain checkers).
+
+**Wave A — knowledge + pipeline primitives (6 plans, parallel-safe: disjoint modules):**
+- [ ] 23-01-PLAN.md — `Touches:` analyzer + parallelism decision engine + tests (SDK-37)
+- [ ] 23-02-PLAN.md — Intel store typed reader/writer + tests (SDK-38)
+- [ ] 23-03-PLAN.md — Knowledge graph typed query layer + tests (SDK-39)
+- [ ] 23-04-PLAN.md — Handoff bundle parser (3 formats) + tests (SDK-40)
+- [ ] 23-05-PLAN.md — Skill manifest registry + project-local skills auto-discovery + tests (SDK-41)
+- [ ] 23-06-PLAN.md — Cycle/workstream model + tests (SDK-42)
+
+**Wave B — visual + token + domain checkers (6 plans, parallel-safe after Wave A):**
+- [ ] 23-07-PLAN.md — Image diff primitive (pixel + SSIM) + screenshot capture orchestration + visual baseline manager + tests (SDK-43)
+- [ ] 23-08-PLAN.md — Design-token reader (multi-source) + token diff + applier + tests (SDK-44)
+- [ ] 23-09-PLAN.md — Audit aggregator + per-stage budget allocator + reference resolver + pause/resume context serializer + tests (SDK-45, SDK-46)
+- [ ] 23-10-PLAN.md — NNG heuristic checker + anti-pattern catalog matcher + tests (SDK-47, SDK-48)
+- [ ] 23-11-PLAN.md — WCAG threshold validator + tests (SDK-49)
+- [ ] 23-12-PLAN.md — Spec↔code↔visual triangulation verifier (placeholder if Phase 16–17 not yet landed) + git operations primitive + tests (SDK-50, SDK-51)
+
+**Wave C — distribution + docs (3 plans, parallel-safe after Wave B):**
+- [ ] 23-13-PLAN.md — Package as `@hegemonart/gdd-sdk` separate npm package; main plugin depends on it; publish workflow (SDK-52)
+- [ ] 23-14-PLAN.md — Migration guide (`docs/MIGRATION.md`) + headless ops guide (`docs/HEADLESS.md`)
+- [ ] 23-15-PLAN.md — API reference (`docs/SDK-API.md` from TSDoc) + MCP tools reference (`docs/MCP-TOOLS.md` from JSON Schema)
+
+**Wave D — closeout (1 plan):**
+- [ ] 23-16-PLAN.md — **Phase closeout**: final regression baseline at `test-fixture/baselines/phase-23/`, README + plugin.json + marketplace.json refresh (SDK milestone complete note, full programmatic surface), CHANGELOG v1.0.17 entry. **SDK milestone complete.**
+
+## Parallelization: Phases 20–23 (SDK Build-Out)
+
+The SDK build-out is the largest parallelizable unit in the roadmap — 54 plans across 4 phases, dominated by **disjoint module work**. Cross-phase parallelism is feasible because Phase 22 (observability) only needs Phase 20's event-stream foundation, not Phase 21's pipeline runner.
+
+**Recommended schedule (Opus velocity, 1 active developer + AI):**
+
+```
+Day 1: Phase 20 Wave A (4 modules in parallel) → Wave B (2 modules) → Wave C (5 stage-skill migrations in parallel) → Wave D (closeout)
+Day 2: Phase 21 Wave A (4 runner modules in parallel)         ──┐
+       Phase 22 Wave A (5 event/transport modules in parallel) ─┼─ parallel worktrees
+Day 3: Phase 21 Wave B (4 parallel runners)                    ──┐
+       Phase 22 Wave B (6 feature wirings in parallel)         ─┼─ parallel worktrees
+Day 4: Phase 21 Wave C (3 distribution plans) → Wave D
+       Phase 22 Wave C (closeout)
+Day 5: Phase 23 Wave A (6 primitives in parallel) → Wave B (6 domain checkers in parallel) → Wave C (distribution) → Wave D
+```
+
+**Cross-phase parallelism rationale:**
+
+- **Phase 21 ⊥ Phase 22 Wave A** — pipeline-runner internals don't share files with event-stream / transports / telemetry-reader / connection-probes. Both phases consume Phase 20's state core + event foundation.
+- **Phase 22 Wave B depends on Phase 21 Wave A** for `session-runner` API surface (reflector / authority-watcher / update-checker may use it for headless invocation). Schedule Wave B after Day 2.
+- **Phase 23 must be last** — domain primitives consume event stream (Phase 22) AND pipeline-runner (Phase 21) AND Touches: analyzer integrates with parallelism decisions made by pipeline-runner.
+
+**Parallel worktree layout:**
+
+- `wt-phase-20-sdk-foundation` — Day 1 only
+- `wt-phase-21-sdk-headless` — Days 2–4
+- `wt-phase-22-sdk-observability` — Days 2–4 (parallel with 21)
+- `wt-phase-23-sdk-domain` — Day 5
+
+**Coordination seams (where rebases matter):**
+
+1. Phase 20 Wave D **must merge to main** before Phase 21 / 22 worktrees branch — both depend on `gdd-state` MCP server existing.
+2. Phase 21 Wave A merge unlocks Phase 22 Wave B feature-wirings that may invoke `session-runner` for headless reflector/watcher runs.
+3. Phase 22 Wave A merge unlocks Phase 23 — domain primitives emit events.
+4. `connections/connections.md` capability matrix accepts edits from all 4 phases — final reconciliation plan in Phase 23 Wave D.
+
+**What NOT to parallelize:**
+
+- Phase 20 stage-skill migration (Wave C) plans must NOT run with Phase 21 plans that touch the same skills' tool-scoping. Serialize via "Phase 20 Wave C merges first."
+- Phase 22 WebSocket transport (22-03) and CLI transport (22-02) share event-emission boundaries — both should land before Wave B feature-wirings consume them.
+- Phase 23 Wave B's WCAG validator, NNG checker, and anti-pattern matcher all consume `reference/` files; if Phase 18 / 19 reference work is mid-flight in the same window, merge those first to avoid double-edits.
+
+**Per-phase Opus-velocity time estimates** (single developer + Opus, no human bottleneck on review):
+
+| Phase | Plans | Wave count | Estimate |
+|-------|-------|------------|----------|
+| 20 | 14 | 4 | 1 day |
+| 21 | 12 | 4 | 1.5 days |
+| 22 | 12 | 4 | 1 day (parallel with 21 → adds ~0.5 day net) |
+| 23 | 16 | 4 | 1.5 days |
+| **Total (sequential)** | **54** | **16** | **~5 days** |
+| **Total (with cross-phase parallelism)** | **54** | **16** | **~3.5 days** |
+
 ## Parallelization: Phase 7 + Phase 8
 
 Phase 7 and Phase 8 can run in parallel in separate Claude Code sessions via git worktrees, with one coordination discipline at the seams. The two phases address **orthogonal axes**:
@@ -850,9 +1092,9 @@ Phase 9's plans as currently listed are **provisional** — Phase 7 reshapes its
 ## Progress
 
 **Execution Order:**
-Phases 1 → 6 execute in numeric order. Phases 7 and 8 can run in parallel (see Parallelization section). Phase 9 depends on both 7 and 8. Phase 10 depends on Phase 8 (graphify connection). Phase 10.1 (INSERTED optimization layer) depends on Phase 10 — router reads intel as a cache; telemetry + cost governance lands before reflection has anything to reflect on. Phase 11 (self-improvement) depends on Phase 10 (learnings) + Phase 10.1 (telemetry + agent-metrics). Phase 12 depends on all prior phases (tests validate their features; regression baselines lock from here forward — including cost-report baseline from Phase 10.1). Phase 13 depends on Phase 12 (CI/CD orchestrates tests) — sequential, not parallel. **Phase 15** (foundational references + impeccable removal) depends on Phase 11 (reference-update proposer infrastructure) and gates Phases 16–19. **Phase 16** (component-benchmark corpus tooling + Waves 1–2) depends on Phase 15 (foundations + impeccable salvage archive). **Phase 17** (corpus Waves 3–5 + pipeline integration) depends on Phase 16 (harvester + synthesizer + locked template). **Phases 18 and 19** (advanced-craft + platform/inclusive/UX-research references) depend only on Phase 15 and **can run in parallel** with each other and with Phases 16–17 — they touch disjoint files.
+Phases 1 → 6 execute in numeric order. Phases 7 and 8 can run in parallel (see Parallelization section). Phase 9 depends on both 7 and 8. Phase 10 depends on Phase 8 (graphify connection). Phase 10.1 (INSERTED optimization layer) depends on Phase 10 — router reads intel as a cache; telemetry + cost governance lands before reflection has anything to reflect on. Phase 11 (self-improvement) depends on Phase 10 (learnings) + Phase 10.1 (telemetry + agent-metrics). Phase 12 depends on all prior phases (tests validate their features; regression baselines lock from here forward — including cost-report baseline from Phase 10.1). Phase 13 depends on Phase 12 (CI/CD orchestrates tests) — sequential, not parallel. **Phase 15** (foundational references + impeccable removal) depends on Phase 11 (reference-update proposer infrastructure) and gates Phases 16–19. **Phase 16** (component-benchmark corpus tooling + Waves 1–2) depends on Phase 15 (foundations + impeccable salvage archive). **Phase 17** (corpus Waves 3–5 + pipeline integration) depends on Phase 16 (harvester + synthesizer + locked template). **Phases 18 and 19** (advanced-craft + platform/inclusive/UX-research references) depend only on Phase 15 and **can run in parallel** with each other and with Phases 16–17 — they touch disjoint files. **Phases 20–23 (SDK build-out)** form a milestone of their own — Phase 20 (state core + lockfiles + stage migration) gates everything; Phase 21 (headless runner + parallel researchers + cross-harness MCP) and Phase 22 (event stream + transports + observability wiring) can run in parallel after Phase 20 lands; Phase 23 (domain primitives + visual/token engines + distribution) depends on both 21 and 22. See "Parallelization: Phases 20–23 (SDK Build-Out)" for the full schedule.
 
-**Version sequence** (sequential patch bumps per user directive — no version jumps even on breaking changes): v1.0.0 (Phase 6) → v1.0.1 (Phase 7) → v1.0.2 (Phase 8) → v1.0.3 (Phase 9) → v1.0.4 (Phase 10) → **v1.0.4.1 (Phase 10.1 — INSERTED Optimization Layer, off-cadence patch)** → v1.0.5 (Phase 11 — Self-Improvement) → v1.0.6 (Phase 12 — Test Coverage) → v1.0.7 (Phase 13 — CI/CD) → v1.0.8 (Phase 14 — AI-Native Design Tool Connections) → v1.0.9 (Phase 15 — Foundational References + Impeccable Removal) → v1.0.10 (Phase 16 — Component Benchmark Corpus Waves 1–2) → v1.0.11 (Phase 17 — Corpus Waves 3–5 + Pipeline Integration) → v1.0.12 (Phase 18 — Advanced Craft References) → v1.0.13 (Phase 19 — Platform + Inclusive + UX Research References; knowledge-layer complete).
+**Version sequence** (sequential patch bumps per user directive — no version jumps even on breaking changes): v1.0.0 (Phase 6) → v1.0.1 (Phase 7) → v1.0.2 (Phase 8) → v1.0.3 (Phase 9) → v1.0.4 (Phase 10) → **v1.0.4.1 (Phase 10.1 — INSERTED Optimization Layer, off-cadence patch)** → v1.0.5 (Phase 11 — Self-Improvement) → v1.0.6 (Phase 12 — Test Coverage) → v1.0.7 (Phase 13 — CI/CD) → v1.0.8 (Phase 14 — AI-Native Design Tool Connections) → v1.0.9 (Phase 15 — Foundational References + Impeccable Removal) → v1.0.10 (Phase 16 — Component Benchmark Corpus Waves 1–2) → v1.0.11 (Phase 17 — Corpus Waves 3–5 + Pipeline Integration) → v1.0.12 (Phase 18 — Advanced Craft References) → v1.0.13 (Phase 19 — Platform + Inclusive + UX Research References; knowledge-layer complete) → v1.0.14 (Phase 20 — SDK Foundation: state core + lockfiles + stage migration) → v1.0.15 (Phase 21 — SDK Headless: pipeline runner + parallel researchers + cross-harness MCP) → v1.0.16 (Phase 22 — SDK Observability: event stream + transports + self-improvement wiring) → v1.0.17 (Phase 23 — SDK Domain Primitives: knowledge layer + visual/token engines + distribution; SDK milestone complete).
 
 | Phase | Plans Complete | Status | Target version | Completed |
 |-------|----------------|--------|----------------|-----------|
@@ -876,6 +1118,10 @@ Phases 1 → 6 execute in numeric order. Phases 7 and 8 can run in parallel (see
 | 17. Component Benchmark Corpus — Waves 3–5 (20 specs: feedback + nav/data + advanced) + pipeline integration (auditor conformance scoring, executor pre-flight, doc-writer scaffold, pattern-mapper convergence) | 0/5 (4 feature + 1 closeout across 3 waves) | Planned | v1.0.11 | - |
 | 18. Advanced Craft References — variable-fonts-loading, image-optimization, css-grid-layout (grids/container queries/fluid typography/safe areas), motion-advanced (spring/stagger/scroll-driven/FLIP/View Transitions) | 0/5 (4 feature + 1 closeout across 2 waves) | Planned | v1.0.12 | - |
 | 19. Platform, Inclusive & UX Research References — platforms (iOS/Android/web/visionOS), rtl-cjk-cultural, onboarding-progressive-disclosure, user-research, information-architecture, form-patterns, data-visualization | 0/8 (7 feature + 1 closeout across 3 waves) | Planned | v1.0.13 | - |
+| 20. GDD SDK Foundation — `gdd-state` Node module + lockfiles + atomic RMW + 4 transition gates + MCP server (11 typed tools) + event stream foundation + prompt-sanitizer + GDDError taxonomy + migrate 5 stage skills + utility skills + hooks | 0/14 (13 feature + 1 closeout across 4 waves) | Planned | v1.0.14 | - |
+| 21. GDD SDK Headless — session-runner + context-engine + tool-scoping + logger + pipeline-runner state machine + parallel research bootstrap + parallel mappers/discussants + gdd-sdk CLI + cross-harness MCP (Codex/Gemini) + E2E headless integration test | 0/12 (11 feature + 1 closeout across 4 waves) | Planned | v1.0.15 | - |
+| 22. GDD SDK Observability — typed event schema expansion (~20 event types) + CLI transport (JSONL with filter language) + WebSocket transport + telemetry reader/aggregator + reflector pipeline ported to events + authority-watcher + update-checker + injection-scanner + cache-warmer + budget-enforcer + gdd-router as primitives + connection probes with retry/fallback | 0/12 (11 feature + 1 closeout across 3 waves) | Planned | v1.0.16 | - |
+| 23. GDD SDK Domain Primitives — knowledge layer SDK (intel + graph + skill manifest + cycle/workstream) + visual engine (image diff + screenshots + baselines) + design-token engine (multi-source + diff + apply) + Touches: analyzer + parallelism decision engine + audit aggregator + budget allocator + reference resolver + pause/resume serializer + NNG/anti-pattern/WCAG checkers + handoff parser + spec↔code↔visual triangulation + git ops + distribution as `@hegemonart/gdd-sdk` + migration/headless/API docs | 0/16 (15 feature + 1 closeout across 4 waves) | Planned | v1.0.17 | - |
 
 ## Deferred commands backlog (GSD-parity commands not yet scheduled)
 
