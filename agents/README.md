@@ -201,3 +201,23 @@ Global ceiling: **no single agent file exceeds 600 lines** under any circumstanc
 ---
 
 *Cross-reference: [Claude Code Task tool documentation](https://docs.anthropic.com/en/docs/claude-code/sub-agents) for deeper detail on agent invocation, tool permissions, and model selection. This README is the authoring contract — the documentation covers the runtime.*
+
+---
+
+## Cache-aligned Prompt Ordering (Phase 10.1, D-17)
+
+**Every agent body must open with, in this exact order:**
+
+1. **`@reference/shared-preamble.md`** — the framework identity, deviation-handling rules, commit conventions, reads-only / writes protocol, and context-exhaustion hook behavior. Imported via the standard `@reference/...` directive. This is Layer A of the D-08 two-layer cache: identical across every agent, so Anthropic's automatic 5-minute prompt cache fires on the preamble prefix and the first-N-tokens input cost drops to `cached_input_per_1m` on every repeat spawn within the window.
+2. **Agent-specific role + tools + output contract** — the static parts unique to this agent (role description, which tools the agent is allowed to use, the exact output schema the orchestrator expects). Also cached by Anthropic on repeat spawns of the same agent, but the cache boundary is per-agent.
+3. **Task-specific dynamic content** — the parts that change per spawn (input file contents, the orchestrator's specific ask, any per-cycle data). This section is not cacheable across spawns because it differs every call; placing it last ensures Steps 1 and 2 form a stable cacheable prefix.
+
+**Rationale.** Anthropic's prompt cache keys on the longest matching prefix. Putting the shared preamble first means a single `/gdd:warm-cache` invocation (see `skills/warm-cache/SKILL.md`) can prime the cache for every agent in the roster in one pass. Putting task-specific content last means that cache is not invalidated by normal sprint variation. Violating this ordering (e.g., putting a dynamic input block above the preamble) causes cache misses that silently 10x the input-token cost per spawn — the cost reduction target of Phase 10.1 depends on this convention.
+
+**Enforcement.** Plan 10.1-04 (shared preamble extraction) audits every agent in `agents/*.md` and verifies the preamble import is the first non-frontmatter line of the body. Plan 10.1-03 (tier audit) adds a CI-style grep check: `grep -L "^@reference/shared-preamble.md" agents/*.md` must return no files (every agent file contains the import on its first body line).
+
+**Cross-references.**
+- `reference/shared-preamble.md` — the preamble file itself (authored in Plan 10.1-04).
+- `skills/warm-cache/SKILL.md` — the command that primes Layer A cache across the roster.
+- `skills/cache-manager/SKILL.md` — Layer B (explicit manifest) cache; independent of this ordering rule.
+- `.planning/phases/10.1-optimization-layer-cost-governance/10.1-CONTEXT.md` §D-16, §D-17 — decision lineage.
