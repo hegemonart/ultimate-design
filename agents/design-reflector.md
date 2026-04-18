@@ -4,6 +4,8 @@ description: Post-cycle reflection agent. Reads .design/intel/, .design/learning
 tools: Read, Write, Bash, Grep, Glob
 color: purple
 model: inherit
+default-tier: opus
+tier-rationale: "Phase 11 strategic reflector; reads telemetry + proposes plugin-level changes"
 size_budget: XL
 parallel-safe: never
 typical-duration-seconds: 60
@@ -11,6 +13,8 @@ reads-only: false
 writes:
   - ".design/reflections/*.md"
 ---
+
+@reference/shared-preamble.md
 
 # design-reflector
 

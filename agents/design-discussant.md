@@ -4,6 +4,8 @@ description: "Adaptive design interview agent — asks one question at a time, a
 tools: Read, Write, AskUserQuestion
 color: blue
 model: inherit
+default-tier: opus
+tier-rationale: "Interactive decision gathering; user-facing, quality-critical"
 parallel-safe: never
 typical-duration-seconds: 180
 reads-only: false
@@ -11,6 +13,8 @@ writes:
   - ".design/STATE.md"
   - ".design/DESIGN-CONTEXT.md"
 ---
+
+@reference/shared-preamble.md
 
 # design-discussant
 

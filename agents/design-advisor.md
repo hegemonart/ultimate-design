@@ -4,11 +4,15 @@ description: Researches a single gray area and produces a 5-column comparison ta
 tools: Read, Grep, Glob, WebSearch
 color: blue
 model: sonnet
+default-tier: opus
+tier-rationale: "Questions prompts to surface ambiguity; wrong advice cascades across downstream spawns"
 parallel-safe: always
 typical-duration-seconds: 30
 reads-only: true
 writes: []
 ---
+
+@reference/shared-preamble.md
 
 # design-advisor
 
