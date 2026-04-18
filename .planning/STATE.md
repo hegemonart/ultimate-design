@@ -2,16 +2,16 @@
 gsd_state_version: 1.0
 milestone: v1.0.0
 milestone_name: milestone
-status: ready-for-next
-stopped_at: Phase 13 merged — v1.0.7 shipped
-last_updated: "2026-04-18T21:45:00.000Z"
-last_activity: 2026-04-18
+status: Executing Phase 13.2
+stopped_at: Completed 13.2-01-PLAN.md
+last_updated: "2026-04-18T21:46:10.000Z"
+last_activity: 2026-04-18 -- Phase 13.2 Plan 01 complete (authority whitelist + snapshot schema)
 progress:
-  total_phases: 19
-  completed_phases: 14
-  total_plans: 63
-  completed_plans: 63
-  percent: 74
+  total_phases: 21
+  completed_phases: 1
+  total_plans: 17
+  completed_plans: 10
+  percent: 55
 ---
 
 # Project State
@@ -21,16 +21,17 @@ progress:
 See: .planning/PROJECT.md (updated 2026-04-17)
 
 **Core value:** Any developer can run the full pipeline on a real project and receive measurable, specific design improvement — not generic AI advice.
-**Current focus:** Phase 14 — AI-Native Design Tool Connections (paper.design + pencil.dev + unified canvas-connection interface) next up.
+**Current focus:** Phase 13.2 — external-authority-watcher
 
 ## Current Position
 
-Phase: 13 (CI/CD) — COMPLETE
+Phase: 13.2 (external-authority-watcher) — EXECUTING
+Plan: 2 of 4 (13.2-01 complete)
 Released: **v1.0.7** at https://github.com/hegemonart/get-design-done/releases/tag/v1.0.7
 Next phase: 14 (AI-Native Design Tool Connections) — not yet started
-Last activity: 2026-04-18
+Last activity: 2026-04-18 -- Phase 13.2 Plan 01 complete (authority whitelist + snapshot schema)
 
-Resume file: (no active resume — ready to start Phase 14)
+Resume file: .planning/phases/13.2-external-authority-watcher/13.2-02-PLAN.md
 
 Progress: [████████████████░░░░] 74% (14/19 phases complete through v1.0.7)
 
@@ -109,6 +110,7 @@ Progress: [████████████████░░░░] 74% (14
 | Phase 08 P05 | 190 | 2 tasks | 5 files |
 | Phase 10.1 P03 | 58 min | 5 tasks | 29 files |
 | Phase 10.1 P04 | 20 min | 8 tasks | 8 files |
+| Phase 13.2 P01 | 11 min | 2 tasks | 3 files |
 
 ## Accumulated Context
 
@@ -217,6 +219,12 @@ Progress: [████████████████░░░░] 74% (14
 - [Phase 10.1-04]: Map Step 3.5 skipped when --only <name> restricts dispatch to a single mapper
 - [Phase 10.1-04]: Per-mapper .design/map/*.md files preserved on disk even after DESIGN-PATTERNS.md synthesis — drill-down evidence unchanged
 - [Phase 10.1-04]: Three gate agents use distinct colors (green, blue, cyan) mirroring their gated counterparts for terminal readability
+- [Phase 13.2-01]: Named-practitioner list locked at 10 writers (Wathan, Mulligan, Andrew, Comeau, Shadeed, Soueidan, Verou, Jehl, Pickering, Kravets) — lower bound of the 10-12 range; Simmons + Coyier dropped for feed-stability uncertainty
+- [Phase 13.2-01]: Rejected-kinds section is load-bearing markdown (not comments) — structurally enforced by Plan 13.2-04's grep test for dribbble.com, behance.net, linkedin.com, medium.com/topic; all rejected hostnames confined to the `## Rejected kinds` section only
+- [Phase 13.2-01]: D-09 feed-entry grammar locked: `- **[Title](home)** — \`kind: X\` · \`url: Y\` · \`cadence-hint: Z\` · *rationale*` — diff-friendly, human-editable, one line per feed
+- [Phase 13.2-01]: authority-snapshot schema-level DoS mitigation: `maxItems:200` on feed entries enforces D-14 retention at validation time (mitigates T-13.2-03 snapshot-growth DoS)
+- [Phase 13.2-01]: scripts/validate-schemas.cjs hardened via `-c ajv-formats` to enforce `format: "date-time"` declarations rather than reject them under ajv strict mode — no-op for existing schemas (none declare formats), future-proof for any new schema that does
+- [Phase 13.2-01]: scripts/validate-schemas.cjs PAIRS array is NOT auto-discovery — new schemas under reference/schemas/ must be manually wired into the PAIRS array to get CI enforcement (CONTEXT.md D-12's "picked up automatically" claim was incorrect; fixed inline as Rule 2 deviation)
 
 ### Roadmap Evolution
 
@@ -233,6 +241,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-04-18T15:51:15.000Z
-Stopped at: Completed 10.1-04-PLAN.md
-Resume file: .planning/phases/10.1-optimization-layer-cost-governance/10.1-06-PLAN.md
+Last session: 2026-04-18T21:46:10.000Z
+Stopped at: Completed 13.2-01-PLAN.md
+Resume file: .planning/phases/13.2-external-authority-watcher/13.2-02-PLAN.md

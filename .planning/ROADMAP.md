@@ -561,7 +561,7 @@ Plans:
 **Plans**: 4 plans
 
 Plans:
-- [ ] 13.2-01-PLAN.md — `reference/authority-feeds.md` whitelist (seed ~25–40 feeds grouped by kind, rejected-kinds section, schema-lintable) + `.design/authority-snapshot.json` schema (AUTH-01, AUTH-08)
+- [x] 13.2-01-PLAN.md — `reference/authority-feeds.md` whitelist (seed ~25–40 feeds grouped by kind, rejected-kinds section, schema-lintable) + `.design/authority-snapshot.json` schema (AUTH-01, AUTH-08) ✅ 2026-04-18 (26 active feeds + Are.na extensibility; schema with maxItems:200 cap; validator wired)
 - [ ] 13.2-02-PLAN.md — `agents/design-authority-watcher.md` agent (frontmatter + fetch + diff + classify into 5 categories, snapshot update, skip-collapse); `.design/authority-report.md` template (AUTH-02, AUTH-03, AUTH-04)
 - [ ] 13.2-03-PLAN.md — `/gdd:watch-authorities` skill with `--refresh` / `--since` / `--feed` / `--schedule` flags; Phase 11 reflector read-path for authority report; `scheduled-tasks` MCP optional integration (AUTH-05, AUTH-06, AUTH-07)
 - [ ] 13.2-04-PLAN.md — **Phase closeout**: bump to v1.0.7.2 (off-cadence); README "Authority Watcher" section; CHANGELOG v1.0.7.2 entry listing shipped feeds; test asserting rejected-kinds are not in whitelist; manifests refresh (plugin.json, marketplace.json)
