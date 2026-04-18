@@ -142,6 +142,8 @@ Initialize iteration counter to 0 (used for fix loop limit in Step 3).
 
 Three agents run in sequence. Each waits for its completion marker before the next is spawned.
 
+**Note on lazy gates (Plan 10.1-04 / D-21):** Each full checker is preceded by a cheap Haiku gate that reads the diff and may return `{spawn: false}` to short-circuit. When gated out, `lazy_skipped: true` is appended to `.design/telemetry/costs.jsonl`. Gates: `design-verifier-gate` (before 1b), `design-integration-checker-gate` (before 1c). `design-context-checker-gate` is wired into `skills/discover/SKILL.md` Step 1.75.
+
 ### 1a. Run design-auditor first (retrospective 6-pillar audit)
 
 ```
@@ -167,6 +169,31 @@ Emit `## AUDIT COMPLETE` when done.
 ```
 
 Wait for `## AUDIT COMPLETE` in the agent response. Once detected, update STATE.md `task_progress=1/3`.
+
+### 1b-gate. Lazy gate — should design-verifier run?
+
+Spawn the cheap Haiku gate before the expensive verifier:
+
+    Task("design-verifier-gate", """
+    <required_reading>
+    @.design/STATE.md
+    </required_reading>
+
+    You are the design-verifier-gate. Read the diff since the last verified commit
+    and decide whether design-verifier should spawn.
+
+    Context:
+      diff_files: <output of `git diff --name-only <baseline_sha>..HEAD`>
+      diff_body: <output of `git diff <baseline_sha>..HEAD` truncated to 4000 lines>
+      baseline_sha: <from .design/STATE.md last_verified_sha, or HEAD~1 if absent>
+
+    Apply the heuristic. Emit JSON + `## GATE COMPLETE`.
+    """)
+
+Wait for `## GATE COMPLETE`. Parse the JSON:
+
+- `spawn: false` → append pending telemetry row `{ts, agent: "design-verifier", tier: "skipped", tokens_in: 0, tokens_out: 0, cache_hit: false, est_cost_usd: 0, lazy_skipped: true, gate_rationale: "<from gate>", cycle, phase}` (PreToolUse hook from 10.1-01 flushes on next tool use; orchestrator MAY stub-append directly to `.design/telemetry/costs.jsonl` until 10.1-05 lands). Skip 1b. Set `task_progress=2/3`. Emit `design-verifier skipped — gate rationale: <rationale>`.
+- `spawn: true` → proceed to 1b as currently written.
 
 ### 1b. Run design-verifier (reads auditor output as additional input)
 
@@ -204,6 +231,31 @@ by structured gap list, then `## VERIFICATION COMPLETE`. If no gaps, just emit `
 ```
 
 Wait for `## VERIFICATION COMPLETE` in the agent response. Once detected, update STATE.md `task_progress=2/3`.
+
+### 1c-gate. Lazy gate — should design-integration-checker run?
+
+Same pattern as 1b-gate:
+
+    Task("design-integration-checker-gate", """
+    <required_reading>
+    @.design/STATE.md
+    </required_reading>
+
+    You are the design-integration-checker-gate. Read the diff and decide whether
+    design-integration-checker should spawn.
+
+    Context:
+      diff_files: <git diff --name-only output>
+      diff_body: <git diff output, truncated>
+      baseline_sha: <from STATE.md or HEAD~1>
+
+    Apply the heuristic. Emit JSON + `## GATE COMPLETE`.
+    """)
+
+Wait for `## GATE COMPLETE`. Parse JSON:
+
+- `spawn: false` → append `lazy_skipped: true` telemetry row (same shape), skip 1c, set `task_progress=3/3`, emit `design-integration-checker skipped — gate rationale: <rationale>`.
+- `spawn: true` → proceed to 1c as currently written.
 
 ### 1c. Run design-integration-checker (post-verification decision wiring check)
 
@@ -382,9 +434,11 @@ Status: PASS | FAIL | ACCEPTED-WITH-GAPS
 Gaps:   X blockers, Y majors, Z minors, W cosmetics
 
 Agents run:
-  design-auditor          → .design/DESIGN-AUDIT.md (6-pillar qualitative)
-  design-verifier         → .design/DESIGN-VERIFICATION.md (7-category + heuristics + UAT)
-  design-integration-checker → inline (D-XX decision wiring)
+  design-auditor              → .design/DESIGN-AUDIT.md (6-pillar qualitative)
+  design-verifier-gate        → JSON gate decision (may skip design-verifier)
+  design-verifier             → .design/DESIGN-VERIFICATION.md (7-category + heuristics + UAT)
+  design-integration-checker-gate → JSON gate decision (may skip design-integration-checker)
+  design-integration-checker  → inline (D-XX decision wiring)
 
 Reports:
   Qualitative audit: .design/DESIGN-AUDIT.md

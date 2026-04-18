@@ -75,9 +75,29 @@ Wait for every mapper's completion marker:
 - `## A11Y MAP COMPLETE`
 - `## MOTION MAP COMPLETE`
 
+## Step 3.5 — Synthesize parallel mapper outputs (Plan 10.1-04, D-13/D-14/D-15)
+
+Each mapper has already written its own `.design/map/*.md` (disjoint writes). Main-context doesn't need all 5 verbatim — invoke the `synthesize` skill inline:
+
+    Skill("synthesize", {
+      outputs: [
+        "=== from token-mapper ===\n" + <read .design/map/tokens.md>,
+        "=== from component-taxonomy-mapper ===\n" + <read .design/map/components.md>,
+        "=== from visual-hierarchy-mapper ===\n" + <read .design/map/visual-hierarchy.md>,
+        "=== from a11y-mapper ===\n" + <read .design/map/a11y.md>,
+        "=== from motion-mapper ===\n" + <read .design/map/motion.md>
+      ],
+      directive: "Merge into a single cross-cutting DESIGN-PATTERNS.md summary preserving each mapper's top-level section header. Consolidate duplicates across mappers into single entries with source-agent names listed. Target ~120 lines.",
+      output_shape: "markdown"
+    })
+
+Wait for `## SYNTHESIS COMPLETE`. Capture the merged markdown, write to `.design/DESIGN-PATTERNS.md` (overwrite if present). This becomes the primary explore-stage input; per-mapper `.design/map/*.md` files remain on disk as drill-down evidence.
+
+If `--only <name>` was passed (single mapper), skip this step entirely.
+
 ## Step 4 — Collate
 
-Write `.design/DESIGN-MAP.md` — a thin index linking to each `.design/map/*.md` with a one-paragraph summary pulled from each file's header.
+Write `.design/DESIGN-MAP.md` — a thin index linking to each `.design/map/*.md` with a one-paragraph summary pulled from each file's header. If Step 3.5 ran, also cross-link to the synthesized `.design/DESIGN-PATTERNS.md` and note at the top: "See DESIGN-PATTERNS.md for the merged cross-cutting summary — this index preserves per-mapper drill-down."
 
 ## Step 5 — Report
 
@@ -85,7 +105,7 @@ Write `.design/DESIGN-MAP.md` — a thin index linking to each `.design/map/*.md
 ━━━ Map complete ━━━
 Files: .design/map/tokens.md, components.md, visual-hierarchy.md, a11y.md, motion.md
 Index: .design/DESIGN-MAP.md
-Next: /gdd:explore (consumes .design/map/*.md when present)
+Next: /gdd:explore (consumes .design/DESIGN-PATTERNS.md on happy path; .design/map/*.md available for drill-down)
 ━━━━━━━━━━━━━━━━━━━━━
 ```
 
