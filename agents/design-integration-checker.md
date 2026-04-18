@@ -43,6 +43,26 @@ Minimum expected files:
 
 ---
 
+## Step 0 — Graphify Pre-Search (if available)
+
+**Skip this step if `graphify` is `not_configured` or `unavailable` in `.design/STATE.md` `<connections>`.** Proceed directly to Step 1 — grep-based checking continues as before. No error.
+
+### If `graphify: available`
+
+For each D-XX decision in DESIGN-CONTEXT.md, query the graph before grepping:
+
+```
+node "$HOME/.claude/get-shit-done/bin/gsd-tools.cjs" graphify query "decision:D-<nn>" --budget 1500
+```
+
+The query returns a subgraph of components and tokens connected to this decision. Use the returned node IDs (`component:<name>` and `token:<name>`) as the seed list for your grep searches. This reduces false-negatives where a decision is implemented but grep pattern misses it.
+
+If the query returns empty results for a decision, continue with standard grep — the graph may not have indexed that decision yet.
+
+Do NOT skip the standard grep even when graph results are found. The graph is a seed list, not a complete index.
+
+---
+
 ## Step 1: Parse D-XX Decision Registry
 
 Read `.design/DESIGN-CONTEXT.md` and extract all D-XX decisions. Each decision entry should specify:

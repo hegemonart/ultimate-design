@@ -57,6 +57,28 @@ Each task maps to a domain with specific reference files. These types are the on
 
 ---
 
+## Step 0 — Graphify Component-Count Annotation (if available)
+
+**Skip this step if `graphify` is `not_configured` or `unavailable` in `.design/STATE.md` `<connections>`.** Proceed directly to task scoping — planning continues as before. No error.
+
+### If `graphify: available`
+
+Before scoping any task that involves a design token change (color, spacing, typography, motion):
+
+```
+node "$HOME/.claude/get-shit-done/bin/gsd-tools.cjs" graphify query "<token-name>" --budget 1500
+```
+
+The query returns all components that reference this token. Annotate the planned task with:
+`"Token scope: N components affected (from graph)"` before deciding task size.
+
+If N > 10, flag the task with a scope warning: "High-impact token change — verify no regressions."
+If N = 0 or query is empty, continue scoping without annotation.
+
+Do NOT block task planning on graph results. The annotation is informational only.
+
+---
+
 ## Wave Assignment Logic
 
 Assign every task to a wave using this decision table:

@@ -2,7 +2,7 @@
 name: get-design-done
 short_name: gdd
 description: "Master design pipeline for Claude Code. 5-stage workflow: Brief → Explore → Plan → Design → Verify. Run 'brief' first in any new project to capture the design problem, then 'explore' to inventory the codebase and interview for context. Invoke without arguments for status and auto-routing."
-argument-hint: "[brief|explore|plan|design|verify|map|next|help|status|style|darkmode|compare|figma-write|discuss|list-assumptions|progress|health|todo|stats|note|plant-seed|add-backlog|review-backlog|scan|discover|settings|update|reapply-patches|audit|pause|resume|new-cycle|debug|quick|new-project|complete-cycle|fast|do|ship|undo|pr-branch|sketch|sketch-wrap-up|spike|spike-wrap-up]"
+argument-hint: "[brief|explore|plan|design|verify|map|next|help|status|style|darkmode|compare|figma-write|graphify|discuss|list-assumptions|progress|health|todo|stats|note|plant-seed|add-backlog|review-backlog|scan|discover|settings|update|reapply-patches|audit|pause|resume|new-cycle|debug|quick|new-project|complete-cycle|fast|do|ship|undo|pr-branch|sketch|sketch-wrap-up|spike|spike-wrap-up]"
 user-invocable: true
 ---
 
@@ -34,6 +34,7 @@ Each stage produces artifacts in `.design/` inside the current project.
 | `darkmode` | `get-design-done:darkmode` | Audit dark mode architecture + contrast + anti-patterns → .design/DARKMODE-AUDIT.md |
 | `compare` | `get-design-done:compare` | Delta between DESIGN.md baseline and DESIGN-VERIFICATION.md → .design/COMPARE-REPORT.md |
 | `figma-write <mode>` | `get-design-done:figma-write` | Write design decisions to Figma (annotate/tokenize/mappings) |
+| `graphify <subcommand>` | `get-design-done:graphify` | Manage Graphify knowledge graph (build/query/status/diff) |
 | `discuss [topic] [--all] [--spec] [--cycle <name>]` | `get-design-done:gdd-discuss` | Adaptive design interview — spawns design-discussant; appends D-XX decisions to STATE.md |
 | `list-assumptions [--area]` | `get-design-done:gdd-list-assumptions` | Surface implicit design assumptions baked into the codebase |
 | **Audit & Session** | | |
@@ -120,6 +121,7 @@ If `$ARGUMENTS` is a stage or command name — invoke it directly, no state chec
 /gdd:darkmode     → Skill("get-design-done:darkmode")
 /gdd:compare      → Skill("get-design-done:compare")
 /gdd:figma-write  → Skill("get-design-done:figma-write")
+/gdd:graphify     → Skill("get-design-done:graphify")
 /gdd:discuss          → Skill("get-design-done:gdd-discuss")
 /gdd:list-assumptions → Skill("get-design-done:gdd-list-assumptions")
 /gdd:progress         → Skill("get-design-done:gdd-progress")
