@@ -3,15 +3,15 @@ gsd_state_version: 1.0
 milestone: v1.0.0
 milestone_name: milestone
 status: executing
-stopped_at: Completed 12-01-PLAN.md
-last_updated: "2026-04-18T00:08:00Z"
-last_activity: 2026-04-18 -- Phase 12 Plan 01 complete (test runner + helpers + CI)
+stopped_at: Completed 12-02-PLAN.md
+last_updated: "2026-04-18T02:30:10.619Z"
+last_activity: 2026-04-18
 progress:
   total_phases: 13
   completed_phases: 6
-  total_plans: 47
-  completed_plans: 24
-  percent: 51
+  total_plans: 53
+  completed_plans: 26
+  percent: 49
 ---
 
 # Project State
@@ -26,9 +26,9 @@ See: .planning/PROJECT.md (updated 2026-04-17)
 ## Current Position
 
 Phase: 12 (Test Coverage) — EXECUTING
-Plan: 2 of 7
-Status: Executing Phase 12
-Last activity: 2026-04-18 -- Phase 12 Plan 01 complete (test runner + helpers + CI)
+Plan: 3 of 7
+Status: Ready to execute
+Last activity: 2026-04-18
 
 Progress: [████████░░] 81%
 
@@ -76,6 +76,7 @@ Progress: [████████░░] 81%
 | Phase 05-automation-agents-new-commands P04 | 2 | 2 tasks | 2 files |
 | Phase 05-automation-agents-new-commands P05 | 101 | 2 tasks | 2 files |
 | Phase 12-test-coverage P01 | 8 min | 3 tasks | 3 files |
+| Phase 12 P02 | 5 min | 2 tasks | 8 files |
 
 ## Accumulated Context
 
@@ -154,6 +155,9 @@ Progress: [████████░░] 81%
 - [Phase 12-01]: node:test built-in runner chosen — zero third-party test dependencies for the entire test suite
 - [Phase 12-01]: CI matrix uses fail-fast: false for full cross-platform signal (node 22/24 x ubuntu/macos/windows)
 - [Phase 12-01]: scaffoldDesignDir returns { dir, designDir, cleanup } — each test creates isolated temp dir, cleanup() called in teardown
+- [Phase ?]: [Phase 12-02]: Phase 6 baseline locks 14 agents, 12 skill dirs, 3 connection docs at plugin v1.0.0
+- [Phase ?]: [Phase 12-02]: Baseline captures manifest + frontmatter snapshot — lower maintenance burden than full file copies
+- [Phase ?]: [Phase 12-02]: Version test uses >= baseline — allows future phases to bump version without re-lock
 
 ### Pending Todos
 
@@ -165,6 +169,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-04-18T00:08:00Z
-Stopped at: Completed 12-01-PLAN.md
+Last session: 2026-04-18T02:30:10.613Z
+Stopped at: Completed 12-02-PLAN.md
 Resume file: None
