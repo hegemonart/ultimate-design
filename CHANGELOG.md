@@ -20,6 +20,7 @@ All notable changes to get-design-done are documented here. Versions follow [sem
 
 ### Changed
 - Plugin version: `1.0.7` → `1.0.7.3` (off-cadence patch — does not shift Phase 14 → v1.0.8).
+- `reference/schemas/plugin.schema.json` and `reference/schemas/marketplace.schema.json` — version pattern widened from `^\d+\.\d+\.\d+$` to `^\d+\.\d+\.\d+(\.\d+)?$` to permit off-cadence 4-segment versions; required so v1.0.7.3 passes the Phase 13 ajv-cli CI gate.
 
 ### Design principles (Phase 13.3)
 - Never auto-updates. The checker only surfaces a nudge; `/gdd:update` remains the explicit user action.
