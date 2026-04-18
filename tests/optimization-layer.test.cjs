@@ -157,7 +157,7 @@ test('optimization-layer: lazy-spawn gate — every design-* agent declares requ
   for (const file of agentFiles) {
     const body = fs.readFileSync(path.join(agentDir, file), 'utf8');
     const hasRequiredReading = /^## Required Reading/m.test(body);
-    const hasInputs = /^## Inputs/m.test(body);
+    const hasInputs = /^## Inputs?/m.test(body) || /^## Input Contract/m.test(body);
     const hasStandaloneMarker =
       /no required reading.*standalone agent/i.test(body) ||
       /standalone agent.*no required reading/i.test(body);

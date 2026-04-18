@@ -12,6 +12,7 @@ const TIER_LIMITS = {
   XL: 500,
   LARGE: 350,
   DEFAULT: 250,
+  S: 150,  // Phase 10.1 Haiku gate agents — tight cap enforces lean diff-scanners
 };
 
 const agentFiles = fs.readdirSync(AGENTS_DIR)

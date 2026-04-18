@@ -2,12 +2,14 @@ design-advisor.md
 design-assumptions-analyzer.md
 design-auditor.md
 design-context-builder.md
+design-context-checker-gate.md
 design-context-checker.md
 design-discussant.md
 design-doc-writer.md
 design-executor.md
 design-figma-writer.md
 design-fixer.md
+design-integration-checker-gate.md
 design-integration-checker.md
 design-pattern-mapper.md
 design-phase-researcher.md
@@ -15,4 +17,5 @@ design-plan-checker.md
 design-planner.md
 design-reflector.md
 design-research-synthesizer.md
+design-verifier-gate.md
 design-verifier.md

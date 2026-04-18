@@ -7,6 +7,11 @@ model: inherit
 default-tier: sonnet
 tier-rationale: "Writer proposes + executes Figma write-backs — Sonnet handles structured proposal synthesis well"
 size_budget: LARGE
+parallel-safe: never
+typical-duration-seconds: 120
+reads-only: false
+writes:
+  - "Figma file (via mcp__figma__use_figma) — annotations, token bindings, Code Connect mappings"
 ---
 
 @reference/shared-preamble.md

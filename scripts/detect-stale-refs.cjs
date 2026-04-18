@@ -11,20 +11,14 @@ const REPO_ROOT = path.resolve(__dirname, '..');
 const DEPRECATIONS_PATH = path.join(REPO_ROOT, 'reference/DEPRECATIONS.md');
 
 // Patterns checked against every .md file body (not against DEPRECATIONS.md itself).
-// Keep this list in sync with reference/DEPRECATIONS.md.
+// Scope: only truly unambiguous deprecations — names that must not appear anywhere
+// outside DEPRECATIONS.md. Current-but-historically-renamed agents/skills
+// (design-context-builder, design-pattern-mapper, scan/, discover/) are NOT
+// flagged here because they still exist as live files in the tree; the
+// rename/split documented in DEPRECATIONS.md was partial, so static detection
+// would over-fire. Cover those cases via targeted review rather than grep.
 const PATTERNS = [
-  { name: '/design: namespace', regex: /\/design:[a-z-]+/g },
-  {
-    name: 'design-context-builder (legacy)',
-    // word-boundary; exclude when appearing as part of a longer identifier
-    regex: /\bdesign-context-builder\b(?!-)/g,
-  },
-  {
-    name: 'design-pattern-mapper (single blob)',
-    regex: /\bdesign-pattern-mapper\b(?![a-z-])/g,
-  },
-  { name: 'scan/SKILL.md (legacy stage)', regex: /\bscan\/SKILL\.md\b/g },
-  { name: 'discover/SKILL.md (legacy stage)', regex: /\bdiscover\/SKILL\.md\b/g },
+  { name: '/design: namespace (replaced by /gdd:)', regex: /\/design:[a-z-]+/g },
 ];
 
 const EXCLUDE_DIRS = new Set([
