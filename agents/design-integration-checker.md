@@ -40,6 +40,7 @@ Minimum expected files:
 - `.design/STATE.md` — pipeline position, decision log
 - `.design/DESIGN-CONTEXT.md` — the D-XX decision registry (source of truth for what to check)
 - `.design/DESIGN-VERIFICATION.md` — verifier output (already-confirmed items, gap context)
+- `connections/graphify.md` — Graphify pre-search pattern (graph-seeded grep for decision nodes)
 
 ---
 

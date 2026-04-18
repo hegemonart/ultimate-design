@@ -32,6 +32,7 @@ The orchestrating stage supplies a `<required_reading>` block in the prompt. Rea
 - `reference/heuristics.md` — NNG heuristics H-01..H-10 scoring guide
 - `reference/review-format.md` — visual UAT presentation format
 - `reference/accessibility.md` — WCAG checklist for accessibility scoring
+- `connections/preview.md` — Preview MCP connection spec (probe, screenshot mode, interaction mode, fallback)
 - `connections/chromatic.md` — Chromatic CLI connection spec (probe, baseline management, fallback)
 - `connections/storybook.md` — Storybook HTTP probe and a11y integration details
 

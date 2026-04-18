@@ -80,6 +80,20 @@ All pipeline artifacts are written to `.design/` inside your project.
 
 ## Connections (optional)
 
+The pipeline integrates with seven external tools and MCPs. All connections are optional — the pipeline degrades gracefully when any connection is unavailable.
+
+| Connection | Type | Purpose |
+|-----------|------|---------|
+| Figma Desktop | MCP (`mcp__figma-desktop__*`) | Token extraction, design context pre-population |
+| Figma Writer | MCP (`mcp__figma__use_figma`) | Write decisions back to Figma (annotate, tokenize, Code Connect) |
+| Refero | MCP (`mcp__refero__*`) | Reference design search during discovery |
+| Preview (Playwright) | MCP (`mcp__Claude_Preview__*`) | Live page screenshots for visual verification |
+| Storybook | HTTP (`localhost:6006`) | Component inventory, a11y per story, story stubs |
+| Chromatic | CLI (`npx chromatic`) | Visual regression delta narration and change-risk scoping |
+| Graphify | CLI (`graphify`) | Knowledge graph: component↔token↔decision relationships |
+
+See [`connections/connections.md`](./connections/connections.md) for the full index, capability matrix, and probe patterns.
+
 ### Figma MCP
 
 When the official Figma Desktop MCP is active, `scan` reads Figma variables and `discover` pre-populates design decisions from your Figma file. Falls back to code-only analysis when not available. See [`connections/figma.md`](./connections/figma.md) for setup.

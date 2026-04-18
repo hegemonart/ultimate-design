@@ -2,16 +2,16 @@
 gsd_state_version: 1.0
 milestone: v1.0.0
 milestone_name: milestone
-status: executing
-stopped_at: Completed 08-02-PLAN.md
-last_updated: "2026-04-18T03:01:10.105Z"
+status: verifying
+stopped_at: Completed 08-05-PLAN.md
+last_updated: "2026-04-18T03:07:46.217Z"
 last_activity: 2026-04-18
 progress:
   total_phases: 15
   completed_phases: 6
   total_plans: 55
-  completed_plans: 32
-  percent: 58
+  completed_plans: 33
+  percent: 60
 ---
 
 # Project State
@@ -27,7 +27,7 @@ See: .planning/PROJECT.md (updated 2026-04-17)
 
 Phase: 12 (Test Coverage) — EXECUTING
 Plan: 7 of 7
-Status: Ready to execute
+Status: Phase complete — ready for verification
 Last activity: 2026-04-18
 
 Progress: [████████░░] 81%
@@ -80,6 +80,7 @@ Progress: [████████░░] 81%
 | Phase 08 P02 | 258 | 3 tasks | 5 files |
 | Phase 08 P03 | 246 | 2 tasks | 5 files |
 | Phase 08-visual-design-connections P01 | 372 | 4 tasks | 6 files |
+| Phase 08 P05 | 190 | 2 tasks | 5 files |
 
 ## Accumulated Context
 
@@ -168,6 +169,9 @@ Progress: [████████░░] 81%
 - [Phase 08-01]: [Phase 08-01]: Preview probe uses preview_list (lightweight) not preview_start — avoids spinning up a browser as a side effect of probing
 - [Phase 08-01]: [Phase 08-01]: preview_screenshot output saved to .design/screenshots/ by file path; base64 never embedded inline in md files (prevents 500KB+ verification files)
 - [Phase 08-01]: [Phase 08-01]: scan/SKILL.md is authoritative probe stage for all 7 connections; downstream stages read STATE.md rather than re-probing
+- [Phase ?]: Graphify probe is CLI/file-based (config flag + graph.json existence), not ToolSearch — distinct from all MCP connections
+- [Phase ?]: Graph is a seed list for grep, never a replacement — agents always grep after graph query
+- [Phase ?]: All Graphify steps are conditional opt-in: skip gracefully when not_configured or unavailable
 
 ### Pending Todos
 
@@ -179,6 +183,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-04-18T03:00:19.203Z
-Stopped at: Completed 08-02-PLAN.md
+Last session: 2026-04-18T03:07:46.210Z
+Stopped at: Completed 08-05-PLAN.md
 Resume file: None

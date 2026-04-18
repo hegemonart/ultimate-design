@@ -33,6 +33,7 @@ The orchestrating stage supplies a `<required_reading>` block in the prompt pass
 It may also include:
 - `.design/DESIGN-RESEARCH.md` — if the research step ran, use these patterns to inform task scope
 - `connections/chromatic.md` — Chromatic CLI connection spec (probe, --trace-changed scoping, baseline management)
+- `connections/graphify.md` — Graphify pre-search pattern (graph-seeded token scope annotation)
 
 **Invariant:** Read every file in the `<required_reading>` block before taking any other action.
 

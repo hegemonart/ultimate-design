@@ -10,6 +10,11 @@ This directory contains connection specifications for external tools and MCPs th
 |-----------|--------|-----------|-------|
 | Figma | Active | [`connections/figma.md`](connections/figma.md) | Uses `mcp__figma-desktop__*` tools (official Figma Desktop MCP) |
 | Refero | Active | [`connections/refero.md`](connections/refero.md) | Uses `mcp__refero__*` tools (verify names via ToolSearch) |
+| Preview | Active | [`connections/preview.md`](connections/preview.md) | Uses `mcp__Claude_Preview__*` tools |
+| Storybook | Active | [`connections/storybook.md`](connections/storybook.md) | HTTP probe: `localhost:6006/index.json` |
+| Chromatic | Active | [`connections/chromatic.md`](connections/chromatic.md) | CLI: `npx chromatic`; env: `CHROMATIC_PROJECT_TOKEN` |
+| Figma Writer | Active | [`connections/figma-writer.md`](connections/figma-writer.md) | Uses `mcp__figma__use_figma` (remote MCP) |
+| Graphify | Active | [`connections/graphify.md`](connections/graphify.md) | CLI: `graphify`; `gsd-tools graphify *` |
 
 ---
 
@@ -21,14 +26,11 @@ Each cell describes what the connection contributes at that pipeline stage, or `
 |-----------|------|----------|------|--------|--------|
 | Figma | token augmentation via `get_variable_defs` (CONN-03) | decisions pre-populate via `get_variable_defs` (CONN-04) | — | — | — |
 | Refero | — | reference search via `mcp__refero__search`; fallback → awesome-design-md (CONN-05) | — | — | — |
-| token-mapper | tokens map → `.design/map/tokens.md` (consumed by explore) | — | — | — | — |
-| component-taxonomy-mapper | components map → `.design/map/components.md` | — | — | — | — |
-| visual-hierarchy-mapper | hierarchy map → `.design/map/visual-hierarchy.md` | — | — | — | — |
-| a11y-mapper | static a11y map → `.design/map/a11y.md` | — | — | — | — |
-| motion-mapper | motion map → `.design/map/motion.md` | — | — | — | — |
-| Storybook (future) | — | — | — | — | components |
-| Linear (future) | — | — | — | — | tickets |
-| GitHub (future) | — | — | commits | — | PRs |
+| Preview | — | — | — | — | screenshots for `? VISUAL` checks (VIS-02) |
+| Storybook | — | component inventory (STB-01) | change-risk via story count (STB-02) | `.stories.tsx` stub (STB-03) | a11y per story (STB-02) |
+| Chromatic | — | — | change-risk scoping (CHR-02) | — | visual delta narration (CHR-01) |
+| Figma Writer | — | — | — | write tokens/annotations/Code Connect (FWR-01..04) | — |
+| Graphify | — | — | dependency scoping (GRF-03) | — | orphan detection (GRF-04) |
 
 **Column definitions:**
 
@@ -98,9 +100,92 @@ Note: Refero probe is ToolSearch-only (no live tool call). ToolSearch presence i
 
 ---
 
+**Preview probe (execute at stage entry, after reading STATE.md):**
+
+```
+Step P1 — ToolSearch check:
+  ToolSearch({ query: "Claude_Preview", max_results: 5 })
+  → Empty result      → preview: not_configured
+  → Non-empty result  → proceed to Step P2
+
+Step P2 — Live tool call:
+  call mcp__Claude_Preview__preview_list
+  → Success (list returned, may be empty)  → preview: available
+  → Error                                   → preview: unavailable
+
+Write preview status to STATE.md <connections>.
+```
+
+**Storybook probe (execute at stage entry, after reading STATE.md):**
+
+```
+Step S1 — HTTP check (Storybook 8):
+  Bash: curl -sf http://localhost:6006/index.json 2>/dev/null
+  → Success (JSON)    → storybook: available
+  → Failure           → proceed to Step S2
+
+Step S2 — HTTP fallback (Storybook 7):
+  Bash: curl -sf http://localhost:6006/stories.json 2>/dev/null
+  → Success (JSON)    → storybook: available
+  → Failure           → storybook: not_configured
+
+Write storybook status to STATE.md <connections>.
+```
+
+Note: Storybook 8 index.json does NOT include parameters. Use id, title, name, type, kind, tags fields only.
+
+**Chromatic probe (execute at stage entry, after reading STATE.md):**
+
+```
+Step C1 — CLI check:
+  Bash: command -v chromatic || npx --yes chromatic --version 2>/dev/null
+  → Exits non-zero    → chromatic: not_configured  (skip all Chromatic steps)
+  → Exits 0           → proceed to Step C2
+
+Step C2 — Token check:
+  Check env var: CHROMATIC_PROJECT_TOKEN
+  → Absent or empty   → chromatic: unavailable  (CLI present but not configured)
+  → Present           → chromatic: available
+
+Write chromatic status to STATE.md <connections>.
+```
+
+Note: First Chromatic run has no baseline — all stories become new snapshots. This is expected; it establishes the baseline.
+
+**Figma Writer probe (execute before any write operation):**
+
+```
+Step R1 — ToolSearch check:
+  ToolSearch({ query: "mcp__figma__use_figma", max_results: 1 })
+  → Empty result      → figma_writer: not_configured
+  → Non-empty result  → figma_writer: available
+
+Write figma_writer status to STATE.md <connections>.
+```
+
+Note: figma_writer is a separate connection key from figma (desktop). Both can be active simultaneously. There is no `unavailable` state for figma_writer — the ToolSearch-only probe cannot detect auth failures; those surface at execution time.
+
+**Graphify probe (execute at agent entry, before using graph):**
+
+```
+Step G1 — Config check:
+  node "$HOME/.claude/get-shit-done/bin/gsd-tools.cjs" graphify status
+  → Error or { enabled: false }  → graphify: not_configured
+  → { enabled: true }            → proceed to Step G2
+
+Step G2 — Graph file check:
+  Check if graphify-out/graph.json exists in project root
+  → Absent    → graphify: unavailable  (graph not built yet)
+  → Present   → graphify: available
+
+Write graphify status to STATE.md <connections>.
+```
+
+---
+
 **Graceful degradation required:** stages MUST continue when a connection is `unavailable` or `not_configured`. Skip connection-dependent steps. If a missing connection prevents a `must_have` from being satisfied, append a `<blocker>` to `.design/STATE.md` and continue.
 
-For full per-connection fallback details, see the spec files: [`connections/figma.md`](connections/figma.md) and [`connections/refero.md`](connections/refero.md).
+For full per-connection fallback details, see the spec files: [`connections/figma.md`](connections/figma.md), [`connections/refero.md`](connections/refero.md), [`connections/preview.md`](connections/preview.md), [`connections/storybook.md`](connections/storybook.md), [`connections/chromatic.md`](connections/chromatic.md), [`connections/figma-writer.md`](connections/figma-writer.md), and [`connections/graphify.md`](connections/graphify.md).
 
 ---
 
@@ -114,7 +199,7 @@ To add a new connection to the pipeline:
 
 3. **Update the Capability Matrix.** Add a row for the new connection. Mark the stages it feeds with a short capability noun; use `—` for stages it does not affect.
 
-4. **Declare the MCP.** If the connection uses an MCP server, ensure the server is declared in `.claude-plugin/plugin.json` or documented as a user-supplied MCP in the spec file.
+4. **Declare the MCP.** If the connection uses an MCP server, ensure the server is declared in `.claude-plugin/plugin.json` or documented as a user-supplied MCP in the spec file. For read-only MCP connections, use `connections/figma.md` as the model. For remote MCP write connections, use `connections/figma-writer.md` as the model.
 
 5. **Wire into stage skills (Phase 2+ work).** Update the relevant stage `SKILL.md` files to probe the connection at entry and write its status to `.design/STATE.md <connections>`.
 
@@ -125,5 +210,5 @@ To add a new connection to the pipeline:
 ## Notes
 
 - `connections/` is infrastructure scaffolding introduced in Phase 1. Stage integration (wiring detection and graceful degradation into each stage) is Phase 2 work.
-- Future connections (Storybook, Linear, GitHub) are placeholder rows in the matrix. Actual spec files and stage wiring are added when those phases land.
+- Phase 8 added five new active connections. Linear and GitHub remain planned for a future phase.
 - The capability matrix columns map to the five pipeline stages: `scan | discover | plan | design | verify`.
