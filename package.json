@@ -10,7 +10,7 @@
   },
   "license": "MIT",
   "scripts": {
-    "test": "node --test 'tests/**/*.cjs'"
+    "test": "node --test \"tests/**/*.cjs\""
   },
   "keywords": [
     "claude",
