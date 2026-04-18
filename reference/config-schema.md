@@ -153,3 +153,86 @@ TTL driving `.design/cache-manifest.json` entry expiry per D-08 Layer B.
 ## Bootstrap behavior
 
 If `.design/budget.json` is missing when any `/gdd:*` command runs, `scripts/bootstrap.sh` writes the Default Config values (per D-12). Don't block the spawn — defaults are sensible.
+
+## .design/cache-manifest.json Schema (Phase 10.1)
+
+Authored and maintained by `skills/cache-manager/SKILL.md`. Read by `hooks/budget-enforcer.js` (PreToolUse on Agent spawns) for short-circuiting cached spawns per D-05. Layer B of the D-08 two-layer cache. Flat KV shape — keys are SHA-256 hex of the deterministic input-hash, values are entry objects. Schema version 1.
+
+## Full Schema
+
+```json
+{
+  "a3f1e4b2c5...": {
+    "agent": "design-verifier",
+    "result": "<base64-encoded-result-or-file-path>",
+    "written_at": "2026-04-18T12:00:00Z",
+    "ttl_seconds": 3600,
+    "expires_at": "2026-04-18T13:00:00Z"
+  },
+  "f7e2d8a1b9...": {
+    "agent": "design-planner",
+    "result": ".design/cache-blobs/f7e2d8a1b9.md",
+    "written_at": "2026-04-18T12:05:00Z",
+    "ttl_seconds": 3600,
+    "expires_at": "2026-04-18T13:05:00Z"
+  }
+}
+```
+
+## Empty Initial State
+
+```json
+{}
+```
+
+## Fields
+
+### `<sha256-hex>` (key)
+
+64-character lowercase SHA-256 hex produced by `skills/cache-manager/SKILL.md` Phase 1 (`computeInputHash(agent_path, input_file_paths)`). See that skill for the canonical algorithm.
+
+### `agent`
+
+String — the `agents/<name>.md` basename without extension (e.g., `design-verifier`). Human-readable debug aid; not load-bearing for lookup.
+
+### `result`
+
+String — either (a) a base64-encoded blob (for small results, typically < 16KB), or (b) a filesystem path under `.design/cache-blobs/<sha-prefix>.md` for larger results. Writers choose based on size; readers handle both transparently.
+
+### `written_at`
+
+String — ISO-8601 UTC timestamp at write time. Produced by `new Date().toISOString()`.
+
+### `ttl_seconds`
+
+Integer — copied from `.design/budget.json.cache_ttl_seconds` at write time (default 3600). Preserved in the entry so a later budget.json change does not retroactively invalidate or extend existing entries.
+
+### `expires_at`
+
+String — ISO-8601 UTC timestamp equal to `written_at + ttl_seconds`. Precomputed at write time; readers never recompute. Stale entries (`Date.now() > expires_at`) are treated as misses.
+
+## TTL semantics
+
+- TTL default source: `.design/budget.json.cache_ttl_seconds` (default 3600s = 1 hour, per Plan 10.1-01 schema).
+- TTL is copied into each entry at write time — **not** recomputed on read. Budget.json changes do not retroactively affect existing entries.
+- `expires_at` = `written_at + ttl_seconds`, computed once, stored in the entry.
+- Stale entries are **not** actively purged (lazy cleanup): they remain in the file until overwritten by a new write with the same key, or pruned manually. A proactive reaper is out of v1 scope.
+- Readers (`hooks/budget-enforcer.js`) check `Date.now() / 1000 > Date.parse(expires_at) / 1000`; if true, return miss.
+
+## Read/Write contract
+
+- **Single writer**: `skills/cache-manager/SKILL.md` Phase 4 (`write-result-on-completion`). Other code must not write this file directly.
+- **Multiple readers**: `hooks/budget-enforcer.js`, any orchestrator that runs Phase 2 (`lookup`) for dry-run planning. Readers treat malformed JSON as "manifest absent" (empty cache) — do not throw.
+- **Concurrency**: Claude Code agent spawns are serialized at the hook level (PreToolUse is synchronous). No file locking is needed at v1 scale. Concurrent writes from parallel orchestrators are theoretically possible but exceedingly rare; last-writer-wins is acceptable (cache miss on next read re-populates).
+
+## Bootstrap behavior
+
+If `.design/cache-manifest.json` is missing when `hooks/budget-enforcer.js` reads it, the hook treats every lookup as a miss and the spawn proceeds normally. No bootstrap action is required — the manifest is created lazily on first successful spawn when `skills/cache-manager/SKILL.md` Phase 4 fires. Unlike `.design/budget.json`, missing cache-manifest.json is the **correct** initial state on a fresh repo.
+
+## Cross-references
+
+- `skills/cache-manager/SKILL.md` — producer; documents the four-phase contract.
+- `hooks/budget-enforcer.js` (Plan 10.1-01) — reader; short-circuits spawns on hit.
+- `.design/budget.json` — provides `cache_ttl_seconds` default.
+- `.design/telemetry/costs.jsonl` (Plan 10.1-05) — records `cache_hit: true` rows with zero tokens and zero cost when the short-circuit fires.
+- D-05, D-08, D-09 in `.planning/phases/10.1-optimization-layer-cost-governance/10.1-CONTEXT.md` — decision lineage.
