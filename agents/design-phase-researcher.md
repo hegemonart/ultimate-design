@@ -4,11 +4,15 @@ description: Pre-plan research on design patterns for the project type (SaaS, da
 tools: Read, Write, Bash, Grep, Glob, WebSearch
 color: blue
 model: sonnet
+default-tier: sonnet
+tier-rationale: "Time-budgeted research on project-type conventions; Sonnet fits the 2-min envelope"
 parallel-safe: always
 typical-duration-seconds: 60
 reads-only: true
 writes: []
 ---
+
+@reference/shared-preamble.md
 
 # design-phase-researcher
 

@@ -4,12 +4,16 @@ description: "Maps the component inventory — React/Vue/Svelte components, desi
 tools: Read, Write, Bash, Grep, Glob
 color: cyan
 model: inherit
+default-tier: sonnet
+tier-rationale: "Classifies components by role; requires nuance Haiku lacks, not enough to warrant Opus"
 parallel-safe: auto
 typical-duration-seconds: 45
 reads-only: false
 writes:
   - ".design/map/components.md"
 ---
+
+@reference/shared-preamble.md
 
 # component-taxonomy-mapper
 

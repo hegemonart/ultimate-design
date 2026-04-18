@@ -3,12 +3,16 @@ name: gdd-learnings-extractor
 description: "Extracts structured learning entries from .design/ artifacts (DESIGN-CONTEXT.md, DESIGN-VERIFICATION.md, DESIGN-DEBT.md, DESIGN-SUMMARY.md, CYCLES.md). Writes .design/learnings/LEARNINGS.md and proposes reference/ additions. Called by /gdd:extract-learnings."
 tools: Read, Write, Bash, Glob, Grep
 color: blue
+default-tier: sonnet
+tier-rationale: "Pulls decisions + lessons + patterns from phase artifacts; prose synthesis"
 parallel-safe: false
 typical-duration-seconds: 45
 reads-only: false
 writes:
   - .design/learnings/LEARNINGS.md
 ---
+
+@reference/shared-preamble.md
 
 # gdd-learnings-extractor
 

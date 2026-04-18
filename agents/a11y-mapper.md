@@ -4,12 +4,16 @@ description: "Maps static accessibility signals — ARIA usage, keyboard nav, fo
 tools: Read, Write, Bash, Grep, Glob
 color: cyan
 model: inherit
+default-tier: sonnet
+tier-rationale: "Open-ended a11y pattern recognition across many files; Sonnet's breadth matters"
 parallel-safe: auto
 typical-duration-seconds: 45
 reads-only: false
 writes:
   - ".design/map/a11y.md"
 ---
+
+@reference/shared-preamble.md
 
 # a11y-mapper
 

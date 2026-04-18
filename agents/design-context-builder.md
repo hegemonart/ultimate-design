@@ -6,6 +6,8 @@ required_reading:
   - connections/storybook.md
 color: blue
 model: inherit
+default-tier: sonnet
+tier-rationale: "Assembles DESIGN-CONTEXT.md from discover outputs; prose synthesis"
 size_budget: XL
 parallel-safe: never
 typical-duration-seconds: 180
@@ -13,6 +15,8 @@ reads-only: false
 writes:
   - ".design/DESIGN-CONTEXT.md"
 ---
+
+@reference/shared-preamble.md
 
 # design-context-builder
 

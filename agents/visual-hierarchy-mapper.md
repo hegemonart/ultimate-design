@@ -4,12 +4,16 @@ description: "Maps visual hierarchy signals — heading structure, type scale re
 tools: Read, Write, Bash, Grep, Glob
 color: cyan
 model: inherit
+default-tier: sonnet
+tier-rationale: "Maps visual hierarchy signals; breadth across many files"
 parallel-safe: auto
 typical-duration-seconds: 45
 reads-only: false
 writes:
   - ".design/map/visual-hierarchy.md"
 ---
+
+@reference/shared-preamble.md
 
 # visual-hierarchy-mapper
 
