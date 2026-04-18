@@ -4,7 +4,7 @@ description: Goal-backward verification of design outcomes against .design/STATE
 tools: Read, Write, Bash, Grep, Glob
 color: green
 model: inherit
-size_budget: XL
+size_budget: XXL
 parallel-safe: never
 typical-duration-seconds: 90
 reads-only: false

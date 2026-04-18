@@ -34,6 +34,13 @@
     "color": "cyan",
     "model": "inherit"
   },
+  "design-discussant.md": {
+    "name": "design-discussant",
+    "description": "Adaptive design interview agent — asks one question at a time, adapts to answers, writes D-XX decisions to STATE.md <decisions> block. Supports --all (batch gray areas) and --spec (ambiguity scoring) modes. Spawned by explore stage and /gdd:discuss command.",
+    "tools": "Read, Write, AskUserQuestion",
+    "color": "blue",
+    "model": "inherit"
+  },
   "design-doc-writer.md": {
     "name": "design-doc-writer",
     "description": "Generates a component handoff doc (DESIGN-STYLE-[ComponentName].md) from design artifacts. Handles both post-pipeline mode (reads DESIGN-SUMMARY.md) and pre-pipeline mode (reads DESIGN.md + source file). Spawned by the style command.",
@@ -46,6 +53,13 @@
     "description": "Executes one plan task from DESIGN-PLAN.md, writes .design/tasks/task-NN.md, and makes an atomic git commit. Applies deviation rules for in-context issues. Spawned by the design stage per task.",
     "tools": "Read, Write, Edit, Bash, Grep, Glob",
     "color": "yellow"
+  },
+  "design-figma-writer.md": {
+    "name": "design-figma-writer",
+    "description": "Writes design decisions back to Figma — annotations, token bindings, Code Connect mappings, and implementation-status write-back. Operates in proposal→confirm mode by default. Accepts --dry-run (emit proposal without executing) and --confirm-shared (required for writes to team library components).",
+    "tools": "Read, Write, Bash, Grep, Glob, mcp__figma__use_figma, mcp__figma-desktop__get_variable_defs, mcp__figma-desktop__get_metadata",
+    "color": "purple",
+    "model": "inherit"
   },
   "design-fixer.md": {
     "name": "design-fixer",
@@ -87,6 +101,20 @@
     "description": "Reads DESIGN-CONTEXT.md and produces DESIGN-PLAN.md with wave-ordered tasks, Touches:/Parallel: fields, and acceptance criteria. Spawned by the plan stage.",
     "tools": "Read, Write, Grep, Glob",
     "color": "green",
+    "model": "inherit"
+  },
+  "design-reflector.md": {
+    "name": "design-reflector",
+    "description": "Post-cycle reflection agent. Reads .design/intel/, .design/learnings/, telemetry, and agent-metrics to produce .design/reflections/<cycle-slug>.md with concrete improvement proposals. Spawned by /gdd:audit (end-of-cycle) and /gdd:reflect (on-demand).",
+    "tools": "Read, Write, Bash, Grep, Glob",
+    "color": "purple",
+    "model": "inherit"
+  },
+  "design-research-synthesizer.md": {
+    "name": "design-research-synthesizer",
+    "description": "Aggregates phase-researcher output, 5 mapper docs, connection data, and discussant decisions into a unified DESIGN-CONTEXT.md. Replaces ad-hoc aggregation in the explore orchestrator.",
+    "tools": "Read, Write, Glob",
+    "color": "cyan",
     "model": "inherit"
   },
   "design-verifier.md": {

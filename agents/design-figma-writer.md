@@ -4,6 +4,7 @@ description: Writes design decisions back to Figma — annotations, token bindin
 tools: Read, Write, Bash, Grep, Glob, mcp__figma__use_figma, mcp__figma-desktop__get_variable_defs, mcp__figma-desktop__get_metadata
 color: purple
 model: inherit
+size_budget: LARGE
 ---
 
 # design-figma-writer

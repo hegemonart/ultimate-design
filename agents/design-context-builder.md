@@ -6,7 +6,7 @@ required_reading:
   - connections/storybook.md
 color: blue
 model: inherit
-size_budget: XL
+size_budget: XXL
 parallel-safe: never
 typical-duration-seconds: 180
 reads-only: false
