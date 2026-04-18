@@ -1,0 +1,99 @@
+{
+  "design-advisor.md": {
+    "name": "design-advisor",
+    "description": "Researches a single gray area and produces a 5-column comparison table with rationale. Spawned by design-context-builder when a gray area exceeds judgment threshold. Returns inline text — no file output.",
+    "tools": "Read, Grep, Glob, WebSearch",
+    "color": "blue",
+    "model": "sonnet"
+  },
+  "design-assumptions-analyzer.md": {
+    "name": "design-assumptions-analyzer",
+    "description": "Reads codebase and DESIGN-CONTEXT.md to surface hidden design assumptions (unstated brand signals, inferred constraints, gray-area candidates) with confidence levels and evidence citations. Runs optionally from plan stage before design-planner.",
+    "tools": "Read, Bash, Grep, Glob",
+    "color": "blue",
+    "model": "inherit"
+  },
+  "design-auditor.md": {
+    "name": "design-auditor",
+    "description": "Retrospective 6-pillar audit (copy, visual hierarchy, color, typography, layout/spacing, experience) with 1–4 scores. Writes .design/DESIGN-AUDIT.md. SUPPLEMENTS the existing 7-category 0-10 system; does not replace it. Spawned by verify stage BEFORE design-verifier.",
+    "tools": "Read, Write, Bash, Grep, Glob",
+    "color": "green",
+    "model": "inherit"
+  },
+  "design-context-builder.md": {
+    "name": "design-context-builder",
+    "description": "Detects existing design system state via grep/glob, runs discovery interview asking ONLY unanswered questions, produces .design/DESIGN-CONTEXT.md. Spawned by the discover stage.",
+    "tools": "Read, Write, Bash, Grep, Glob, mcp__figma-desktop__get_variable_defs, mcp__figma-desktop__get_metadata, mcp__refero__search",
+    "color": "blue",
+    "model": "inherit"
+  },
+  "design-context-checker.md": {
+    "name": "design-context-checker",
+    "description": "Validates .design/DESIGN-CONTEXT.md across 6 dimensions (copy specificity, color contract, typography scale, spacing scale, must-have testability, goal observability). Returns APPROVED or BLOCKED with per-dimension BLOCK/FLAG/PASS verdicts. Spawned by the discover stage after design-context-builder completes.",
+    "tools": "Read, Grep, Glob",
+    "color": "cyan",
+    "model": "inherit"
+  },
+  "design-doc-writer.md": {
+    "name": "design-doc-writer",
+    "description": "Generates a component handoff doc (DESIGN-STYLE-[ComponentName].md) from design artifacts. Handles both post-pipeline mode (reads DESIGN-SUMMARY.md) and pre-pipeline mode (reads DESIGN.md + source file). Spawned by the style command.",
+    "tools": "Read, Write, Grep, Glob",
+    "color": "yellow",
+    "model": "sonnet"
+  },
+  "design-executor.md": {
+    "name": "design-executor",
+    "description": "Executes one plan task from DESIGN-PLAN.md, writes .design/tasks/task-NN.md, and makes an atomic git commit. Applies deviation rules for in-context issues. Spawned by the design stage per task.",
+    "tools": "Read, Write, Edit, Bash, Grep, Glob",
+    "color": "yellow"
+  },
+  "design-fixer.md": {
+    "name": "design-fixer",
+    "description": "Applies BLOCKER and MAJOR gaps from DESIGN-VERIFICATION.md to source code atomically, with one git commit per gap fix. Enables the verify→fix loop. Spawned by the verify stage.",
+    "tools": "Read, Write, Edit, Bash, Grep, Glob",
+    "color": "red",
+    "model": "inherit"
+  },
+  "design-integration-checker.md": {
+    "name": "design-integration-checker",
+    "description": "Verifies D-XX design decisions from DESIGN-CONTEXT.md are actually wired through source code via grep-based checks on tokens, colors, spacing, component patterns. Runs AFTER design-verifier in the verify stage. Returns Connected/Orphaned/Missing counts.",
+    "tools": "Read, Bash, Grep, Glob",
+    "color": "blue",
+    "model": "inherit"
+  },
+  "design-pattern-mapper.md": {
+    "name": "design-pattern-mapper",
+    "description": "Greps codebase for existing design patterns (color tokens, spacing scale, typography conventions, component styling) and writes .design/DESIGN-PATTERNS.md. Runs before design-planner to prevent brownfield conflicts.",
+    "tools": "Read, Write, Bash, Grep, Glob",
+    "color": "green",
+    "model": "inherit"
+  },
+  "design-phase-researcher.md": {
+    "name": "design-phase-researcher",
+    "description": "Pre-plan research on design patterns for the project type (SaaS, dashboard, e-commerce, marketing, B2B tool). Spawned optionally by the plan stage when project complexity warrants.",
+    "tools": "Read, Write, Bash, Grep, Glob, WebSearch",
+    "color": "blue",
+    "model": "sonnet"
+  },
+  "design-plan-checker.md": {
+    "name": "design-plan-checker",
+    "description": "Validates DESIGN-PLAN.md will achieve DESIGN-CONTEXT.md brief goals before execution. Goal-backward check on plan structure, not on code. Spawned by the plan stage after design-planner completes.",
+    "tools": "Read, Bash, Grep, Glob",
+    "color": "green",
+    "model": "sonnet"
+  },
+  "design-planner.md": {
+    "name": "design-planner",
+    "description": "Reads DESIGN-CONTEXT.md and produces DESIGN-PLAN.md with wave-ordered tasks, Touches:/Parallel: fields, and acceptance criteria. Spawned by the plan stage.",
+    "tools": "Read, Write, Grep, Glob",
+    "color": "green",
+    "model": "inherit"
+  },
+  "design-verifier.md": {
+    "name": "design-verifier",
+    "description": "Goal-backward verification of design outcomes against .design/STATE.md must-haves, NNG heuristics, and audit rubric. Returns pass result or structured gap list. Spawned by the verify stage.",
+    "tools": "Read, Write, Bash, Grep, Glob",
+    "color": "green",
+    "model": "inherit"
+  }
+}

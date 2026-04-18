@@ -1,0 +1,12 @@
+brief
+compare
+darkmode
+design
+discover
+explore
+help
+next
+plan
+scan
+style
+verify
