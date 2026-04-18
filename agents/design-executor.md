@@ -3,6 +3,8 @@ name: design-executor
 description: Executes one plan task from DESIGN-PLAN.md, writes .design/tasks/task-NN.md, and makes an atomic git commit. Applies deviation rules for in-context issues. Spawned by the design stage per task.
 tools: Read, Write, Edit, Bash, Grep, Glob
 color: yellow
+default-tier: sonnet
+tier-rationale: "Follows an Opus-authored plan; executes rather than plans"
 size_budget: XL
 parallel-safe: conditional-on-touches
 typical-duration-seconds: 60
@@ -11,6 +13,8 @@ writes:
   - ".design/tasks/*.md"
   - "src/**"
 ---
+
+@reference/shared-preamble.md
 
 # design-executor
 

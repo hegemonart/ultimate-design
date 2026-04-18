@@ -37,6 +37,31 @@ All notable changes to get-design-done are documented here. Versions follow [sem
 
 ---
 
+## [1.0.6] — 2026-04-18
+
+### Added — Phase 12: Test Coverage
+- Test runner wired (`node --test "tests/**/*.cjs"` via `npm test`) — zero third-party test dependencies
+- `tests/helpers.cjs` — shared fixtures: `scaffoldDesignDir`, `readFrontmatter`, `countLines`, `mockMCP`
+- GitHub Actions CI matrix: Node 22/24 × Linux/macOS/Windows, fail-fast disabled
+- Regression baseline harness: `test-fixture/baselines/phase-<N>/` snapshots of agent/skill/connection manifests and agent frontmatter snapshots; drift detector per phase
+- **Agent hygiene tests** — `tests/agent-frontmatter.test.cjs`, `tests/agent-size-budget.test.cjs`, `tests/agent-required-reading-consistency.test.cjs`, `tests/stale-colon-refs.test.cjs`
+- **System contract tests** — `tests/config.test.cjs`, `tests/commands.test.cjs`, `tests/command-count-sync.test.cjs`, `tests/hook-validation.test.cjs`, `tests/atomic-write.test.cjs`, `tests/frontmatter.test.cjs`, `tests/model-profiles.test.cjs`, `tests/verify-health.test.cjs`, `tests/worktree-safety.test.cjs`, `tests/semver-compare.test.cjs`, `tests/schema-drift.test.cjs`
+- **Pipeline + data tests** — `tests/pipeline-smoke.test.cjs`, `tests/mapper-schema.test.cjs`, `tests/parallelism-engine.test.cjs`, `tests/touches-analysis.test.cjs`, `tests/cycle-lifecycle.test.cjs`, `tests/intel-consistency.test.cjs`, `tests/regression-baseline-drift.test.cjs`
+- **Feature correctness tests** — `tests/sketch-determinism.test.cjs`, `tests/connection-probe.test.cjs`, `tests/figma-writer-dry-run.test.cjs`, `tests/reflection-proposal.test.cjs`, `tests/deprecation-redirect.test.cjs`, `tests/nng-coverage.test.cjs`, `tests/read-injection-scanner.test.cjs`, `tests/optimization-layer.test.cjs`
+- `reference/DEPRECATIONS.md` — registry of renamed/split/removed concepts (seeded by deprecation-redirect test)
+- `test-fixture/mapper-outputs/*.json` — locked schema-shape fixtures for the 5 domain mappers
+- Added `XXL` tier (700 lines) to `agent-size-budget.test.cjs` for legitimately long agents (`design-verifier`, `design-context-builder`)
+
+### Changed
+- `package.json` keywords add `"tested"`, `"ci"`; `.claude-plugin/plugin.json` + `marketplace.json` versions bumped to 1.0.6 with matching keyword + description additions
+- `README.md` gains a `## Testing` section describing the suite + CI contract
+- Root `SKILL.md` surfaces `analyze-dependencies`, `extract-learnings`, `skill-manifest` in the command table so `command-count-sync` passes
+- `test-fixture/baselines/phase-6/` manifests re-locked to reflect post-Phase-11 inventory (documented in `phase-6/README.md`)
+- Plugin version: 1.0.5 → 1.0.6
+
+### Policy change
+- **From v1.0.6 forward, every PR MUST pass `npm test` before merging to `main`.** See `CONTRIBUTING.md` for the testing contract.
+
 ## [1.0.5] — 2026-04-18
 
 ### Added — Phase 11: Self-Improvement
@@ -56,6 +81,48 @@ All notable changes to get-design-done are documented here. Versions follow [sem
 - `/gdd:audit` now spawns `design-reflector` at cycle end when learnings data exists
 - `agents/design-discussant.md` logs answer quality after each Q&A exchange
 - Plugin version: 1.0.4.1 → 1.0.5
+
+## [1.0.4.1] — 2026-04-18 (off-cadence patch, retroactive)
+
+**Phase 10.1: Optimization Layer + Cost Governance.** Off-cadence decimal phase — does NOT shift the v1.0.5 / v1.0.6 / v1.0.7 sequence of Phases 11/12/13. `package.json`, `.claude-plugin/plugin.json`, `.claude-plugin/marketplace.json` remain at their post-Phase-11 versions; the v1.0.4.1 identity lives in this entry, the plugin description, and the baseline directory name.
+
+### Added
+- `gdd-router` skill — intent → `{path: fast|quick|full, model_tier_overrides, estimated_cost_usd, cache_hits}`. First step of every `/gdd:*` command.
+- `gdd-cache-manager` skill + `/gdd:warm-cache` command — maintains `.design/cache-manifest.json`, pre-warms common agent prompts for Anthropic's 5-min prompt cache.
+- `skills/synthesize/` streaming-synthesizer skill — Haiku-collapses N parallel-agent outputs for map / discover / plan orchestrators.
+- `/gdd:optimize` advisory command — reads telemetry + metrics, emits `.design/OPTIMIZE-RECOMMENDATIONS.md`. No auto-apply.
+- `hooks/budget-enforcer.js` — PreToolUse hook on `Agent` spawns. Hard-blocks on cap breach, auto-downgrades at 80% soft-threshold, short-circuits on cache hit. Writes telemetry on every decision.
+- `.design/budget.json` config — `per_task_cap_usd`, `per_phase_cap_usd`, `tier_overrides`, `auto_downgrade_on_cap`, `cache_ttl_seconds`, `enforcement_mode`.
+- `.design/cache-manifest.json` — SHA-256-keyed answer store with TTL.
+- `.design/telemetry/costs.jsonl` — append-only ledger per spawn decision: `{ts, agent, tier, tokens_in, tokens_out, cache_hit, est_cost_usd, cycle, phase}`.
+- `.design/agent-metrics.json` — incremental per-agent aggregator (total_spawns, total_cost_usd, cache_hit_rate, etc). Consumed by Phase 11 reflector.
+- `reference/model-prices.md` — static Anthropic pricing table + `size_budget` → token-range mapping.
+- `reference/model-tiers.md` — tier-selection guide, per-agent tier map, override precedence rules.
+- `reference/shared-preamble.md` — extracted common agent framework preamble. Every agent imports it first.
+- Three lazy gate agents: `design-verifier-gate`, `design-integration-checker-gate`, `design-context-checker-gate`. Cheap Haiku heuristic decides whether to spawn the full expensive checker.
+- `scripts/aggregate-agent-metrics.js` — incremental telemetry aggregator invoked by the hook.
+- Regression baseline at `test-fixture/baselines/phase-10.1/` — methodology README + `pre-baseline-cost-report.md` + `cost-report.md`.
+
+### Changed
+- All 26 agents in `agents/` now carry `default-tier: haiku|sonnet|opus` + `tier-rationale` frontmatter.
+- All 26 agents now open with `@reference/shared-preamble.md` import (cache-aligned ordering per agents/README.md convention).
+- `scripts/bootstrap.sh` writes `.design/budget.json` defaults on first run if missing.
+- `hooks/hooks.json` adds `PreToolUse` matcher `Agent` → `hooks/budget-enforcer.js`.
+- `skills/map/`, `skills/discover/`, `skills/plan/` — parallel-agent outputs now funnel through `skills/synthesize/` before main-context merge.
+- `skills/verify/` — spawns `design-*-gate` agents before their full checker counterparts; skips the full spawn when the gate returns `spawn: false`.
+- `agents/README.md` — documents the `default-tier` + `tier-rationale` frontmatter fields and the cache-aligned agent-prompt ordering convention.
+- `reference/config-schema.md` — new sections for `.design/budget.json`, `.design/cache-manifest.json`, `.design/telemetry/costs.jsonl`, `.design/agent-metrics.json`.
+
+### Performance
+- Target: 50–70% per-task token-cost reduction vs the pre-10.1 baseline on `test-fixture/`.
+- Evidence: `test-fixture/baselines/phase-10.1/pre-baseline-cost-report.md` (pre-layer run) + `cost-report.md` (post-layer run).
+- Gap-count regression check: DESIGN-VERIFICATION.md gap count on the post-layer run must be ≤ pre-layer.
+
+### Notes
+- Requirements OPT-01 through OPT-10 + MAN-10a/b were formally added to `.planning/REQUIREMENTS.md` by plan 01.
+- Phase 11's `design-reflector` (already shipped in v1.0.5) now has the `.design/telemetry/costs.jsonl` + `.design/agent-metrics.json` it was originally designed to read.
+
+---
 
 ## [1.0.4] — 2026-04-18
 

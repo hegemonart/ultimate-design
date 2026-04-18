@@ -4,12 +4,16 @@ description: Generates a component handoff doc (DESIGN-STYLE-[ComponentName].md)
 tools: Read, Write, Grep, Glob
 color: yellow
 model: sonnet
+default-tier: sonnet
+tier-rationale: "Produces polished prose documentation; Sonnet's style quality is sufficient"
 parallel-safe: always
 typical-duration-seconds: 45
 reads-only: false
 writes:
   - ".design/DESIGN-STYLE-*.md"
 ---
+
+@reference/shared-preamble.md
 
 # design-doc-writer
 

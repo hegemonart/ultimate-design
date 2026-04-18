@@ -137,6 +137,62 @@ session to restore context.
 - **Architectural Responsibility Map** — file/module → tier → responsibility table
 - **Flow Diagram** — Mermaid flowchart of the main user workflow
 
+## Optimization Layer (v1.0.4.1)
+
+Phase 10.1 added a cross-cutting optimization layer that every `/gdd:*` command and agent spawn passes through. Target: **50–70% per-task token-cost reduction** versus the pre-optimization baseline — with no regression on the design-quality floor. Shipped as an off-cadence patch (v1.0.4.1) retroactively after Phases 10 and 11.
+
+### What's in it
+
+- **`gdd-router` skill** — first-step intent router. Given task intent and target artifacts, returns `{path: fast|quick|full, model_tier_overrides, estimated_cost_usd, cache_hits}`. Cheap Haiku call; gates every downstream spawn.
+- **`gdd-cache-manager` skill** + **`/gdd:warm-cache`** command — maintains `.design/cache-manifest.json` and pre-warms common agent system prompts so Anthropic's 5-minute prompt cache fires on the shared preamble.
+- **`.design/budget.json`** config — per-task + per-phase USD caps, per-agent tier overrides, auto-downgrade on soft-threshold, cache TTL, and enforcement mode. Schema: [`reference/config-schema.md`](reference/config-schema.md).
+- **PreToolUse `budget-enforcer` hook** — intercepts every `Agent` tool spawn: consults router, cache-manifest, and budget.json. Hard-blocks on cap breach (with an actionable error), auto-downgrades at the 80% soft-threshold, short-circuits on cache hit. Without the hook, optimization is advisory; with it, violations are impossible.
+- **Model-tier system** — every agent now carries `default-tier: haiku|sonnet|opus` + `tier-rationale` in its frontmatter. Overridden by `budget.json tier_overrides`. Policy: [`reference/model-tiers.md`](reference/model-tiers.md).
+- **Shared preamble** at [`reference/shared-preamble.md`](reference/shared-preamble.md) — extracted common agent framework content. All agents import it first; first agent in a session pays full cost, rest ride the 5-min prompt cache.
+- **Lazy checker gates** (`design-verifier-gate`, `design-integration-checker-gate`, `design-context-checker-gate`) — cheap Haiku heuristic agents that decide whether to spawn the expensive full checker.
+- **Streaming synthesizer** (`skills/synthesize/`) — parallel-mapper and parallel-researcher outputs are collapsed by a single Haiku call before returning to main context.
+- **Cost telemetry** — `.design/telemetry/costs.jsonl` appends one row per agent spawn decision: `{ts, agent, tier, tokens_in, tokens_out, cache_hit, est_cost_usd, cycle, phase}`. Aggregated to `.design/agent-metrics.json`.
+- **`/gdd:optimize`** advisory command — reads telemetry + metrics and emits recommendations to `.design/OPTIMIZE-RECOMMENDATIONS.md`. Pure advisory; no auto-apply. Phase 11's reflector consumes the same data for frontmatter-update proposals.
+
+### Using it
+
+```bash
+# One-shot cache warm-up before a design sprint
+/gdd:warm-cache
+
+# Run any /gdd:* command — the hook enforces budget.json automatically
+/gdd:scan .
+
+# Review cost recommendations after a run
+/gdd:optimize
+```
+
+### Configuration
+
+Edit `.design/budget.json` to tune limits per project:
+
+```json
+{
+  "per_task_cap_usd": 2.00,
+  "per_phase_cap_usd": 20.00,
+  "tier_overrides": {
+    "design-planner": "opus",
+    "design-verifier": "haiku"
+  },
+  "auto_downgrade_on_cap": true,
+  "cache_ttl_seconds": 3600,
+  "enforcement_mode": "enforce"
+}
+```
+
+`enforcement_mode` takes `enforce | warn | log` — use `log` during adoption to see the hook's decisions without blocking.
+
+### Baselines
+
+Regression baselines for Phase 10.1 live at [`test-fixture/baselines/phase-10.1/`](test-fixture/baselines/phase-10.1/) — methodology in that directory's README. Phase 12's test suite diffs against `cost-report.md` to catch regressions.
+
+---
+
 ## Connections (optional)
 
 The pipeline integrates with seven external tools and MCPs. All connections are optional — the pipeline degrades gracefully when any connection is unavailable.
@@ -215,6 +271,32 @@ Every proposal requires explicit user review via `/gdd:apply-reflections`. The d
 
 ### Global skills
 Cross-project conventions live in `~/.claude/gdd/global-skills/`. Once you accept a `[GLOBAL-SKILL]` proposal, that convention auto-loads in every future gdd session across all projects.
+
+## Testing
+
+`get-design-done` ships with a locked test suite. Every push and PR runs the full suite across a cross-platform matrix — Node 22/24 × Linux/macOS/Windows.
+
+### Run tests locally
+
+```bash
+npm test
+```
+
+The test runner is Node's built-in `node:test` + `node:assert/strict` — zero third-party test dependencies.
+
+### What's covered
+
+- **Infrastructure** — test runner, CI workflow, shared helpers, regression baselines locked per phase
+- **Agent hygiene** — frontmatter completeness, line-count tier budgets (XXL/XL/LARGE/DEFAULT), `Required Reading` path validity, `/gdd:` namespace consistency (no stale `/design:` references)
+- **System contracts** — `.design/config.json` schema, command↔skill parity, hooks integrity, atomic writes to `.design/STATE.md`, frontmatter parser edge cases, model-profile resolution, `/gdd:health` output shape, worktree safety, semver bump sequence, STATE-TEMPLATE drift
+- **Pipeline + data** — end-to-end pipeline smoke on `test-fixture/`, mapper JSON-schema validation (tokens, components, a11y, motion, hierarchy), parallelism-engine decision table, `Touches:` field parsing, cycle lifecycle (`/gdd:new-cycle` → stage progression → `/gdd:complete-cycle`), `.design/intel/` incremental-update correctness, regression-baseline drift detector
+- **Feature correctness** — `/gdd:sketch` variant determinism, 8-connection probe contracts with mocked MCPs (figma / refero / preview / storybook / chromatic / graphify / claude-design / pinterest), `design-figma-writer` dry-run discipline, `design-reflector` proposal-only shape, deprecated-name redirects, NNG heuristic coverage, `gdd-read-injection-scanner` hook behavior, optimization-layer schema enforcement
+
+### CI
+
+GitHub Actions runs the suite on every push and every PR. A green build is required before merge — see `.github/workflows/ci.yml` for the exact matrix.
+
+From v1.0.6 forward, every PR MUST pass `npm test` before it merges to `main`. Baselines in `test-fixture/baselines/phase-<N>/` lock each phase's structural state; if a PR introduces drift, re-lock explicitly (see `test-fixture/baselines/phase-6/README.md` for the re-lock procedure) rather than relaxing the test.
 
 ## Distribution
 

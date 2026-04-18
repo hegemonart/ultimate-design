@@ -4,12 +4,16 @@ description: "Aggregates phase-researcher output, 5 mapper docs, connection data
 tools: Read, Write, Glob
 color: cyan
 model: inherit
+default-tier: sonnet
+tier-rationale: "Collapses multiple research outputs into one; synthesis is Sonnet territory"
 parallel-safe: never
 typical-duration-seconds: 60
 reads-only: false
 writes:
   - ".design/DESIGN-CONTEXT.md"
 ---
+
+@reference/shared-preamble.md
 
 # design-research-synthesizer
 

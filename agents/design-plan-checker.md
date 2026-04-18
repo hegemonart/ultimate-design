@@ -4,11 +4,15 @@ description: Validates DESIGN-PLAN.md will achieve DESIGN-CONTEXT.md brief goals
 tools: Read, Bash, Grep, Glob
 color: green
 model: sonnet
+default-tier: haiku
+tier-rationale: "Checks plan artifact against a fixed schema; boolean + gap-list output fits Haiku"
 parallel-safe: always
 typical-duration-seconds: 30
 reads-only: true
 writes: []
 ---
+
+@reference/shared-preamble.md
 
 # design-plan-checker
 

@@ -4,12 +4,16 @@ description: Validates .design/DESIGN-CONTEXT.md across 6 dimensions (copy speci
 tools: Read, Grep, Glob
 color: cyan
 model: inherit
+default-tier: haiku
+tier-rationale: "Schema-driven completeness check; deterministic rubric, no reasoning density needed"
 size_budget: LARGE
 parallel-safe: always
 typical-duration-seconds: 20
 reads-only: true
 writes: []
 ---
+
+@reference/shared-preamble.md
 
 # design-context-checker
 
