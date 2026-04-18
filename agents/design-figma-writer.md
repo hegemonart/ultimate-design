@@ -1,9 +1,10 @@
 ---
 name: design-figma-writer
-description: Writes design decisions back to Figma — annotations, token bindings, and Code Connect mappings. Operates in proposal→confirm mode by default. Accepts --dry-run (emit proposal without executing) and --confirm-shared (required for writes to team library components).
+description: Writes design decisions back to Figma — annotations, token bindings, Code Connect mappings, and implementation-status write-back. Operates in proposal→confirm mode by default. Accepts --dry-run (emit proposal without executing) and --confirm-shared (required for writes to team library components).
 tools: Read, Write, Bash, Grep, Glob, mcp__figma__use_figma, mcp__figma-desktop__get_variable_defs, mcp__figma-desktop__get_metadata
 color: purple
 model: inherit
+size_budget: LARGE
 ---
 
 # design-figma-writer
@@ -35,16 +36,17 @@ Read `.design/STATE.md` to confirm `figma: available` in the `<connections>` blo
 Parse flags from the invocation arguments:
 - `--dry-run` — emit proposal, do NOT call use_figma, stop after proposal output
 - `--confirm-shared` — required for writes that touch shared team library components (components with `shared: true` in Figma metadata); if absent and shared components are detected, STOP and require the flag
-- `mode` — one of `annotate | tokenize | mappings` (required; if absent, list modes and stop)
+- `mode` — one of `annotate | tokenize | mappings | implementation-status` (required; if absent, list modes and stop)
 
 If mode is absent, write to output:
 
 ```
 design-figma-writer requires a mode argument.
 Available modes:
-  annotate   — add design decision comments to Figma layers
-  tokenize   — bind hard-coded color/spacing/type values to Figma variables
-  mappings   — write Code Connect component↔code file mappings
+  annotate               — add design decision comments to Figma layers
+  tokenize               — bind hard-coded color/spacing/type values to Figma variables
+  mappings               — write Code Connect component↔code file mappings
+  implementation-status  — annotate frames with build status + register Code Connect mappings from Handoff Faithfulness results
 
 Usage: design-figma-writer <mode> [--dry-run] [--confirm-shared]
 ```
@@ -199,4 +201,93 @@ If M = 0 (nothing to write — context had no applicable decisions), write:
 
 ```
 No operations to perform. DESIGN-CONTEXT.md had no <mode>-applicable data.
+```
+
+---
+
+## Implementation-Status Mode
+
+**Activation:** Mode is `implementation-status`. Spawned by the SKILL.md handoff routing post-verify step.
+
+**Source data:**
+- `.design/DESIGN-VERIFICATION.md` — reads `## Handoff Faithfulness → Component Structure` table
+- `.design/DESIGN-CONTEXT.md` — reads `<component_inventory>` for component-to-file path mappings
+- `.design/STATE.md` — reads `handoff_path` for bundle reference
+
+### Step IS-1 — Read implementation status
+
+Parse DESIGN-VERIFICATION.md `## Handoff Faithfulness → Component Structure` table:
+- PRESENT → status: `built`
+- MISSING → status: `pending`
+- Component with any DIVERGE token in Color/Typography/Spacing tables → status: `diverging`
+
+If `## Handoff Faithfulness` section is absent, write: "No Handoff Faithfulness data found. Run `/gdd:handoff --post-handoff` verify first." and STOP.
+
+### Step IS-2 — Build annotation proposal
+
+For each component with a known status:
+1. Look up Figma node ID from DESIGN-CONTEXT.md `<component_inventory>` (or ask user if absent)
+2. Draft annotation: `"Implementation: [built|pending|diverging] — verified <ISO date>"`
+3. For `built` components: draft Code Connect mapping: `{ node_id, code_file, framework: "react" }`
+
+Present to user:
+
+```
+Implementation-Status Write-Back — Proposed Operations
+═══════════════════════════════════════════════════════
+
+Frame Annotations (N):
+  1. Annotate "Button" → "Implementation: built — verified 2026-04-18"
+  2. Annotate "Modal" → "Implementation: pending — not yet implemented"
+  3. Annotate "Card" → "Implementation: diverging — spacing tokens differ"
+
+Code Connect Mappings (M built components):
+  1. Map "Button" → src/components/Button.tsx (react)
+  2. Map "Card" → src/components/Card.tsx (react)
+
+Proceed? (yes / no / edit)
+```
+
+If `--dry-run`: emit proposal only, do not execute. Write `[dry-run] N annotations + M Code Connect mappings proposed.` and STOP.
+
+If user says "no": STOP with "Cancelled."
+If user says "edit": allow user to modify proposal, then re-confirm.
+
+### Step IS-3 — Execute annotation writes
+
+For each confirmed annotation:
+```javascript
+mcp__figma__use_figma({
+  operation: "add_comment",
+  layerId: "<frame-node-id>",
+  message: "Implementation: <status> — verified <ISO date>"
+})
+```
+
+### Step IS-4 — Execute Code Connect mappings
+
+For each confirmed Code Connect mapping:
+```javascript
+mcp__figma__use_figma({
+  operation: "set_code_connect",
+  componentId: "<component-node-id>",
+  filePath: "<relative-code-path>",
+  framework: "react"
+})
+```
+
+After all individual mappings, send the batch:
+```javascript
+mcp__figma__use_figma({
+  operation: "send_code_connect_mappings"
+})
+```
+
+### Step IS-5 — Summary
+
+```
+implementation-status complete.
+Annotations applied: N/N_total
+Code Connect mappings registered: M/M_total
+Failed: <list any failed operations>
 ```

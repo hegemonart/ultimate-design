@@ -1,5 +1,34 @@
 # Changelog
 
+All notable changes to get-design-done are documented here. Versions follow [semantic versioning](https://semver.org/).
+
+---
+
+## [1.0.6] — 2026-04-18
+
+### Added — Phase 12: Test Coverage
+- Test runner wired (`node --test "tests/**/*.cjs"` via `npm test`) — zero third-party test dependencies
+- `tests/helpers.cjs` — shared fixtures: `scaffoldDesignDir`, `readFrontmatter`, `countLines`, `mockMCP`
+- GitHub Actions CI matrix: Node 22/24 × Linux/macOS/Windows, fail-fast disabled
+- Regression baseline harness: `test-fixture/baselines/phase-<N>/` snapshots of agent/skill/connection manifests and agent frontmatter snapshots; drift detector per phase
+- **Agent hygiene tests** — `tests/agent-frontmatter.test.cjs`, `tests/agent-size-budget.test.cjs`, `tests/agent-required-reading-consistency.test.cjs`, `tests/stale-colon-refs.test.cjs`
+- **System contract tests** — `tests/config.test.cjs`, `tests/commands.test.cjs`, `tests/command-count-sync.test.cjs`, `tests/hook-validation.test.cjs`, `tests/atomic-write.test.cjs`, `tests/frontmatter.test.cjs`, `tests/model-profiles.test.cjs`, `tests/verify-health.test.cjs`, `tests/worktree-safety.test.cjs`, `tests/semver-compare.test.cjs`, `tests/schema-drift.test.cjs`
+- **Pipeline + data tests** — `tests/pipeline-smoke.test.cjs`, `tests/mapper-schema.test.cjs`, `tests/parallelism-engine.test.cjs`, `tests/touches-analysis.test.cjs`, `tests/cycle-lifecycle.test.cjs`, `tests/intel-consistency.test.cjs`, `tests/regression-baseline-drift.test.cjs`
+- **Feature correctness tests** — `tests/sketch-determinism.test.cjs`, `tests/connection-probe.test.cjs`, `tests/figma-writer-dry-run.test.cjs`, `tests/reflection-proposal.test.cjs`, `tests/deprecation-redirect.test.cjs`, `tests/nng-coverage.test.cjs`, `tests/read-injection-scanner.test.cjs`, `tests/optimization-layer.test.cjs`
+- `reference/DEPRECATIONS.md` — registry of renamed/split/removed concepts (seeded by deprecation-redirect test)
+- `test-fixture/mapper-outputs/*.json` — locked schema-shape fixtures for the 5 domain mappers
+- Added `XXL` tier (700 lines) to `agent-size-budget.test.cjs` for legitimately long agents (`design-verifier`, `design-context-builder`)
+
+### Changed
+- `package.json` keywords add `"tested"`, `"ci"`; `.claude-plugin/plugin.json` + `marketplace.json` versions bumped to 1.0.6 with matching keyword + description additions
+- `README.md` gains a `## Testing` section describing the suite + CI contract
+- Root `SKILL.md` surfaces `analyze-dependencies`, `extract-learnings`, `skill-manifest` in the command table so `command-count-sync` passes
+- `test-fixture/baselines/phase-6/` manifests re-locked to reflect post-Phase-11 inventory (documented in `phase-6/README.md`)
+- Plugin version: 1.0.5 → 1.0.6
+
+### Policy change
+- **From v1.0.6 forward, every PR MUST pass `npm test` before merging to `main`.** See `CONTRIBUTING.md` for the testing contract.
+
 ## [1.0.5] — 2026-04-18
 
 ### Added — Phase 11: Self-Improvement
@@ -19,6 +48,53 @@
 - `/gdd:audit` now spawns `design-reflector` at cycle end when learnings data exists
 - `agents/design-discussant.md` logs answer quality after each Q&A exchange
 - Plugin version: 1.0.4.1 → 1.0.5
+
+## [1.0.4] — 2026-04-18
+
+### Added — Phase 10: Knowledge Layer
+
+- **Intel store** (`.design/intel/`): queryable JSON slices indexing all files, exports, symbols, tokens, components, patterns, dependencies, decisions, debt, and a cross-reference graph
+- `scripts/build-intel.cjs` — full initial index builder with mtime + git-hash incremental updates
+- `agents/gdd-intel-updater` — incremental intel store updater agent
+- `/gdd:analyze-dependencies` — token fan-out, component call-graph, decision traceability, circular dependency detection (all O(1) from intel store)
+- `/gdd:skill-manifest` — browse all skills and agents from intel store; fallback to directory scan
+- `/gdd:extract-learnings` — extract project-specific patterns from `.design/` artifacts; propose reference/ additions with user review flow
+- `agents/gdd-learnings-extractor` — structured learning entry extractor; writes `.design/learnings/LEARNINGS.md`
+- `agents/gdd-graphify-sync` — feeds Graphify knowledge graph from intel store `graph.json`
+- `hooks/context-exhaustion.js` — PostToolUse hook: auto-records `<paused>` STATE.md block at 85% context
+- `reference/intel-schema.md` — authoritative schema reference for all ten intel slices
+- `design-phase-researcher` — now produces `## Architectural Responsibility Map` and `## Flow Diagram` (Mermaid) in every DESIGN-CONTEXT.md
+- Five core agents (design-context-builder, design-executor, design-verifier, design-phase-researcher, design-planner) now include conditional `@.design/intel/` required-reading blocks
+
+### Changed
+
+- Plugin version: 1.0.3 → 1.0.4
+- `hooks/hooks.json`: added context-exhaustion PostToolUse entry (fires on all tools)
+
+---
+
+## [1.0.3] — 2026-04-18
+
+### Added — Phase 9: Claude Design Integration + Pinterest Connection
+- Claude Design handoff bundle adapter: HTML export → D-XX decisions in STATE.md (`connections/claude-design.md`)
+- `/gdd:handoff <path>` standalone command — skips Scan→Discover→Plan, routes direct to verify with Handoff Faithfulness scoring
+- Handoff Faithfulness Phase in design-verifier: color, typography, spacing, component structure scoring with PASS/WARN/FAIL thresholds
+- `--post-handoff` flag for `verify` stage — relaxes DESIGN-PLAN.md prerequisite, activates HF section
+- `--from-handoff` mode for design-discussant — confirms tentative D-XX decisions, fills gaps only
+- Handoff mode for design-research-synthesizer — parses bundle HTML, writes `<handoff_context>` to DESIGN-CONTEXT.md
+- Pinterest MCP connection spec (`connections/pinterest.md`): ToolSearch-only probe, `mcp__mcp-pinterest__pinterest_search`, fallback chain Pinterest → Refero → awesome-design-md
+- Pinterest as visual reference source in design-research-synthesizer (up to 2–3 queries per synthesis)
+- Pinterest probe (block C) in `discover` stage
+- `implementation-status` mode for design-figma-writer — annotates Figma frames with build status + registers Code Connect mappings from Handoff Faithfulness results
+- `pinterest:` and `claude_design:` fields in STATE-TEMPLATE.md `<connections>` block
+- `handoff_source`, `handoff_path`, `skipped_stages` fields in STATE-TEMPLATE.md `<position>` block
+
+### Changed
+- Plugin version: 1.0.2 → 1.0.3
+- connections/connections.md: added Pinterest and Claude Design rows to Active Connections table and Capability Matrix
+- README: updated agent count (14 → 22), added handoff command, Pinterest and Claude Design connection docs
+
+---
 
 ## [1.0.2] — Phase 8: Visual + Design-Side Connections + Knowledge Graph
 

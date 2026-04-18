@@ -6,7 +6,7 @@ required_reading:
   - connections/storybook.md
 color: blue
 model: inherit
-size_budget: XL
+size_budget: XXL
 parallel-safe: never
 typical-duration-seconds: 180
 reads-only: false
@@ -530,5 +530,11 @@ You MUST NOT:
 - Spawn other agents
 - Skip the Design Direction Statement step (unless `auto_mode: true`)
 - Write vague goals — push back until G-XX entries are observable and verifiable
+
+## Required reading (conditional)
+
+@.design/intel/files.json (if present)
+@.design/intel/exports.json (if present)
+@.design/intel/symbols.json (if present)
 
 ## CONTEXT COMPLETE

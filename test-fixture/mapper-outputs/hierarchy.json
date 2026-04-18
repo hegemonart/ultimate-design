@@ -1,0 +1,26 @@
+{
+  "generated": "2026-04-18T00:00:00Z",
+  "hierarchy": [
+    {
+      "file": "src/App.jsx",
+      "element": "h1",
+      "level": 1,
+      "line": 8,
+      "text": "Welcome"
+    },
+    {
+      "file": "src/App.jsx",
+      "element": "h2",
+      "level": 2,
+      "line": 16,
+      "text": "Features"
+    },
+    {
+      "file": "src/App.jsx",
+      "element": "h3",
+      "level": 3,
+      "line": 28,
+      "text": "Get Started"
+    }
+  ]
+}

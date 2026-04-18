@@ -1,0 +1,21 @@
+{
+  "generated": "2026-04-18T00:00:00Z",
+  "motion": [
+    {
+      "file": "src/App.css",
+      "property": "transition",
+      "duration_ms": 200,
+      "easing": "ease-in-out",
+      "line": 52,
+      "context": "Button hover transition"
+    },
+    {
+      "file": "src/App.css",
+      "property": "animation",
+      "duration_ms": 400,
+      "easing": "cubic-bezier(0.4, 0, 0.2, 1)",
+      "line": 68,
+      "context": "Card fade-in animation"
+    }
+  ]
+}

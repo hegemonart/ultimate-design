@@ -1,6 +1,6 @@
 # Get Design Done
 
-Agent-orchestrated design pipeline for Claude Code. One entry point that routes design work through a 5-stage workflow — **Scan → Discover → Plan → Design → Verify** — using 14 specialized agents, Figma + Refero MCP connections, and 3 standalone audit commands.
+Agent-orchestrated design pipeline for Claude Code. One entry point that routes design work through a 5-stage workflow — **Scan → Discover → Plan → Design → Verify** — using 22 specialized agents, Figma + Refero + Pinterest MCP connections, and Claude Design handoff integration.
 
 ## Install
 
@@ -35,9 +35,10 @@ Invoke without arguments for pipeline status and auto-routing to the next stage.
 ### Standalone commands (work without running the pipeline first)
 
 ```
-@get-design-done style Button  — Generate component handoff doc → .design/DESIGN-STYLE-Button.md
-@get-design-done darkmode      — Audit dark mode architecture + contrast → .design/DARKMODE-AUDIT.md
-@get-design-done compare       — Delta between baseline and verification result → .design/COMPARE-REPORT.md
+@get-design-done handoff <path>  — Skip pipeline; parse Claude Design bundle → verify → optional Figma write-back
+@get-design-done style Button    — Generate component handoff doc → .design/DESIGN-STYLE-Button.md
+@get-design-done darkmode        — Audit dark mode architecture + contrast → .design/DARKMODE-AUDIT.md
+@get-design-done compare         — Delta between baseline and verification result → .design/COMPARE-REPORT.md
 ```
 
 ## Commands
@@ -58,7 +59,7 @@ All commands are invoked as `/gdd:<name>`.
 
 **Session**: `pause`, `resume`, `list-assumptions`, `discuss`
 
-**Standalone**: `style`, `darkmode`, `compare`
+**Standalone**: `style`, `darkmode`, `compare`, `handoff`
 
 **Settings**: `settings`, `update`, `reapply-patches`
 
@@ -77,6 +78,59 @@ Each stage is orchestrated by a thin skill that spawns specialized agents:
 | verify | design-verifier, design-auditor, design-integration-checker, design-fixer | DESIGN-VERIFICATION.md |
 
 All pipeline artifacts are written to `.design/` inside your project.
+
+## Knowledge Layer (v1.0.4)
+
+The knowledge layer gives the design pipeline persistent memory and O(1) lookups
+across all design surface files.
+
+### Intel Store (`.design/intel/`)
+
+A queryable set of JSON slices that index the design surface:
+
+| Slice | Contents |
+|-------|----------|
+| `files.json` | All tracked skill/agent/reference/script/hook files with mtime and git hash |
+| `exports.json` | Named exports: skill commands and agent names |
+| `symbols.json` | Markdown headings and section anchors |
+| `tokens.json` | Design token references (color, spacing, typography, radius) |
+| `components.json` | Component names and their referencing files |
+| `patterns.json` | Design pattern classifications by concern |
+| `dependencies.json` | @-reference and reads-from relationships |
+| `decisions.json` | Architectural decisions from DESIGN-CONTEXT.md |
+| `debt.json` | Design debt items from DESIGN-DEBT.md |
+| `graph.json` | Cross-reference graph: nodes (files) + edges (dependencies) |
+
+Build the intel store: `node scripts/build-intel.cjs --force`
+Incremental updates: invoke the `gdd-intel-updater` agent after any file edits.
+
+### New Commands
+
+| Command | Purpose |
+|---------|---------|
+| `/gdd:analyze-dependencies` | Token fan-out, component call-graph, decision traceability, circular dep detection |
+| `/gdd:skill-manifest` | Browse all registered skills and agents from the intel store |
+| `/gdd:extract-learnings` | Extract project patterns from `.design/` artifacts → propose reference updates |
+
+### New Agents
+
+| Agent | Purpose |
+|-------|---------|
+| `gdd-intel-updater` | Incremental intel store rebuilder |
+| `gdd-learnings-extractor` | Structured learning entry extractor |
+| `gdd-graphify-sync` | Feeds Graphify knowledge graph from intel store |
+
+### Context Exhaustion Hook
+
+A `PostToolUse` hook (`hooks/context-exhaustion.js`) auto-records a `<paused>` resumption
+block in `.design/STATE.md` when session context reaches 85%. Run `/gdd:resume` in the next
+session to restore context.
+
+### Architectural Responsibility Map
+
+`design-phase-researcher` now produces two new sections in every `DESIGN-CONTEXT.md`:
+- **Architectural Responsibility Map** — file/module → tier → responsibility table
+- **Flow Diagram** — Mermaid flowchart of the main user workflow
 
 ## Connections (optional)
 
@@ -116,6 +170,14 @@ When Refero is active, `discover` pulls visual references to ground design decis
 
 Falls back to `~/.claude/libs/awesome-design-md/` when unavailable. See [`connections/refero.md`](./connections/refero.md) for setup.
 
+### Pinterest MCP
+
+When the Pinterest MCP (`terryso/mcp-pinterest`) is active, `discover` pulls visual inspiration boards to ground design decisions alongside Refero references. ToolSearch-only probe — no API key required. Falls back to Refero → awesome-design-md when unavailable. See [`connections/pinterest.md`](./connections/pinterest.md) for setup.
+
+### Claude Design handoff
+
+Drop a Claude Design bundle (HTML export from claude.ai/design) into your project root and run `/gdd:handoff <path>`. The pipeline skips Scan → Discover → Plan, parses the bundle CSS custom properties into D-XX design decisions, runs `verify --post-handoff` for Handoff Faithfulness scoring, and optionally writes implementation status back to Figma. See [`connections/claude-design.md`](./connections/claude-design.md) for the full bundle format and adapter pattern.
+
 ## Bootstrap hook
 
 On `SessionStart`, the plugin provisions the companion library if missing:
@@ -149,14 +211,40 @@ Every proposal requires explicit user review via `/gdd:apply-reflections`. The d
 ### Global skills
 Cross-project conventions live in `~/.claude/gdd/global-skills/`. Once you accept a `[GLOBAL-SKILL]` proposal, that convention auto-loads in every future gdd session across all projects.
 
+## Testing
+
+`get-design-done` ships with a locked test suite. Every push and PR runs the full suite across a cross-platform matrix — Node 22/24 × Linux/macOS/Windows.
+
+### Run tests locally
+
+```bash
+npm test
+```
+
+The test runner is Node's built-in `node:test` + `node:assert/strict` — zero third-party test dependencies.
+
+### What's covered
+
+- **Infrastructure** — test runner, CI workflow, shared helpers, regression baselines locked per phase
+- **Agent hygiene** — frontmatter completeness, line-count tier budgets (XXL/XL/LARGE/DEFAULT), `Required Reading` path validity, `/gdd:` namespace consistency (no stale `/design:` references)
+- **System contracts** — `.design/config.json` schema, command↔skill parity, hooks integrity, atomic writes to `.design/STATE.md`, frontmatter parser edge cases, model-profile resolution, `/gdd:health` output shape, worktree safety, semver bump sequence, STATE-TEMPLATE drift
+- **Pipeline + data** — end-to-end pipeline smoke on `test-fixture/`, mapper JSON-schema validation (tokens, components, a11y, motion, hierarchy), parallelism-engine decision table, `Touches:` field parsing, cycle lifecycle (`/gdd:new-cycle` → stage progression → `/gdd:complete-cycle`), `.design/intel/` incremental-update correctness, regression-baseline drift detector
+- **Feature correctness** — `/gdd:sketch` variant determinism, 8-connection probe contracts with mocked MCPs (figma / refero / preview / storybook / chromatic / graphify / claude-design / pinterest), `design-figma-writer` dry-run discipline, `design-reflector` proposal-only shape, deprecated-name redirects, NNG heuristic coverage, `gdd-read-injection-scanner` hook behavior, optimization-layer schema enforcement
+
+### CI
+
+GitHub Actions runs the suite on every push and every PR. A green build is required before merge — see `.github/workflows/ci.yml` for the exact matrix.
+
+From v1.0.6 forward, every PR MUST pass `npm test` before it merges to `main`. Baselines in `test-fixture/baselines/phase-<N>/` lock each phase's structural state; if a PR introduces drift, re-lock explicitly (see `test-fixture/baselines/phase-6/README.md` for the re-lock procedure) rather than relaxing the test.
+
 ## Distribution
 
 **Ships with the plugin:**
 - `.claude-plugin/plugin.json`, `.claude-plugin/marketplace.json` — manifest
 - `SKILL.md` — root pipeline router
 - `skills/` — stage skills (scan, discover, plan, design, verify, style, darkmode, compare)
-- `agents/` — 14 specialized agent specs
-- `connections/` — Figma + Refero connection specs
+- `agents/` — 22 specialized agent specs
+- `connections/` — Figma, Refero, Pinterest, Claude Design connection specs
 - `reference/` — curated design reference material
 - `hooks/`, `scripts/bootstrap.sh`
 

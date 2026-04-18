@@ -1,8 +1,16 @@
 # Phase 6 Regression Baseline
 
 Captured: 2026-04-18
-Plugin version: 1.0.0
-Last validated phase: Phase 6 (Validation + Version Bump)
+Re-locked: 2026-04-18 (post Phases 7–11 merges)
+Plugin version at re-lock: 1.0.5
+Last validated phase: Phase 11 (Self-Improvement)
+
+## Re-lock note (2026-04-18)
+
+The phase-6 baseline was re-locked after Phases 7, 8, 9, 10, and 11 merged to main
+with new agents, skills, and connections. This baseline now tracks current shipped
+state through Phase 11 so the regression-baseline test detects future drift rather
+than producing noise from legitimate phase additions.
 
 ## Contents
 
