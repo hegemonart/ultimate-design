@@ -1,6 +1,6 @@
 # Review Format — The Before/After Table
 
-Adopted from `emil-design-eng` and enforced across `ultimate-design`. **Every design review uses this format.** No exceptions.
+Adopted from `emil-design-eng` and enforced across `get-design-done`. **Every design review uses this format.** No exceptions.
 
 ## The format
 

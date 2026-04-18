@@ -5,7 +5,7 @@ argument-hint: "[--auto] [--parallel]"
 user-invocable: true
 ---
 
-# Ultimate Design — Plan
+# Get Design Done — Plan
 
 **Stage 2 of 4.** Thin orchestrator. All planning intelligence lives in agents/design-planner.md.
 

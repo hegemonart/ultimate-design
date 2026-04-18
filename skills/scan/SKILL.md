@@ -5,7 +5,7 @@ argument-hint: "[--quick] [--full]"
 user-invocable: true
 ---
 
-# Ultimate Design — Scan
+# Get Design Done — Scan
 
 **Pre-pipeline initializer.** Run once in any new or existing repo before starting the Discover → Plan → Design → Verify pipeline.
 

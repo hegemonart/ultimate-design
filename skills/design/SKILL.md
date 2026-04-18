@@ -5,7 +5,7 @@ argument-hint: "[--auto] [--parallel]"
 user-invocable: true
 ---
 
-# Ultimate Design — Design
+# Get Design Done — Design
 
 **Stage 3 of 4.** Thin orchestrator. All design execution intelligence lives in `agents/design-executor.md`.
 

@@ -7,7 +7,7 @@ Agent-orchestrated design pipeline for Claude Code. One entry point that routes 
 ### 1. Add the marketplace
 
 ```bash
-claude plugin marketplace add hegemonart/ultimate-design
+claude plugin marketplace add hegemonart/get-design-done
 ```
 
 ### 2. Install the plugin
@@ -107,7 +107,7 @@ Idempotent — skips work if already present, runs `git pull --ff-only` on subse
 ## Develop locally
 
 ```bash
-claude --plugin-dir ./ultimate-design
+claude --plugin-dir ./get-design-done
 /reload-plugins
 claude plugin validate .
 ```

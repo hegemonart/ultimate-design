@@ -1,10 +1,24 @@
-# Pipeline artifacts — project-specific, not part of the plugin itself
+# Pipeline artifacts — project-specific output, not part of the plugin itself
 .design/
 
 # OS
 .DS_Store
+Thumbs.db
+
+# Editors / IDEs
+.idea/
+.vscode/
+*.swp
+
+# Logs and temp
+*.log
+*.tmp
+node_modules/
 
 # Development planning artifacts (not part of plugin distribution)
 .planning/
+
+# Claude local state (private — do not distribute)
 .claude/memory/
 .claude/settings.local.json
+.claude/worktrees/

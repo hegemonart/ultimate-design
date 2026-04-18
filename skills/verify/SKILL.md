@@ -5,7 +5,7 @@ argument-hint: "[--auto]"
 user-invocable: true
 ---
 
-# Ultimate Design — Verify
+# Get Design Done — Verify
 
 **Stage 4 of 4.** Thin orchestrator. Verification intelligence lives in three agents: design-auditor, design-verifier, and design-integration-checker.
 

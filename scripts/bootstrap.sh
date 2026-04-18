@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
-# ultimate-design bootstrap
-# Auto-provisions companion resources that ultimate-design references but which
+# get-design-done bootstrap
+# Auto-provisions companion resources that get-design-done references but which
 # are not Claude Code plugins (so they cannot be listed in `dependencies`).
 #
 # Runs on SessionStart. Idempotent: uses a marker in ${CLAUDE_PLUGIN_DATA} so it
@@ -15,7 +15,7 @@
 
 set -u
 
-PLUGIN_DATA="${CLAUDE_PLUGIN_DATA:-$HOME/.claude/plugins/data/ultimate-design}"
+PLUGIN_DATA="${CLAUDE_PLUGIN_DATA:-$HOME/.claude/plugins/data/get-design-done}"
 PLUGIN_DATA="${PLUGIN_DATA//\\//}"  # Normalize Windows backslashes to forward slashes
 PLUGIN_ROOT="${CLAUDE_PLUGIN_ROOT:-$(cd "$(dirname "$0")/.." && pwd)}"
 PLUGIN_ROOT="${PLUGIN_ROOT//\\//}"  # Normalize Windows backslashes to forward slashes
@@ -29,7 +29,7 @@ if [[ -f "${MANIFEST}" && -f "${MARKER}" ]] && diff -q "${MANIFEST}" "${MARKER}"
   exit 0
 fi
 
-log() { printf '[ultimate-design bootstrap] %s\n' "$*" >&2; }
+log() { printf '[get-design-done bootstrap] %s\n' "$*" >&2; }
 
 clone_or_update() {
   local repo_url="$1"
@@ -50,7 +50,7 @@ clone_or_update "https://github.com/VoltAgent/awesome-design-md.git" "${HOME}/.c
 
 # Soft notice for companion skills we cannot auto-install.
 if [[ ! -d "${HOME}/.claude/skills/emil-design-eng" ]]; then
-  log "optional: emil-design-eng skill not found in ~/.claude/skills. See ultimate-design README for install options."
+  log "optional: emil-design-eng skill not found in ~/.claude/skills. See get-design-done README for install options."
 fi
 
 # Record success so we don't re-run until the bundled manifest changes.

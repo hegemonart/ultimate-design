@@ -5,7 +5,7 @@ argument-hint: "[--auto]"
 user-invocable: true
 ---
 
-# Ultimate Design — Discover
+# Get Design Done — Discover
 
 **Stage 1.5 of 4.** Produces `.design/DESIGN-CONTEXT.md`.
 
