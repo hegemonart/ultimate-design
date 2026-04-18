@@ -17,7 +17,8 @@
     "validate:frontmatter": "node scripts/validate-frontmatter.cjs agents/",
     "detect:stale-refs": "node scripts/detect-stale-refs.cjs",
     "scan:injection": "node scripts/run-injection-scanner-ci.cjs",
-    "test:size-budget": "node --test tests/agent-size-budget.test.cjs"
+    "test:size-budget": "node --test tests/agent-size-budget.test.cjs",
+    "release:extract-changelog": "node scripts/extract-changelog-section.cjs"
   },
   "keywords": [
     "claude",
