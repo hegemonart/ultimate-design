@@ -63,11 +63,20 @@ function main() {
   for (const file of targets) {
     const body = fs.readFileSync(file, 'utf8');
     const lines = body.split('\n');
+    let inFence = false;
     for (let i = 0; i < lines.length; i++) {
+      const line = lines[i];
+      // Track code fences — prompt-injection attacks live in prose, not in
+      // literal code/template blocks. Skip lines inside ``` ... ``` fences.
+      if (/^\s*```/.test(line)) {
+        inFence = !inFence;
+        continue;
+      }
+      if (inFence) continue;
       for (const pat of INJECTION_PATTERNS) {
-        if (pat.re.test(lines[i])) {
+        if (pat.re.test(line)) {
           const rel = path.relative(REPO_ROOT, file);
-          const excerpt = lines[i].trim().slice(0, 120);
+          const excerpt = line.trim().slice(0, 120);
           console.log(`${rel}:${i + 1}: ${pat.name}: ${excerpt}`);
           findings++;
           break; // one finding per line is enough

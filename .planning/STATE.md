@@ -2,16 +2,16 @@
 gsd_state_version: 1.0
 milestone: v1.0.0
 milestone_name: milestone
-status: executing
-stopped_at: Phase 10.1 Plan 04 complete
-last_updated: "2026-04-18T15:51:15.000Z"
+status: ready-for-next
+stopped_at: Phase 13 merged — v1.0.7 shipped
+last_updated: "2026-04-18T21:45:00.000Z"
 last_activity: 2026-04-18
 progress:
-  total_phases: 15
-  completed_phases: 9
-  total_plans: 55
-  completed_plans: 47
-  percent: 85
+  total_phases: 19
+  completed_phases: 14
+  total_plans: 63
+  completed_plans: 63
+  percent: 74
 ---
 
 # Project State
@@ -21,18 +21,42 @@ progress:
 See: .planning/PROJECT.md (updated 2026-04-17)
 
 **Core value:** Any developer can run the full pipeline on a real project and receive measurable, specific design improvement — not generic AI advice.
-**Current focus:** Phase 10.1 — Optimization Layer + Cost Governance (INSERTED, retroactive v1.0.4.1)
+**Current focus:** Phase 14 — AI-Native Design Tool Connections (paper.design + pencil.dev + unified canvas-connection interface) next up.
 
 ## Current Position
 
-Phase: 10.1 (Optimization Layer + Cost Governance) — EXECUTING
-Plan: 4 of 6 complete (Plans 01, 02, 03, 04, 05 done; 06 remaining)
-Status: Plan 10.1-04 complete — 3 Haiku gate agents + streaming synthesize skill + 4 orchestrator wirings shipped
+Phase: 13 (CI/CD) — COMPLETE
+Released: **v1.0.7** at https://github.com/hegemonart/get-design-done/releases/tag/v1.0.7
+Next phase: 14 (AI-Native Design Tool Connections) — not yet started
 Last activity: 2026-04-18
 
-Resume file: .planning/phases/10.1-optimization-layer-cost-governance/10.1-06-PLAN.md
+Resume file: (no active resume — ready to start Phase 14)
 
-Progress: [████████▌░] 85%
+Progress: [████████████████░░░░] 74% (14/19 phases complete through v1.0.7)
+
+## Phases completed (through v1.0.7)
+
+| Phase | Version | Shipped |
+|-------|---------|---------|
+| 1  — Foundation + Distribution + Infrastructure | — | 2026-04-17 |
+| 2  — Core Agents + Stage Orchestration | — | 2026-04-17 |
+| 3  — Quality Gate Agents + Pipeline Polish | — | 2026-04-17 |
+| 4  — Connections Layer | — | 2026-04-17 |
+| 5  — Automation Agents + New Commands | — | 2026-04-17 |
+| 6  — Validation + Version Bump | v1.0.0 | 2026-04-18 |
+| 7  — GSD Parity + Exploration | v1.0.1 | 2026-04-18 |
+| 8  — Visual + Design-Side Connections + Knowledge Graph | v1.0.2 | 2026-04-18 |
+| 9  — Claude Design Integration + Pinterest Connection | v1.0.3 | 2026-04-18 |
+| 10 — Knowledge Layer | v1.0.4 | 2026-04-18 |
+| 10.1 — Optimization Layer + Cost Governance (INSERTED) | v1.0.4.1 | 2026-04-18 |
+| 11 — Self-Improvement | v1.0.5 | 2026-04-18 |
+| 12 — Test Coverage | v1.0.6 | 2026-04-18 |
+| 13 — CI/CD | v1.0.7 | 2026-04-18 |
+
+## Open follow-ups
+
+- [ ] Apply `scripts/apply-branch-protection.sh --enforcing` after CI has been green for one release cycle (per D-17 two-phase rollout in `reference/BRANCH-PROTECTION.md`).
+- [ ] Phase 14 discuss + plan (AI-native design tool connections).
 
 ## Performance Metrics
 

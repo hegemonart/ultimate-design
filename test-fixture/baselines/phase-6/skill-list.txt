@@ -3,6 +3,7 @@ analyze-dependencies
 apply-reflections
 audit
 brief
+cache-manager
 compare
 complete-cycle
 darkmode
@@ -24,6 +25,7 @@ new-cycle
 new-project
 next
 note
+optimize
 pause
 plan
 plant-seed
@@ -34,6 +36,7 @@ reapply-patches
 reflect
 resume
 review-backlog
+router
 scan
 settings
 ship
@@ -44,7 +47,9 @@ spike
 spike-wrap-up
 stats
 style
+synthesize
 todo
 undo
 update
 verify
+warm-cache

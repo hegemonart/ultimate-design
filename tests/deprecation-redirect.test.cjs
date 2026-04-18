@@ -30,6 +30,8 @@ const ALLOWED_DEPRECATION_REFS = [
   // Reference docs that enumerate parallelism + intel schema for the historical set.
   'reference/intel-schema.md',
   'reference/parallelism-rules.md',
+  // Phase 10.1 tier reference: documents the historical pattern-mapper tier mapping.
+  'reference/model-tiers.md',
   // The deprecations registry itself.
   'reference/DEPRECATIONS.md',
 ];

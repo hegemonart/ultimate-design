@@ -6,7 +6,7 @@ color: green
 model: inherit
 default-tier: opus
 tier-rationale: "Authors DESIGN-PLAN.md — the contract every downstream agent follows"
-size_budget: LARGE
+size_budget: XL
 parallel-safe: never
 typical-duration-seconds: 120
 reads-only: false

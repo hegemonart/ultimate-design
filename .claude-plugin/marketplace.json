@@ -49,6 +49,11 @@
         "intel-store",
         "tested",
         "ci",
+        "cicd",
+        "release-automation",
+        "gitleaks",
+        "shellcheck",
+        "schema-validation",
         "cost-optimization",
         "cache-aware",
         "budget"
