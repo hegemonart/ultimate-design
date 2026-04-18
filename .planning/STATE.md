@@ -3,8 +3,8 @@ gsd_state_version: 1.0
 milestone: v1.0.0
 milestone_name: milestone
 status: executing
-stopped_at: Phase 13.3 Plan 04 complete (skills/check-update/SKILL.md — /gdd:check-update with --refresh/--dismiss/--prompt)
-last_updated: "2026-04-18T22:15:00.000Z"
+stopped_at: Phase 13.3 Plan 05 complete (6 safe-window skills wired to .design/update-available.md; audit frontmatter gains Bash)
+last_updated: "2026-04-18T22:18:49.000Z"
 last_activity: 2026-04-18
 progress:
   total_phases: 19
@@ -25,13 +25,13 @@ See: .planning/PROJECT.md (updated 2026-04-17)
 
 ## Current Position
 
-Phase: 13.3 (Plugin Update Checker) — IN PROGRESS (plan 04 of 06 complete)
+Phase: 13.3 (Plugin Update Checker) — IN PROGRESS (plan 05 of 06 complete)
 Last shipped: **v1.0.7** at https://github.com/hegemonart/get-design-done/releases/tag/v1.0.7
 Target version (13.3 closeout): v1.0.7.3
-Next plan: 13.3-05 (safe-window banner wiring in 6 skills: progress, health, help, post-closeout of ship/complete-cycle/audit)
+Next plan: 13.3-06 (Phase-13.3 baseline relock + CHANGELOG entry + plugin.json / marketplace.json bump to v1.0.7.3)
 Last activity: 2026-04-18
 
-Resume file: .planning/phases/13.3-plugin-update-checker/13.3-05-PLAN.md
+Resume file: .planning/phases/13.3-plugin-update-checker/13.3-06-PLAN.md
 
 Progress: [████████████████░░░░] 74% (14/19 phases complete through v1.0.7)
 
@@ -114,6 +114,7 @@ Progress: [████████████████░░░░] 74% (14
 | Phase 13.3 P02 | ~4 min | 2 tasks | 2 files |
 | Phase 13.3 P03 | ~3 min | 1 tasks | 1 files |
 | Phase 13.3 P04 | ~2 min | 1 tasks | 1 files |
+| Phase 13.3 P05 | ~2 min | 2 tasks | 6 files |
 
 ## Accumulated Context
 
@@ -235,6 +236,8 @@ Progress: [████████████████░░░░] 74% (14
 - [Phase 13.3-04]: Env-prefix python3 heredoc pattern locked — `CONFIG_PATH=... LATEST_TAG=... python3 <<'PY'` + `os.environ['KEY']` inside body is the only portable way to pass shell-provided string values into a heredoc-embedded python block; trailing-argv form (`python3 -c '...' KEY=VALUE`) is explicitly called out as an anti-pattern in the skill's `## Do Not` section because Python assigns those to `sys.argv`, not `os.environ`
 - [Phase 13.3-04]: Atomic config rewrite contract (D-14) — `json.load → set single key → json.dump` + `os.replace()` preserves every pre-existing top-level key in `.design/config.json` (model_profile, parallelism nested object, etc.); verified end-to-end with both flat primitive and nested-object preservation scenarios
 - [Phase 13.3-04]: Dispatcher-skill pattern — `/gdd:check-update` is a thin router: `--refresh` delegates to the hot-path hook (13.3-02), `--prompt` spawns the cold-path Haiku agent (13.3-03), `--dismiss` handles the only skill-local mutation (atomic config write); no-flag default prints cached state and auto-refreshes if cache >24h old
+- [Phase 13.3-05]: Safe-window surface wiring pattern — each of the 6 D-15 skills appends a one-line `[ -f .design/update-available.md ] && cat .design/update-available.md` immediately before its `## <NAME> COMPLETE` marker; render logic stays in the hot-path hook (13.3-02), skills own zero state-machine or dismissal logic; narrative prose alongside the conditional documents the three silent-on-absence conditions (no newer release / state-machine guard / per-version dismissal)
+- [Phase 13.3-05]: audit frontmatter tools-list expansion is additive only — `Read, Write, Task, Glob` → `Read, Write, Task, Glob, Bash`; ship + complete-cycle already listed Bash (for `gh pr create` / `mkdir -p` respectively); surface-list discipline per D-15 is enforced by grepping mid-pipeline skills (brief/explore/plan/design/verify) MUST NOT contain `update-available.md`
 
 ### Roadmap Evolution
 
@@ -251,6 +254,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-04-18T22:15:00.000Z
-Stopped at: Phase 13.3 Plan 04 complete — skills/check-update/SKILL.md (133 lines, gdd-check-update, --refresh/--dismiss/--prompt flags, env-prefix python3 heredoc for atomic config write, preserves all pre-existing config keys, ## CHECK-UPDATE COMPLETE marker)
-Resume file: .planning/phases/13.3-plugin-update-checker/13.3-05-PLAN.md
+Last session: 2026-04-18T22:18:49.000Z
+Stopped at: Phase 13.3 Plan 05 complete — 6 safe-window skills (progress, health, help, ship, complete-cycle, audit) each append `[ -f .design/update-available.md ] && cat .design/update-available.md` before their `## <NAME> COMPLETE` marker; audit frontmatter tools list expanded from `Read, Write, Task, Glob` to `Read, Write, Task, Glob, Bash`; mid-pipeline skills (brief/explore/plan/design/verify) verified untouched; Phase 12 contract tests green.
+Resume file: .planning/phases/13.3-plugin-update-checker/13.3-06-PLAN.md
