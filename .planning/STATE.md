@@ -3,9 +3,9 @@ gsd_state_version: 1.0
 milestone: v1.0.0
 milestone_name: milestone
 status: executing
-stopped_at: Phase 13.3 Plan 03 complete (design-update-checker Haiku enrichment agent)
-last_updated: "2026-04-19T22:10:00.000Z"
-last_activity: 2026-04-19
+stopped_at: Phase 13.3 Plan 04 complete (skills/check-update/SKILL.md — /gdd:check-update with --refresh/--dismiss/--prompt)
+last_updated: "2026-04-18T22:15:00.000Z"
+last_activity: 2026-04-18
 progress:
   total_phases: 19
   completed_phases: 14
@@ -25,13 +25,13 @@ See: .planning/PROJECT.md (updated 2026-04-17)
 
 ## Current Position
 
-Phase: 13.3 (Plugin Update Checker) — IN PROGRESS (plan 03 of 06 complete)
+Phase: 13.3 (Plugin Update Checker) — IN PROGRESS (plan 04 of 06 complete)
 Last shipped: **v1.0.7** at https://github.com/hegemonart/get-design-done/releases/tag/v1.0.7
 Target version (13.3 closeout): v1.0.7.3
-Next plan: 13.3-04 (skills/check-update/SKILL.md — binds --prompt to design-update-checker)
-Last activity: 2026-04-19
+Next plan: 13.3-05 (safe-window banner wiring in 6 skills: progress, health, help, post-closeout of ship/complete-cycle/audit)
+Last activity: 2026-04-18
 
-Resume file: .planning/phases/13.3-plugin-update-checker/13.3-04-PLAN.md
+Resume file: .planning/phases/13.3-plugin-update-checker/13.3-05-PLAN.md
 
 Progress: [████████████████░░░░] 74% (14/19 phases complete through v1.0.7)
 
@@ -113,6 +113,7 @@ Progress: [████████████████░░░░] 74% (14
 | Phase 13.3 P01 | ~2 min | 1 tasks | 1 files |
 | Phase 13.3 P02 | ~4 min | 2 tasks | 2 files |
 | Phase 13.3 P03 | ~3 min | 1 tasks | 1 files |
+| Phase 13.3 P04 | ~2 min | 1 tasks | 1 files |
 
 ## Accumulated Context
 
@@ -231,6 +232,9 @@ Progress: [████████████████░░░░] 74% (14
 - [Phase 13.3-03]: Haiku-tier cold-path enrichment agent (design-update-checker) ships as inline-text-only summarizer — reads .design/update-cache.json + optional prompt release_body, returns 3-5-line user-impact narrative, ends with ## UPDATE-CHECKER COMPLETE marker; tools=Read/Grep/Glob only for minimum injection surface (mitigates T-13.3.03-01)
 - [Phase 13.3-03]: Classification-boundary discipline — agent echoes hook-classified delta verbatim; does NOT recompute or override even when release body suggests discrepancy (flag-don't-override pattern); keeps hot-path hook authoritative per D-10
 - [Phase 13.3-03]: Inline-text-only pattern extended beyond discover/plan agents (design-advisor, design-plan-checker) to the update-checker domain — caller skill captures response text, no .design/ artifact produced
+- [Phase 13.3-04]: Env-prefix python3 heredoc pattern locked — `CONFIG_PATH=... LATEST_TAG=... python3 <<'PY'` + `os.environ['KEY']` inside body is the only portable way to pass shell-provided string values into a heredoc-embedded python block; trailing-argv form (`python3 -c '...' KEY=VALUE`) is explicitly called out as an anti-pattern in the skill's `## Do Not` section because Python assigns those to `sys.argv`, not `os.environ`
+- [Phase 13.3-04]: Atomic config rewrite contract (D-14) — `json.load → set single key → json.dump` + `os.replace()` preserves every pre-existing top-level key in `.design/config.json` (model_profile, parallelism nested object, etc.); verified end-to-end with both flat primitive and nested-object preservation scenarios
+- [Phase 13.3-04]: Dispatcher-skill pattern — `/gdd:check-update` is a thin router: `--refresh` delegates to the hot-path hook (13.3-02), `--prompt` spawns the cold-path Haiku agent (13.3-03), `--dismiss` handles the only skill-local mutation (atomic config write); no-flag default prints cached state and auto-refreshes if cache >24h old
 
 ### Roadmap Evolution
 
@@ -247,6 +251,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-04-19T22:10:00.000Z
-Stopped at: Phase 13.3 Plan 03 complete — agents/design-update-checker.md (117 lines, Haiku-tier, reads-only, writes:[], inline-text contract, ## UPDATE-CHECKER COMPLETE marker)
-Resume file: .planning/phases/13.3-plugin-update-checker/13.3-04-PLAN.md
+Last session: 2026-04-18T22:15:00.000Z
+Stopped at: Phase 13.3 Plan 04 complete — skills/check-update/SKILL.md (133 lines, gdd-check-update, --refresh/--dismiss/--prompt flags, env-prefix python3 heredoc for atomic config write, preserves all pre-existing config keys, ## CHECK-UPDATE COMPLETE marker)
+Resume file: .planning/phases/13.3-plugin-update-checker/13.3-05-PLAN.md
