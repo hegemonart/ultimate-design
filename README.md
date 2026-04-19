@@ -2,14 +2,14 @@
 
 # GET DESIGN DONE
 
-**Agent-orchestrated design pipeline for Claude Code. Five stages, thirty specialized agents, nine tool connections — from brief to verified shipping work.**
+**Agent-orchestrated design pipeline for Claude Code. Five stages, thirty-three specialized agents, twelve tool connections — from brief to verified shipping work.**
 
 **Solves the "Claude made it look fine but nothing ties together" problem: no design system extraction, no reference grounding, no verification against the brief.**
 
 [![npm version](https://img.shields.io/npm/v/@hegemonart/get-design-done?style=for-the-badge&logo=npm&logoColor=white&color=CB3837)](https://www.npmjs.com/package/@hegemonart/get-design-done)
 [![CI](https://img.shields.io/github/actions/workflow/status/hegemonart/get-design-done/ci.yml?branch=main&style=for-the-badge&logo=github&label=CI)](https://github.com/hegemonart/get-design-done/actions/workflows/ci.yml)
 [![Node](https://img.shields.io/badge/node-22%20%7C%2024-339933?style=for-the-badge&logo=node.js&logoColor=white)](https://nodejs.org/)
-[![Plugin](https://img.shields.io/badge/plugin-v1.0.7-blue?style=for-the-badge)](https://github.com/hegemonart/get-design-done/releases/tag/v1.0.7)
+[![Plugin](https://img.shields.io/badge/plugin-v1.14.0-blue?style=for-the-badge)](https://github.com/hegemonart/get-design-done/releases/tag/v1.14.0)
 [![License](https://img.shields.io/badge/license-MIT-blue?style=for-the-badge)](LICENSE)
 
 <br>
@@ -27,7 +27,7 @@ claude plugin install get-design-done@get-design-done
 
 <br>
 
-[Why I Built This](#why-i-built-this) · [How It Works](#how-it-works) · [Commands](#commands) · [Connections](#connections) · [Why It Works](#why-it-works)
+[Why I Built This](#why-i-built-this) · [How It Works](#how-it-works) · [Canvas Tools](#ai-native-canvas-tools) · [Component Generators](#component-generators) · [Commands](#commands) · [Connections](#connections) · [Why It Works](#why-it-works)
 
 </div>
 
@@ -52,7 +52,7 @@ I'm a designer who ships with Claude Code. The code-side workflow (GSD, Speckit,
 
 What I kept running into: Claude happily generates UI, but the output is *disconnected*. Tokens don't match the existing system. Contrast ratios silently drift below WCAG. Hierarchy gets reinvented per screen. Anti-patterns from old stacks leak into new ones. And none of it is caught until the PR review, because nothing verified the output against the original design brief.
 
-So I built Get Design Done. Same philosophy as GSD — **the complexity is in the system, not in your workflow**. Behind the scenes: thirty specialized agents, a queryable intel store, tier-aware model routing, connection probes across Figma/Refero/Pinterest/Storybook/Chromatic/Graphify/Preview, and a self-improvement loop that tunes itself from measured telemetry. What you see: a few commands that just work.
+So I built Get Design Done. Same philosophy as GSD — **the complexity is in the system, not in your workflow**. Behind the scenes: thirty-three specialized agents, a queryable intel store, tier-aware model routing, twelve tool connections, and a self-improvement loop that tunes itself from measured telemetry. What you see: a few commands that just work.
 
 The pipeline does the work *and* verifies it. I trust the workflow. It gets design done.
 
@@ -74,11 +74,11 @@ You don't need to be a designer. The pipeline carries the design expertise so yo
 
 Built-in quality gates catch real problems: Handoff Faithfulness scoring on Claude Design bundles, contrast audits across the full palette × surface matrix, anti-pattern detection from the NNG catalog, dark-mode architecture verification, and motion-system consistency checks.
 
-### v1.0.7 Highlights
+### v1.14.0 Highlights
 
-- **Full CI/CD pipeline** — Five-job GitHub Actions matrix (lint → validate → test → security + size-budget) across Node 22/24 × Linux/macOS/Windows. Blocking markdownlint, link checker, JSON schema validation, frontmatter validator, stale-ref detector, shellcheck, gitleaks, injection scanner, agent size-budget enforcement. Release automation auto-tags and publishes GitHub Releases on manifest version bumps.
-- **Self-improvement loop** — The `design-reflector` agent reads cycle telemetry and proposes concrete improvements: frontmatter tuning, reference additions, budget adjustments, question pruning, and global-skill promotion to `~/.claude/gdd/global-skills/`. Nothing auto-applies — you review and accept each proposal via `/gdd:apply-reflections`.
-- **Cost optimization layer** — `gdd-router` + `gdd-cache-manager` + `budget-enforcer` hook + tier-aware agent frontmatter + lazy checker gates + streaming synthesizer. Target: 50–70% per-task token-cost reduction versus pre-layer baseline, with no regression on the design-quality floor.
+- **AI-native canvas tools** — paper.design (MCP canvas read/write, screenshot verification) and pencil.dev (git-tracked `.pen` spec files, no MCP required) complete a full canvas→code→verify→canvas round-trip.
+- **Component generators** — 21st.dev Magic MCP adds a prior-art gate before any greenfield build; Magic Patterns generates DS-aware components with a `preview_url` for visual verification. Both feed into a shared `design-component-generator` agent.
+- **Twelve tool connections** — Four new connections (paper.design, pencil.dev, 21st.dev, Magic Patterns) join the original eight. All are optional; the pipeline degrades gracefully to fallbacks when any connection is unavailable.
 
 ---
 
@@ -145,7 +145,7 @@ You approve the brief. Now the rest of the pipeline has something to verify agai
 
 **Unified inventory + interview.** (The old `scan` and `discover` commands are deprecated aliases that route here.)
 
-The skill probes connection availability (Figma, Refero, Pinterest, Preview, Storybook, Chromatic, Graphify, Figma Writer, Claude Design), then:
+The skill probes all twelve connection slots (Figma, Refero, Pinterest, Preview, Storybook, Chromatic, Graphify, Claude Design, paper.design, pencil.dev, 21st.dev, Magic Patterns), then:
 
 1. **Inventory scan** — If `.design/map/` exists and is fresher than `src/`, consumes the structured map output. Otherwise runs a grep-based inventory pass
 2. **Design interview** — Spawns `design-discussant`, which runs an adaptive interview grounded in the brief and what it found in the code
@@ -204,7 +204,7 @@ Walk away, come back to completed work with a clean commit history.
 
 The skill spawns four agents in sequence, each with cheap-gate precursors:
 
-1. **`design-verifier`** — Scores output against brief + context + plan. Runs Phase 4B visual evidence via Preview (Playwright screenshots) when available, plus Chromatic delta narration on the visual regression diff
+1. **`design-verifier`** — Scores output against brief + context + plan. Runs visual verification via Preview (Playwright screenshots) when available, plus Chromatic delta narration on the visual regression diff
 2. **`design-auditor`** — Runs the NNG heuristic sweep, WCAG contrast pass across the full palette × surface matrix, typography system audit, motion framework audit, and anti-pattern detector
 3. **`design-integration-checker`** — Cross-file consistency: token naming, component taxonomy, visual hierarchy, a11y labels
 4. **`design-fixer`** — Proposes fixes for each gap, scoped and prioritized
@@ -238,7 +238,7 @@ Loop **brief → explore → plan → design → verify → ship** per cycle. Ea
 ### Standalone commands (no pipeline init required)
 
 ```
-/gdd:handoff <bundle.html>   # Skip scan/discover/plan, route direct to verify
+/gdd:handoff <bundle.html>   # Skip explore/plan, route direct to verify
 /gdd:style Button            # Generate component handoff doc
 /gdd:darkmode                # Audit dark mode architecture + contrast
 /gdd:compare                 # Delta between baseline and verification
@@ -271,7 +271,7 @@ Claude Code does great design work *if* you give it the context it needs. Most w
 
 Size budgets are tiered per agent (XXL: 700, XL: 500, Large: 300, Default: 200 lines). Stay under, get consistent output. The `agent-size-budget` CI job blocks violations.
 
-### 30 Specialized Agents
+### 33 Specialized Agents
 
 Every stage uses the same pattern: a thin orchestrator skill spawns specialized agents, collects results, routes to the next step.
 
@@ -287,7 +287,7 @@ Every stage uses the same pattern: a thin orchestrator skill spawns specialized 
 
 All agents carry `default-tier: haiku|sonnet|opus` + `tier-rationale` in frontmatter. Every agent opens with `@reference/shared-preamble.md` so the first agent in a session pays full cost and the rest ride Anthropic's 5-minute prompt cache.
 
-### 8 Tool Connections
+### 12 Tool Connections
 
 Every connection is optional. The pipeline degrades gracefully — a grep-based fallback exists for every missing tool.
 
@@ -301,6 +301,10 @@ Every connection is optional. The pipeline degrades gracefully — a grep-based 
 | Chromatic | CLI (`npx chromatic`) | Visual regression delta narration and change-risk scoping |
 | Graphify | CLI (`graphify`) | Knowledge graph: component↔token↔decision relationships |
 | Claude Design | Bundle adapter | Parse HTML export → D-XX decisions, Handoff Faithfulness scoring |
+| paper.design | MCP (`mcp__paper-design__*`) | Canvas read/write, component tree + computed styles, screenshot verification |
+| pencil.dev | File (`.pen` YAML) | Git-tracked design specs; no MCP — pipeline reads and writes `.pen` files directly |
+| 21st.dev Magic MCP | MCP + CLI | Prior-art gate before greenfield builds; component search + generation; SVGL brand logos |
+| Magic Patterns | MCP / API key | DS-aware component generation; `preview_url` feeds visual verification |
 
 See [`connections/connections.md`](connections/connections.md) for the full index and capability matrix.
 
@@ -365,7 +369,7 @@ See [`reference/authority-feeds.md`](reference/authority-feeds.md). 26 curated f
 
 ### What is explicitly rejected
 
-No Dribbble. No Behance. No LinkedIn. No generic "trending" aggregators. See `reference/authority-feeds.md` §"Rejected kinds" — enforced structurally by `scripts/tests/test-authority-rejected-kinds.sh`, which greps the active whitelist for rejected hostnames and fails CI on any match. The anti-slop thesis is a test, not a comment.
+No Dribbble. No Behance. No LinkedIn. No generic "trending" aggregators. See `reference/authority-feeds.md` §"Rejected kinds" — the exclusions are CI-enforced, not just documented.
 
 ### How the report feeds reflection
 
@@ -462,7 +466,7 @@ All commands use the `/gdd:` namespace.
 | `/gdd:plan` | Stage 3 — research + decompose into atomic tasks + verify plan |
 | `/gdd:design` | Stage 4 — execute tasks with fresh context per task |
 | `/gdd:verify [--post-handoff]` | Stage 5 — verifier + auditor + integration checker + fixer |
-| `/gdd:handoff <bundle>` | Skip scan/discover/plan, route direct to verify from Claude Design bundle |
+| `/gdd:handoff <bundle>` | Skip explore/plan, route direct to verify from Claude Design bundle |
 | `/gdd:next` | Auto-detect pipeline state and run next step |
 | `/gdd:map` | Parallel codebase mapping — 5 specialist mappers |
 
@@ -563,7 +567,7 @@ All connections are optional — the pipeline degrades gracefully when any conne
 
 ### Figma MCP (reads + writes)
 
-One remote MCP covers both reads and writes as of v1.0.7.1. When it is active, `explore` reads Figma variables and pre-populates design decisions from your file, and `design-figma-writer` writes decisions back via `use_figma` — annotates frames, tokenizes local styles, registers Code Connect mappings. Proposal → confirm discipline with `--dry-run` and `--confirm-shared` guards. Falls back to code-only analysis when the MCP is not configured. One install command unlocks both:
+One remote MCP covers both reads and writes. When active, `explore` reads Figma variables and pre-populates design decisions from your file, and `design-figma-writer` writes decisions back via `use_figma` — annotates frames, tokenizes local styles, registers Code Connect mappings. Proposal → confirm discipline with `--dry-run` and `--confirm-shared` guards. Falls back to code-only analysis when the MCP is not configured. One install command unlocks both:
 
 ```
 claude mcp add figma --transport http https://mcp.figma.com/v1/sse
@@ -611,7 +615,31 @@ When Graphify CLI is available, `plan` and `design-integration-checker` consult 
 
 ### Claude Design
 
-Drop a Claude Design bundle (HTML export from [claude.ai/design](https://claude.ai/design)) into your project root and run `/gdd:handoff <path>`. The pipeline skips Scan → Discover → Plan, parses the bundle CSS custom properties into D-XX design decisions, runs `verify --post-handoff` for Handoff Faithfulness scoring, and optionally writes implementation status back to Figma. Full format: [`connections/claude-design.md`](connections/claude-design.md).
+Drop a Claude Design bundle (HTML export from [claude.ai/design](https://claude.ai/design)) into your project root and run `/gdd:handoff <path>`. The pipeline skips Explore → Plan, parses the bundle CSS custom properties into D-XX design decisions, runs `verify --post-handoff` for Handoff Faithfulness scoring, and optionally writes implementation status back to Figma. Full format: [`connections/claude-design.md`](connections/claude-design.md).
+
+### paper.design
+
+When the paper.design MCP is active, `explore` reads the canvas selection (JSX tree, computed styles) into `DESIGN-CONTEXT.md`, `design` writes annotations and token bindings back to the canvas, and `verify` captures component screenshots for visual checks. Setup: [`connections/paper-design.md`](connections/paper-design.md).
+
+```bash
+claude mcp add paper-design --transport http https://mcp.paper.design/sse
+```
+
+### pencil.dev
+
+No MCP required. Add `.pen` YAML files to your project and install the pencil.dev VS Code / Cursor extension. `explore` discovers and merges `.pen` token declarations; `design` writes DESIGN-DEBT findings back as spec updates; `verify` diffs declared token values against actual CSS. Setup: [`connections/pencil-dev.md`](connections/pencil-dev.md).
+
+### 21st.dev Magic MCP
+
+When active, `explore` runs a prior-art gate (`21st_magic_component_search`) before any greenfield component build — if an existing component fits ≥80%, adoption is recommended. `design` generates components via search → generate → adopt. Also provides `svgl_get_brand_logo` for brand SVGs. Setup: [`connections/21st-dev.md`](connections/21st-dev.md).
+
+```bash
+npx @21st-dev/magic@latest init
+```
+
+### Magic Patterns
+
+When the Magic Patterns connector is active (via Claude environment or API key), `design` generates DS-aware components and feeds the `preview_url` into visual verification. Setup: [`connections/magic-patterns.md`](connections/magic-patterns.md).
 
 ---
 
@@ -701,16 +729,14 @@ Incremental updates fire automatically via the `gdd-intel-updater` agent after f
 
 ## Optimization Layer
 
-Every `/gdd:*` command and agent spawn passes through a cross-cutting optimization layer. Target: **50–70% per-task token-cost reduction** vs the pre-optimization baseline, with no regression on the design-quality floor.
+Every `/gdd:*` command and agent spawn passes through a cross-cutting optimization layer designed to reduce token cost without regressing on design quality.
 
-- **`gdd-router` skill** — First-step intent router. Returns `{path: fast|quick|full, model_tier_overrides, estimated_cost_usd, cache_hits}`. Cheap Haiku call; gates every downstream spawn.
-- **`gdd-cache-manager` skill + `/gdd:warm-cache`** — Maintains `.design/cache-manifest.json` and pre-warms common agent system prompts so Anthropic's 5-min prompt cache fires on the shared preamble.
-- **`budget-enforcer` PreToolUse hook** — Intercepts every `Agent` spawn. Hard-blocks on cap breach (actionable error), auto-downgrades at 80% soft-threshold, short-circuits on cache hit. Without the hook, optimization is advisory; with it, violations are impossible.
-- **Lazy checker gates** (`design-verifier-gate`, `design-integration-checker-gate`, `design-context-checker-gate`) — Cheap Haiku heuristic decides whether to spawn the expensive full checker.
-- **Streaming synthesizer** (`skills/synthesize/`) — N parallel-mapper outputs collapse through a single Haiku call before returning to main context.
-- **Cost telemetry** — `.design/telemetry/costs.jsonl` appends one row per spawn decision: `{ts, agent, tier, tokens_in, tokens_out, cache_hit, est_cost_usd, cycle, phase}`. Aggregated to `.design/agent-metrics.json`. Consumed by `/gdd:optimize` and `design-reflector`.
-
-CI diffs against a locked cost baseline on every push to catch regressions.
+- **`gdd-router` skill** — First-step intent router. Returns the right execution path (`fast|quick|full`) with model-tier overrides and a cache-hit check before any downstream spawn.
+- **`gdd-cache-manager` skill + `/gdd:warm-cache`** — Pre-warms common agent system prompts so Anthropic's 5-minute prompt cache fires on the shared preamble across a session.
+- **`budget-enforcer` PreToolUse hook** — Intercepts every `Agent` spawn. Hard-blocks on cap breach, auto-downgrades at the soft threshold, short-circuits on cache hit.
+- **Lazy checker gates** — Cheap Haiku heuristic decides whether to spawn the expensive full checker for each verification stage.
+- **Streaming synthesizer** — Parallel-mapper outputs collapse through a single Haiku call before returning to main context, keeping the orchestrator cache-aligned.
+- **Cost telemetry** — `.design/telemetry/costs.jsonl` records every spawn decision. Aggregated to `.design/agent-metrics.json` and consumed by `/gdd:optimize` and `design-reflector`.
 
 ---
 
@@ -732,22 +758,15 @@ Zero third-party test dependencies — the runner is Node's built-in `node:test`
 lint → validate → test (matrix) → security + size-budget
 ```
 
-- **Lint** — `markdownlint-cli2@0.13.0` (pinned), link checker via `lycheeverse/lychee-action@v2` (blocking)
-- **Validate** — JSON schema validation (`plugin.schema.json`, `marketplace.schema.json`, `hooks.schema.json`, `config.schema.json`, `intel.schema.json`), agent frontmatter validator, stale-ref detector (fails on any `/design:*` legacy namespace or deprecated agent/stage names), `claude plugin validate .`
+- **Lint** — markdownlint + blocking link checker
+- **Validate** — JSON schema validation, agent frontmatter validator, stale-ref detector, `claude plugin validate .`
 - **Test** — Node 22/24 × Linux/macOS/Windows, fail-fast disabled
-- **Security** — `ludeeus/action-shellcheck@master` on `scripts/`, `gitleaks/gitleaks-action@v2` secrets scan with `.gitleaks.toml` allowlist, injection scanner over all shipped reference/skills/agents
-- **Size-budget** — Blocking tier enforcement (XXL: 700, XL: 500, Large: 300, Default: 200 lines) with actionable override guidance
-
-### What's covered
-
-- **Agent hygiene** — frontmatter completeness, line-count tier budgets, required-reading path validity, `/gdd:` namespace consistency
-- **System contracts** — config schema, command↔skill parity, hooks integrity, atomic writes to `.design/STATE.md`, frontmatter parser edge cases, model-profile resolution, `/gdd:health` output shape, worktree safety, semver bump sequence, STATE-TEMPLATE drift
-- **Pipeline + data** — end-to-end smoke on `test-fixture/`, mapper JSON-schema validation (tokens, components, a11y, motion, hierarchy), parallelism-engine decision table, `Touches:` field parsing, cycle lifecycle, `.design/intel/` incremental-update correctness, regression-baseline drift detector
-- **Feature correctness** — `/gdd:sketch` variant determinism, 8-connection probe contracts with mocked MCPs, `design-figma-writer` dry-run discipline, `design-reflector` proposal-only shape, deprecated-name redirects, NNG heuristic coverage, injection-scanner hook behavior, optimization-layer schema enforcement
+- **Security** — shellcheck on `scripts/`, secrets scan, injection scanner over all shipped skills/agents
+- **Size-budget** — Blocking tier enforcement (XXL: 700, XL: 500, Large: 300, Default: 200 lines)
 
 ### Release automation
 
-`.github/workflows/release.yml` auto-tags and publishes a GitHub Release when `.claude-plugin/plugin.json` version changes. Release body is extracted from the matching `CHANGELOG.md` section. A release-time smoke test diffs a fresh checkout against a locked baseline before the release publishes.
+`.github/workflows/release.yml` auto-tags and publishes a GitHub Release when `.claude-plugin/plugin.json` version changes. Release body is extracted from the matching `CHANGELOG.md` section.
 
 Every PR must pass `npm test` before merging to `main`. See [`CONTRIBUTING.md`](CONTRIBUTING.md) for the re-lock procedure when baselines change.
 
@@ -758,8 +777,8 @@ Every PR must pass `npm test` before merging to `main`. See [`CONTRIBUTING.md`](
 - `.claude-plugin/plugin.json`, `.claude-plugin/marketplace.json` — manifest
 - `SKILL.md` — root pipeline router
 - `skills/` — 55 stage + standalone skills
-- `agents/` — 30 specialized agent specs
-- `connections/` — 9 connection specs
+- `agents/` — 33 specialized agent specs
+- `connections/` — 12 connection specs
 - `reference/` — curated design reference (shared preamble, model tiers, model prices, schemas, DEPRECATIONS, config schema)
 - `hooks/`, `scripts/bootstrap.sh`
 
