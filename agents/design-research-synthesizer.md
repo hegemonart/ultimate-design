@@ -52,7 +52,19 @@ Use Glob to confirm presence; skip absent files gracefully and mark section as `
 
    For each result (top 5 per query): record `{ query, pin_title, pin_url }`. Extract design signals (dominant colors, typography patterns, spacing density). Append to `<connection_sources>`: `source: pinterest (N pins from M queries)`.
 
-3. Produce `.design/DESIGN-CONTEXT.md` with the following sections, each wrapped in XML tags:
+3. **pencil.dev .pen files** (when `pencil-dev: available` in STATE.md):
+
+   Read `<pen_sources>` block from DESIGN-CONTEXT.md (written by design-context-builder Step 0B).
+
+   For each .pen component: merge declared design-tokens into the synthesis output:
+   - Token key/value pairs from `.pen` frontmatter → added to `<token_system>` section
+   - If a .pen token value differs from a grep-found implementation value → flag as `DIVERGE` in synthesis output
+
+   Add to `<connection_sources>` block: `source: pencil.dev (N components read from .pen files)`
+
+   Note in synthesis header: `pen-sources: N components read from .pen files` (or `pen-sources: 0 — pencil-dev not_configured` if skipped).
+
+4. Produce `.design/DESIGN-CONTEXT.md` with the following sections, each wrapped in XML tags:
    - `<token_system>` — from token-mapper
    - `<component_inventory>` — from component-taxonomy-mapper
    - `<visual_hierarchy>` — from visual-hierarchy-mapper

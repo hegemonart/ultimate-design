@@ -92,9 +92,86 @@ Note: Decisions D-XX through D-YY pre-populated from Figma variables (source: fi
       These are starting points — the interview (Step 1+) may override or remove them.
 ```
 
-Proceed to Step 1 regardless of whether Step 0 ran or was skipped.
+Proceed to Step 0A regardless of whether Step 0 ran or was skipped.
 
-## Step 0B — Storybook Component Inventory
+## Step 0A — paper.design Canvas Read (optional)
+
+**Skip if `paper-design` is `not_configured` or `unavailable` in `.design/STATE.md` `<connections>`.** Proceed to Step 0B.
+
+### If `paper-design: available`
+
+ToolSearch first — paper.design tools may be in the deferred tool set:
+
+```
+ToolSearch({ query: "mcp__paper", max_results: 5 })
+```
+
+Then call:
+1. `mcp__paper-design__get_selection` → JSON of selected canvas elements (id, type, name, bounds)
+2. `mcp__paper-design__get_jsx` → React JSX string of selected component tree
+3. `mcp__paper-design__get_computed_styles` → computed CSS values for selection
+
+If any call errors: update STATE.md to `paper-design: unavailable`. Proceed to Step 0B.
+
+Add a `<canvas_sources>` block to DESIGN-CONTEXT.md:
+```xml
+<canvas_sources>
+  <canvas source="paper.design">
+    <!-- JSX component tree and computed styles extracted from canvas selection -->
+  </canvas>
+</canvas_sources>
+```
+
+Merge canvas-sourced values alongside Figma variables, Refero refs, and other sources. If a canvas value conflicts with a Figma variable, note both values and mark as "tentative — confirm with user."
+
+Proceed to Step 0B regardless of whether Step 0A ran or was skipped.
+
+## Step 0B — pencil.dev .pen File Discovery (optional)
+
+```bash
+PEN_FILES=$(find . -name "*.pen" -not -path "*/node_modules/*" 2>/dev/null)
+```
+
+If PEN_FILES is empty: `pencil-dev: not_configured` in STATE.md. Skip.
+
+If PEN_FILES found:
+1. `pencil-dev: available` in STATE.md `<connections>`
+2. Read each `.pen` file. Extract component name, variant, design-tokens map.
+3. Add a `<pen_sources>` block to DESIGN-CONTEXT.md:
+```xml
+<pen_sources>
+  <pen file="Button.pen" component="Button" variant="primary">
+    <!-- design-tokens extracted from .pen frontmatter -->
+  </pen>
+</pen_sources>
+```
+4. Cross-reference .pen component names with grep-found component files. Flag components where `.pen` spec exists but no implementation found (DEBT: not-yet-built).
+
+Proceed to Step 0C regardless of whether Step 0B ran or was skipped.
+
+## Step 0C — Design System Detection (for component generators)
+
+Detect the project's active design system for use by `design-component-generator` (Magic Patterns, 21st.dev).
+
+Detection order:
+1. Check `gdd.config.json` (if present): read `designSystem` field → use directly if set.
+2. Scan `package.json` dependencies:
+   - `@shadcn/ui` or `shadcn` present → `"shadcn"`
+   - `@mantine/core` or `@mantine/hooks` present → `"mantine"`
+   - `@chakra-ui/react` present → `"chakra"`
+   - `tailwindcss` present → `"tailwind"`
+3. Default: `"tailwind"`
+
+Write result to STATE.md `<design_system>` block:
+```xml
+<design_system>tailwind</design_system>
+```
+
+Always runs — no skip condition. Takes < 1 second (file reads only).
+
+Proceed to Step 0D regardless of outcome.
+
+## Step 0D — Storybook Component Inventory
 
 **Skip this step if `storybook` is `not_configured` or `unavailable` in `.design/STATE.md` `<connections>`.** Proceed to Step 1 — grep-based inventory continues as before.
 
@@ -133,7 +210,7 @@ curl -sf http://localhost:6006/stories.json
 
 **If index.json fetch errors:** update STATE.md `storybook: unavailable`, fall back to grep-based inventory in Step 1. Continue without error.
 
-Proceed to Step 1 regardless of whether Step 0B ran or was skipped.
+Proceed to Step 1 regardless of whether Step 0D ran or was skipped.
 
 ## Step 1 — Auto-Detect Design System State
 

@@ -328,6 +328,57 @@ In DESIGN-VERIFICATION.md, add a `## Phase 4B — Screenshot Evidence` section l
 
 ---
 
+## Phase 4C — paper.design Canvas Screenshots (when paper-design: available)
+
+**Gate:** Skip this entire Phase 4C block if `paper-design` is `not_configured` or `unavailable` in STATE.md `<connections>`. Print: `paper.design canvas screenshots: skipped.`
+
+**Step 1 — ToolSearch first:**
+
+```
+ToolSearch({ query: "mcp__paper", max_results: 5 })
+```
+
+If empty: skip Phase 4C.
+
+**Step 2 — Per-component screenshot loop:**
+
+For each component flagged `? VISUAL` in Phase 2 or Phase 3:
+
+1. Look up the canvas node_id from DESIGN-CONTEXT.md `<canvas_sources>` block (written by design-context-builder Step 0A).
+2. If node_id found:
+   ```
+   mcp__paper-design__get_screenshot(node_id: "<id>")
+   ```
+   Save screenshot to `.design/screenshots/paper-<component>-<date>.png`.
+   Reference path in DESIGN-VERIFICATION.md `## Phase 4C` section.
+3. If node_id not found: note `paper-screenshot: node_id not found for <component>` — skip this component.
+
+**Note:** paper.design screenshots are canvas-element-scoped (individual components). Phase 4B Preview screenshots are route-scoped (full rendered pages). Both are complementary — run both when available.
+
+---
+
+### pencil.dev Spec-vs-Implementation Diff (optional)
+
+If `pencil-dev: available` in STATE.md `<connections>`:
+
+```bash
+PEN_FILES=$(find . -name "*.pen" -not -path "*/node_modules/*" 2>/dev/null)
+```
+
+For each `.pen` file:
+1. Parse `design-tokens` from YAML frontmatter.
+2. For each declared token (e.g., `bg: brand-primary-500`):
+   - Grep implementation files for the component name to find corresponding CSS/token usage.
+   - Compare: declared value vs. found value.
+   - **MATCH** → token is correctly implemented.
+   - **DIVERGE** → flag: `PENCIL-DIVERGE: <component> <token-key>: spec=<declared> impl=<found>`
+   - **NOT FOUND** → flag: `PENCIL-MISSING: <component> <token-key> not found in implementation`
+3. Append results to DESIGN-VERIFICATION.md under `## pencil.dev Spec Compliance`.
+
+If no `.pen` files: skip silently. Print: `pencil.dev spec diff: no .pen files — skipped.`
+
+---
+
 ## Phase 5 — Gap Analysis
 
 Collect all failures from Phases 1–4:

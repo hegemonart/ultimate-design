@@ -1,8 +1,12 @@
+21st-dev.md
 chromatic.md
 claude-design.md
 connections.md
 figma.md
 graphify.md
+magic-patterns.md
+paper-design.md
+pencil-dev.md
 pinterest.md
 preview.md
 refero.md

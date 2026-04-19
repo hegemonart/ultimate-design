@@ -373,6 +373,82 @@ The watcher writes `.design/authority-report.md` — new entries classified into
 
 ---
 
+## AI-Native Canvas Tools
+
+get-design-done integrates with canvas tools that treat the design canvas as both source AND destination — enabling a full canvas→code→verify→canvas round-trip.
+
+### paper.design
+
+Read component trees, computed styles, and screenshots from the paper.design canvas. Write design decisions back via annotate / tokenize / roundtrip modes.
+
+**Setup:**
+```bash
+claude mcp add paper-design --transport http https://mcp.paper.design/sse
+```
+
+**Capabilities:**
+- `explore` — reads canvas selection, JSX tree, computed styles into DESIGN-CONTEXT.md
+- `design` — `design-paper-writer` agent writes annotations, token bindings, and status back to canvas
+- `verify` — `get_screenshot` captures component snapshots for `? VISUAL` checks (Phase 4C)
+
+See [`connections/paper-design.md`](connections/paper-design.md) for full setup and probe pattern.
+
+### pencil.dev
+
+Git-tracked `.pen` YAML files are canonical design specs. No MCP required — the pipeline reads and writes `.pen` files directly.
+
+**Setup:** Install the pencil.dev VS Code / Cursor extension. Add `.pen` files to your project.
+
+**Capabilities:**
+- `explore` — discovers `.pen` files; synthesizer merges token declarations with code
+- `design` — `design-pencil-writer` agent writes DESIGN-DEBT findings and status back as `.pen` comments / spec updates (atomic git commits)
+- `verify` — spec-vs-implementation diff: declared token values vs. actual CSS values
+
+See [`connections/pencil-dev.md`](connections/pencil-dev.md) for `.pen` file format and pipeline integration.
+
+---
+
+## Component Generators
+
+Component generators produce UI component code from natural-language descriptions, targeting your project's design system.
+
+### 21st.dev Magic MCP
+
+Marketplace search + AI component generation. Built-in prior-art gate: the explore stage searches 21st.dev before any greenfield component build. If an existing component fits ≥80%, adoption is recommended over custom build.
+
+**Setup:**
+```bash
+npx @21st-dev/magic@latest init
+# Set TWENTY_FIRST_API_KEY environment variable
+```
+
+**Capabilities:**
+- `explore` — prior-art gate: `21st_magic_component_search` before greenfield builds
+- `design` — `design-component-generator` (21st.dev impl): search → generate → adopt
+- `explore/design` — `svgl_get_brand_logo` for brand logo/icon SVGs
+
+See [`connections/21st-dev.md`](connections/21st-dev.md) for setup and prior-art gate logic.
+
+### Magic Patterns
+
+DS-aware component generation via the Magic Patterns Claude connector (no manual setup when enabled) or API key fallback. Returns a `preview_url` for visual verification.
+
+**Setup (Claude connector):** Enable Magic Patterns in your Claude environment — no additional steps.
+
+**Setup (API key):**
+```bash
+claude mcp add magic-patterns --transport http https://mcp.magicpatterns.com/sse \
+  -e MAGIC_PATTERNS_API_KEY=$MAGIC_PATTERNS_API_KEY
+```
+
+**Capabilities:**
+- `design` — `design-component-generator` (magic-patterns impl): generate → annotate → regenerate
+- `verify` — `preview_url` from generation feeds `? VISUAL` check in Phase 8 Preview
+
+See [`connections/magic-patterns.md`](connections/magic-patterns.md) for probe pattern and DS detection.
+
+---
+
 ## Commands
 
 All commands use the `/gdd:` namespace.

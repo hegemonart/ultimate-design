@@ -31,7 +31,59 @@ Empty → refero: not_configured
 Non-empty → refero: available
 ```
 
-Write results to STATE.md `<connections>`.
+**C — 21st.dev probe:**
+```
+ToolSearch({ query: "mcp__21st", max_results: 5 })
+Empty → 21st-dev: not_configured
+Non-empty → 21st-dev: available
+```
+
+**D — Magic Patterns probe:**
+```
+ToolSearch({ query: "mcp__magic_patterns", max_results: 5 })
+Empty → magic-patterns: not_configured
+Non-empty → magic-patterns: available
+```
+
+**E — paper.design probe:**
+```
+ToolSearch({ query: "mcp__paper", max_results: 5 })
+Empty → paper-design: not_configured
+Non-empty → call mcp__paper-design__get_selection; success → available; error → unavailable
+```
+
+**F — pencil.dev probe (file-based):**
+```bash
+find . -name "*.pen" -not -path "*/node_modules/*" 2>/dev/null | head -1
+Empty → pencil-dev: not_configured
+Found → pencil-dev: available
+```
+
+Write all results to STATE.md `<connections>`.
+
+## Step 1.5 — 21st.dev Prior-Art Check (when 21st-dev: available)
+
+If `21st-dev: not_configured` in STATE.md: skip this step entirely.
+
+When the explore stage identifies any greenfield component in scope (component name from BRIEF.md or user request that does not yet have an implementation file):
+
+1. `21st_magic_component_search(component_name, limit: 3)`
+2. Evaluate top result:
+   - **fit ≥ 80%**: add `<prior-art>` block to DESIGN.md:
+     ```xml
+     <prior-art source="21st.dev" component="<name>" fit="<score>%" id="<component_id>">
+       Recommendation: adopt — do not build custom. Confirm with design-executor.
+     </prior-art>
+     ```
+   - **fit < 80%**: note top candidate in DESIGN.md as a reference, proceed with custom build:
+     ```xml
+     <prior-art source="21st.dev" component="<name>" fit="<score>%" id="<component_id>">
+       Low fit — noted for reference. Building custom component.
+     </prior-art>
+     ```
+3. If `svgl_get_brand_logo` is available and explore scope includes brand logo assets: call `svgl_get_brand_logo(brand_name)` for each required brand asset; add SVG results to `.design/assets/` and note in DESIGN.md.
+
+If no greenfield components in scope: skip this step.
 
 ## Step 2 — Inventory scan (unless `--skip-scan`)
 

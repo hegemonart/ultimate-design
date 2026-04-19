@@ -16,6 +16,10 @@ This directory contains connection specifications for external tools and MCPs th
 | Graphify | Active | [`connections/graphify.md`](connections/graphify.md) | CLI: `graphify`; `gsd-tools graphify *` |
 | Pinterest | Active | [`connections/pinterest.md`](connections/pinterest.md) | `mcp__mcp-pinterest__*` tools (ToolSearch-only probe; headless scraping, no API key) |
 | Claude Design | Active | [`connections/claude-design.md`](connections/claude-design.md) | No MCP — bundle file probe; enables `/gdd:handoff` pipeline + bidirectional write-back via figma-writer |
+| paper.design | Active | [`connections/paper-design.md`](connections/paper-design.md) | Uses `mcp__paper-design__*` tools; free tier: 100 calls/week |
+| pencil.dev | Active | [`connections/pencil-dev.md`](connections/pencil-dev.md) | File-based; `.pen` YAML specs; git-tracked; no MCP |
+| 21st.dev Magic MCP | Active | [`connections/21st-dev.md`](connections/21st-dev.md) | Uses `mcp__21st*` tools; `TWENTY_FIRST_API_KEY` required |
+| Magic Patterns | Active | [`connections/magic-patterns.md`](connections/magic-patterns.md) | Claude connector (`mcp__magic_patterns*`) + API key fallback |
 
 ---
 
@@ -23,16 +27,20 @@ This directory contains connection specifications for external tools and MCPs th
 
 Each cell describes what the connection contributes at that pipeline stage, or `—` if it is not used.
 
-| Connection | scan | discover | plan | design | verify |
-|-----------|------|----------|------|--------|--------|
-| Figma | token augmentation via `get_variable_defs` (CONN-03) | decisions pre-populate via `get_variable_defs` (CONN-04) | — | write tokens/annotations/Code Connect via `use_figma` (FWR-01..04) | — |
-| Refero | — | reference search via `mcp__refero__search`; fallback → awesome-design-md (CONN-05) | — | — | — |
-| Preview | — | — | — | — | screenshots for `? VISUAL` checks (VIS-02) |
-| Storybook | — | component inventory (STB-01) | change-risk via story count (STB-02) | `.stories.tsx` stub (STB-03) | a11y per story (STB-02) |
-| Chromatic | — | — | change-risk scoping (CHR-02) | — | visual delta narration (CHR-01) |
-| Graphify | — | — | dependency scoping (GRF-03) | — | orphan detection (GRF-04) |
-| Pinterest | probe only | visual reference search via `pinterest_search`; fallback → Refero → awesome-design-md | — | — | — |
-| Claude Design | bundle probe → `claude_design: available` | synthesizer handoff mode — parses bundle → D-XX decisions; discussant `--from-handoff` confirms | — (skipped in handoff) | — (skipped in handoff) | Handoff Faithfulness section; bidirectional write-back via figma-writer `implementation-status` mode |
+| Connection | scan | discover | plan | design | verify | canvas | generator |
+|-----------|------|----------|------|--------|--------|--------|-----------|
+| Figma | token augmentation via `get_variable_defs` (CONN-03) | decisions pre-populate via `get_variable_defs` (CONN-04) | — | write tokens/annotations/Code Connect via `use_figma` (FWR-01..04) | — | — | — |
+| Refero | — | reference search via `mcp__refero__search`; fallback → awesome-design-md (CONN-05) | — | — | — | — | — |
+| Preview | — | — | — | — | screenshots for `? VISUAL` checks (VIS-02) | — | — |
+| Storybook | — | component inventory (STB-01) | change-risk via story count (STB-02) | `.stories.tsx` stub (STB-03) | a11y per story (STB-02) | — | — |
+| Chromatic | — | — | change-risk scoping (CHR-02) | — | visual delta narration (CHR-01) | — | — |
+| Graphify | — | — | dependency scoping (GRF-03) | — | orphan detection (GRF-04) | — | — |
+| Pinterest | probe only | visual reference search via `pinterest_search`; fallback → Refero → awesome-design-md | — | — | — | — | — |
+| Claude Design | bundle probe → `claude_design: available` | synthesizer handoff mode — parses bundle → D-XX decisions; discussant `--from-handoff` confirms | — (skipped in handoff) | — (skipped in handoff) | Handoff Faithfulness section; bidirectional write-back via figma-writer `implementation-status` mode | — | — |
+| paper.design | — | canvas read: `get_selection`, `get_jsx`, `get_computed_styles` | — | paper-writer: annotate/tokenize/roundtrip | `get_screenshot` for `? VISUAL` | ✓ | — |
+| pencil.dev | `.pen` discovery | `.pen` as canonical design source | — | pencil-writer: annotate/roundtrip | spec-vs-impl diff | ✓ | — |
+| 21st.dev | — | prior-art gate: marketplace search before greenfield build | — | component-generator (21st impl) | — | — | ✓ |
+| Magic Patterns | — | — | — | component-generator (magic-patterns impl) | preview_url → `? VISUAL` check | — | ✓ |
 
 **Column definitions:**
 
@@ -41,6 +49,8 @@ Each cell describes what the connection contributes at that pipeline stage, or `
 - **plan** — what the connection contributes to planning artifacts
 - **design** — what the connection provides during design execution
 - **verify** — what the connection checks or surfaces during verification
+- **canvas** — whether the connection provides bidirectional canvas read+write (see `reference/ai-native-tool-interface.md`)
+- **generator** — whether the connection provides AI component generation (see `reference/ai-native-tool-interface.md`)
 
 ---
 
@@ -202,4 +212,24 @@ To add a new connection to the pipeline:
 
 - `connections/` is infrastructure scaffolding introduced in Phase 1. Stage integration (wiring detection and graceful degradation into each stage) is Phase 2 work.
 - Phase 8 added five new active connections. Linear and GitHub remain planned for a future phase.
-- The capability matrix columns map to the five pipeline stages: `scan | discover | plan | design | verify`.
+- Phase 14 added four AI-native design tool connections (paper.design, pencil.dev, 21st.dev, Magic Patterns) and the canvas/generator capability columns.
+- The capability matrix columns map to the five pipeline stages: `scan | discover | plan | design | verify`, plus `canvas` and `generator` sub-categories.
+
+---
+
+## Future AI-Native Tools (Backlog)
+
+Candidate tools to integrate using the contract in `reference/ai-native-tool-interface.md`.
+
+| Tool | Sub-category | Priority |
+|------|-------------|----------|
+| Subframe | canvas | high |
+| v0.dev | generator | high |
+| Galileo AI | generator | medium |
+| Builder.io Visual Copilot | canvas + generator | medium |
+| Locofy | generator | low |
+| Anima | canvas | low |
+| Plasmic | generator | medium |
+| TeleportHQ | generator | low |
+
+To add any of these: follow the steps in `reference/ai-native-tool-interface.md §Extending with Future Tools`.

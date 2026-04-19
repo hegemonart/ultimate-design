@@ -4,6 +4,34 @@ All notable changes to get-design-done are documented here. Versions follow [sem
 
 ---
 
+## [1.14.0] — 2026-04-19
+
+### Added — Phase 14: AI-Native Design Tool Connections
+
+- `connections/paper-design.md` — paper.design MCP integration (canvas read/write, budget tracking, 100 calls/week free tier)
+- `connections/pencil-dev.md` — pencil.dev .pen file integration (git-tracked design specs, pre-merge spec-vs-impl diff)
+- `connections/21st-dev.md` — 21st.dev Magic MCP (prior-art gate, component scaffolding, SVGL brand logo lookup)
+- `connections/magic-patterns.md` — Magic Patterns component generator (Claude connector + API key fallback, DS-aware, preview_url)
+- `agents/design-paper-writer.md` — annotate / tokenize / roundtrip modes for paper.design canvas; proposal→confirm, dry-run, budget-aware
+- `agents/design-pencil-writer.md` — annotate / roundtrip modes for .pen files with atomic git commits
+- `agents/design-component-generator.md` — shared component generator (21st.dev + Magic Patterns impl sections); proposal→confirm, DS-aware
+- `reference/ai-native-tool-interface.md` — capability-based contract for canvas + component-generator sub-categories; extension guide for future tools
+- Explore stage: 21st.dev prior-art gate — marketplace search before any greenfield component build; ≥80% fit → adopt recommendation
+- Explore stage: design-system auto-detection (shadcn / tailwind / mantine / chakra) written to STATE.md for generator targeting
+- Verify stage: paper.design component screenshots via `get_screenshot` for `? VISUAL` checks (Phase 4C)
+- Verify stage: pencil.dev spec-vs-implementation diff — compares .pen design-token declarations against actual code values
+
+### Changed
+
+- `connections/connections.md` — added `canvas` and `generator` columns to capability matrix; 4 new rows; backlog of 8 candidate future tools
+- `agents/design-context-builder.md` — Step 0A (paper.design canvas read), Step 0B (pencil.dev .pen discovery), Step 0C (DS detection)
+- `agents/design-verifier.md` — Phase 4C (paper.design screenshots), pencil.dev spec-vs-impl diff block
+- `agents/design-research-synthesizer.md` — .pen file merge into synthesis output
+- `skills/explore/SKILL.md` — probes C/D/E/F (21st.dev, Magic Patterns, paper.design, pencil.dev) + Step 1.5 prior-art gate
+- Version bump to 1.14.0 (milestone.phase.patch scheme: 1.MM.P)
+
+---
+
 ## [1.13.3] — 2026-04-19
 
 ### Added — Phase 13.3: Plugin Update Checker
@@ -35,7 +63,7 @@ All notable changes to get-design-done are documented here. Versions follow [sem
 
 ---
 
-## [1.0.7.2] — 2026-04-19
+## [1.13.2] — 2026-04-19
 
 ### Added — Phase 13.2: External Authority Watcher
 
@@ -56,11 +84,11 @@ All notable changes to get-design-done are documented here. Versions follow [sem
 - `tests/agent-size-budget.test.cjs` — added `M: 300` tier to `TIER_LIMITS` for Worker-tier agents (between `S: 150` and `LARGE: 350`); accommodates CONTEXT D-05's "body ≈ 200–300 lines" target with modest headroom.
 - `test-fixture/baselines/phase-6/agent-list.txt` — appended `design-authority-watcher.md` in sorted position.
 - `test-fixture/baselines/phase-6/skill-list.txt` — appended `watch-authorities` in sorted position.
-- Plugin version: 1.0.7 → 1.0.7.2 (off-cadence decimal patch; 1.0.7.1 was a CHANGELOG-only label consumed by Phase 13.1 Figma MCP consolidation and did not bump manifests). Does not shift the Phase 14 → v1.0.8 cadence.
+- Plugin version: 1.0.7 → 1.13.2 (decimal sub-phase = PATCH bump per new versioning scheme: MAJOR=milestone, MINOR=phase, PATCH=sub-phase). Does not shift the Phase 14 → v1.14.0 cadence.
 
 ---
 
-## [1.0.7.1] — 2026-04-19
+## [1.13.1] — 2026-04-19
 
 ### Changed — Phase 13.1: Figma MCP Consolidation
 - Collapsed the dual Figma MCP setup (local `figma-desktop` for reads + remote `figma` for writes) into the single remote `figma` MCP, which exposes full read parity (`get_metadata`, `get_design_context`, `get_variable_defs`, `get_screenshot`) alongside `use_figma` for writes.
@@ -81,8 +109,8 @@ All notable changes to get-design-done are documented here. Versions follow [sem
   ```
 - No command or flag renames. The `design-figma-writer` agent keeps its name and proposal→confirm UX unchanged.
 
-### Off-cadence note
-- Labelled **v1.0.7.1** per the decimal-phase convention (established by Phase 10.1 → v1.0.4.1). The label is CHANGELOG-only: `package.json`, `.claude-plugin/plugin.json`, and `.claude-plugin/marketplace.json` remain at `1.0.7` so the release workflow does not auto-tag. The next integer bump (Phase 14 → v1.0.8) will absorb these changes implicitly. This matches how Phase 10.1 was handled.
+### Version note
+- Shipped as **v1.13.1** per the new versioning scheme (MAJOR=milestone, MINOR=phase, PATCH=sub-phase). Phase 13.1 is a PATCH bump from v1.13.0. Phase 14 ships as v1.14.0.
 
 ---
 
@@ -164,9 +192,9 @@ All notable changes to get-design-done are documented here. Versions follow [sem
 - `agents/design-discussant.md` logs answer quality after each Q&A exchange
 - Plugin version: 1.0.4.1 → 1.0.5
 
-## [1.0.4.1] — 2026-04-18 (off-cadence patch, retroactive)
+## [1.10.1] — 2026-04-18
 
-**Phase 10.1: Optimization Layer + Cost Governance.** Off-cadence decimal phase — does NOT shift the v1.0.5 / v1.0.6 / v1.0.7 sequence of Phases 11/12/13. `package.json`, `.claude-plugin/plugin.json`, `.claude-plugin/marketplace.json` remain at their post-Phase-11 versions; the v1.0.4.1 identity lives in this entry, the plugin description, and the baseline directory name.
+**Phase 10.1: Optimization Layer + Cost Governance.** Decimal sub-phase = PATCH bump per versioning scheme (MAJOR=milestone, MINOR=phase, PATCH=sub-phase). v1.10.1 follows v1.10.0 (Phase 10) and precedes v1.11.0 (Phase 11).
 
 ### Added
 - `gdd-router` skill — intent → `{path: fast|quick|full, model_tier_overrides, estimated_cost_usd, cache_hits}`. First step of every `/gdd:*` command.

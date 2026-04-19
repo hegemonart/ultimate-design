@@ -32,9 +32,15 @@ const EXPECTED_SEQUENCE = [
 // but do NOT participate in the exact-patch-bump sequence check above.
 //   - 1.0.7.2 → Phase 13.2 (external-authority-watcher); skips 1.0.7.1 which
 //     was reserved for Phase 13.1 (Figma MCP consolidation) per ROADMAP.
+//   - 1.13.3 → Phase 13.3 (plugin-update-checker); Phase 13.3 changed the
+//     versioning scheme from sequential patch (1.0.x) to milestone.phase.patch
+//     (1.MM.P). Off-cadence from the old 1.0.x sequence.
+//   - 1.14.0 → Phase 14 (AI-native design tool connections); first mainline
+//     release under the new milestone.phase.patch scheme.
 const OFF_CADENCE_VERSIONS = new Set([
   '1.0.7.2',
-  '1.13.3',  // Phase 13.3 (Plugin Update Checker) — first version under the new milestone.phase.sub-phase scheme
+  '1.13.3',
+  '1.14.0',
 ]);
 
 test('semver-compare: consecutive versions in sequence are exact patch bumps', () => {

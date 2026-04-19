@@ -53,6 +53,20 @@
     "typical-duration-seconds",
     "writes"
   ],
+  "design-component-generator.md": [
+    "color",
+    "default-tier",
+    "description",
+    "model",
+    "name",
+    "parallel-safe",
+    "reads-only",
+    "size_budget",
+    "tier-rationale",
+    "tools",
+    "typical-duration-seconds",
+    "writes"
+  ],
   "design-context-builder.md": [
     "color",
     "default-tier",
@@ -190,6 +204,20 @@
     "typical-duration-seconds",
     "writes"
   ],
+  "design-paper-writer.md": [
+    "color",
+    "default-tier",
+    "description",
+    "model",
+    "name",
+    "parallel-safe",
+    "reads-only",
+    "size_budget",
+    "tier-rationale",
+    "tools",
+    "typical-duration-seconds",
+    "writes"
+  ],
   "design-pattern-mapper.md": [
     "color",
     "default-tier",
@@ -198,6 +226,20 @@
     "name",
     "parallel-safe",
     "reads-only",
+    "tier-rationale",
+    "tools",
+    "typical-duration-seconds",
+    "writes"
+  ],
+  "design-pencil-writer.md": [
+    "color",
+    "default-tier",
+    "description",
+    "model",
+    "name",
+    "parallel-safe",
+    "reads-only",
+    "size_budget",
     "tier-rationale",
     "tools",
     "typical-duration-seconds",
