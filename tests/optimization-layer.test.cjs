@@ -20,11 +20,11 @@ const { REPO_ROOT, scaffoldDesignDir, readFrontmatter } = require('./helpers.cjs
 
 const COSTS_JSONL = path.join(
   REPO_ROOT,
-  'test-fixture/baselines/phase-11/sample-costs.jsonl'
+  'test-fixture/baselines/current/sample-costs.jsonl'
 );
 const AGENT_METRICS = path.join(
   REPO_ROOT,
-  'test-fixture/baselines/phase-11/sample-agent-metrics.json'
+  'test-fixture/baselines/current/sample-agent-metrics.json'
 );
 
 test('optimization-layer: budget.json schema contract', () => {

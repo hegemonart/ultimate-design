@@ -6,7 +6,7 @@ const path = require('path');
 const { execSync } = require('child_process');
 const { REPO_ROOT } = require('./helpers.cjs');
 
-const BASELINE_DIR = path.join(REPO_ROOT, 'test-fixture', 'baselines', 'phase-6');
+const BASELINE_DIR = path.join(REPO_ROOT, 'test-fixture', 'baselines', 'current');
 
 function readBaseline(filename) {
   return fs.readFileSync(path.join(BASELINE_DIR, filename), 'utf8').trim();
@@ -46,7 +46,7 @@ test('baseline: agent-list matches committed agents/ files', () => {
     .filter(f => f.startsWith('design-') && f.endsWith('.md'))
     .sort();
   assert.deepEqual(actual, expected,
-    `Agent list drift detected. Expected:\n${expected.join('\n')}\nActual:\n${actual.join('\n')}\n\nIf intentional, re-lock the baseline per test-fixture/baselines/phase-6/README.md`
+    `Agent list drift detected. Expected:\n${expected.join('\n')}\nActual:\n${actual.join('\n')}\n\nIf intentional, re-lock per test-fixture/baselines/current/README.md`
   );
 });
 

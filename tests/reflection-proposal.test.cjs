@@ -5,7 +5,7 @@
  * Validates that agents/design-reflector.md output is always proposal-shaped
  * (never auto-applied) and /gdd:apply-reflections requires explicit
  * confirmation. Also checks the locked fixture at
- * test-fixture/baselines/phase-11/expected-reflection-proposals.json.
+ * test-fixture/baselines/current/expected-reflection-proposals.json.
  */
 
 const { test } = require('node:test');
@@ -18,7 +18,7 @@ const REFLECTOR = path.join(REPO_ROOT, 'agents/design-reflector.md');
 const APPLY_SKILL = path.join(REPO_ROOT, 'skills/apply-reflections/SKILL.md');
 const FIXTURE = path.join(
   REPO_ROOT,
-  'test-fixture/baselines/phase-11/expected-reflection-proposals.json'
+  'test-fixture/baselines/current/expected-reflection-proposals.json'
 );
 
 // All five proposal-type tags declared in the reflector.

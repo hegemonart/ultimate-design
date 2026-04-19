@@ -60,32 +60,20 @@ test('pipeline-smoke: each stage skill declares its DESIGN-*.md write target', (
   }
 });
 
-test('pipeline-smoke: baseline manifest exists for at least one executed phase', () => {
-  const baselineRoot = path.join(REPO_ROOT, 'test-fixture', 'baselines');
-  assert.ok(fs.existsSync(baselineRoot), 'test-fixture/baselines/ must exist');
+test('pipeline-smoke: current baseline manifest exists', () => {
+  const currentDir = path.join(REPO_ROOT, 'test-fixture', 'baselines', 'current');
+  assert.ok(fs.existsSync(currentDir), 'test-fixture/baselines/current/ must exist');
 
-  const phaseDirs = fs.readdirSync(baselineRoot)
-    .filter(d => /^phase-/.test(d))
-    .map(d => path.join(baselineRoot, d));
-
-  let foundManifest = false;
-  for (const dir of phaseDirs) {
-    const entries = fs.readdirSync(dir);
-    const hasManifest = entries.some(e =>
-      e === 'BASELINE.md' ||
-      e === 'README.md' ||
-      e === 'baseline-manifest.md' ||
-      e === 'agent-list.txt' ||
-      e === 'skill-list.txt' ||
-      e === 'connection-list.txt'
-    );
-    if (hasManifest) {
-      foundManifest = true;
-      break;
-    }
-  }
+  const entries = fs.readdirSync(currentDir);
+  const hasManifest = entries.some(e =>
+    e === 'BASELINE.md' ||
+    e === 'README.md' ||
+    e === 'agent-list.txt' ||
+    e === 'skill-list.txt' ||
+    e === 'connection-list.txt'
+  );
   assert.ok(
-    foundManifest,
-    'At least one test-fixture/baselines/phase-*/ must contain a manifest (BASELINE.md, README.md, baseline-manifest.md, or a *-list.txt file)'
+    hasManifest,
+    'test-fixture/baselines/current/ must contain a manifest (BASELINE.md, README.md, or a *-list.txt file)'
   );
 });

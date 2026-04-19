@@ -110,16 +110,10 @@ jobs:
         with:
           node-version: 22
 
-      - name: Run release smoke test against phase-13 baseline
+      - name: Run release smoke test against current baseline
         run: |
           set -euo pipefail
-          if [ -d test-fixture/baselines/phase-13 ]; then
-            BASELINE=test-fixture/baselines/phase-13
-          else
-            echo "phase-13 baseline not yet present — falling back to phase-11 (plan 13-08 locks phase-13)"
-            BASELINE=test-fixture/baselines/phase-11
-          fi
-          node scripts/release-smoke-test.cjs --baseline "$BASELINE"
+          node scripts/release-smoke-test.cjs --baseline test-fixture/baselines/current
 
       - name: Rollback guidance on failure
         if: failure()

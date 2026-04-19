@@ -51,22 +51,25 @@ Phase-closeout PRs bump the plugin version:
 
 ## Baseline relock how-to
 
-Baselines live at `test-fixture/baselines/phase-<N>/`. If a phase changes
-agent behavior such that the release smoke test would flag a diff, relock
-the baseline as part of the phase-closeout PR:
+The baseline lives at `test-fixture/baselines/current/` and is updated
+in-place — no new phase subdirectories are created. If a change adds,
+renames, or removes agents/skills/connections, or changes `build-intel.cjs`
+output, relock as part of the closeout PR. Full procedure in
+`test-fixture/baselines/current/README.md`. In short:
 
-1. Rerun the deterministic portion of `/gdd:explore` on `test-fixture/src/`:
+```bash
+git ls-files agents/ | grep 'design-.*\.md' | xargs -I{} basename {} | sort \
+  > test-fixture/baselines/current/agent-list.txt
+git ls-files skills/ | awk -F/ 'NF>=2{print $2}' | sort -u \
+  > test-fixture/baselines/current/skill-list.txt
+ls connections/*.md | xargs -I{} basename {} | sort \
+  > test-fixture/baselines/current/connection-list.txt
+node -e "process.stdout.write(require('./.claude-plugin/plugin.json').version + '\n')" \
+  > test-fixture/baselines/current/plugin-version.txt
+```
 
-   ```bash
-   TMPDIR=$(mktemp -d)
-   cp -r test-fixture/src/* "$TMPDIR/"
-   (cd "$TMPDIR" && node "$OLDPWD/scripts/build-intel.cjs" .)
-   ```
-
-2. Copy the resulting `.design/intel/*.json` plus any `DESIGN-CONTEXT.md` fragments into `test-fixture/baselines/phase-<N>/`.
-3. Write a short `BASELINE.md` in the new phase directory documenting what changed vs the prior baseline.
-4. Update `scripts/release-smoke-test.cjs` + `.github/workflows/release.yml` release-smoke-test step if the artifact shape changed.
-5. Include the baseline commit in the phase-closeout PR.
+Then update `BASELINE.md`, run `npm test`, and include the updated
+`current/` in your PR.
 
 ## Adding CI checks
 
