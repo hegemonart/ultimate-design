@@ -1,11 +1,11 @@
 ---
 gsd_state_version: 1.0
-milestone: v1.0.7.2
+milestone: v1.13.3
 milestone_name: milestone
-status: Phase 13.2 COMPLETE — v1.0.7.2 shipped
-stopped_at: Completed 13.2-04-PLAN.md — Phase 13.2 closed
-last_updated: "2026-04-19T22:21:50.000Z"
-last_activity: 2026-04-19 -- Phase 13.2 complete (v1.0.7.2 shipped — rejected-kinds + watcher-diff-structural-v1 tests; atomic manifests bump; CHANGELOG + README; 233/0/1 suite green)
+status: Phase 13.3 COMPLETE — v1.13.3 shipped
+stopped_at: Phase 13.3 complete — v1.13.3 shipped; versioning scheme migrated to MAJOR.MINOR.PATCH
+last_updated: "2026-04-19T23:59:00.000Z"
+last_activity: 2026-04-19 — Phase 13.3 complete (v1.13.3 shipped — update-check hook, design-update-checker agent, /gdd:check-update skill; versioning scheme migrated to MAJOR.MINOR.PATCH)
 progress:
   total_phases: 21
   completed_phases: 1
@@ -21,25 +21,24 @@ progress:
 See: .planning/PROJECT.md (updated 2026-04-17)
 
 **Core value:** Any developer can run the full pipeline on a real project and receive measurable, specific design improvement — not generic AI advice.
-**Current focus:** Phase 13.2 — external-authority-watcher
+**Current focus:** Phase 14 — AI-Native Design Tool Connections (paper.design + pencil.dev) — next up
 
 ## Current Position
 
-Phase: 13.2 (external-authority-watcher) — **COMPLETE**
-Plan: 4 of 4 (ALL PLANS SHIPPED)
-Shipping: **v1.0.7.2** — off-cadence decimal patch (skips 1.0.7.1, reserved for Phase 13.1)
-Previous release: v1.0.7 at https://github.com/hegemonart/get-design-done/releases/tag/v1.0.7
-Next phase: 14 (AI-Native Design Tool Connections) — not yet started
-Last activity: 2026-04-19 -- Phase 13.2 Plan 04 complete (rejected-kinds + watcher-diff-structural-v1 CI tests; atomic v1.0.7.2 bump across 3 manifests; CHANGELOG + README shipped; full test suite 233/0/1 green; schemas + semver-compare relaxed via Rule 3 to accept the locked 4-segment off-cadence version)
+Phase: 13.3 (Plugin Update Checker) — **COMPLETE**
+Released: **v1.13.3** at https://github.com/hegemonart/get-design-done/releases/tag/v1.13.3
+Next phase: 14 (AI-Native Design Tool Connections) → v1.14.0 — not yet started
+Last activity: 2026-04-19
 
-Resume file: (none — Phase 13.2 closed; Phase 14 discuss-phase is next)
+Resume file: (none — Phase 13.3 closed; ready to start Phase 14)
 
-Progress: [█████████████████░░░] 79% (15/19 phases complete through v1.0.7.2)
+Progress: [█████████████████░░░] 79% (17/22 phases complete through v1.13.3)
 
-## Phases completed (through v1.0.7)
+## Phases completed (through v1.13.3)
+
+Versioning: MAJOR=milestone, MINOR=phase, PATCH=sub-phase. Historical npm tags in parens where different.
 
 | Phase | Version | Shipped |
-|-------|---------|---------|
 | 1  — Foundation + Distribution + Infrastructure | — | 2026-04-17 |
 | 2  — Core Agents + Stage Orchestration | — | 2026-04-17 |
 | 3  — Quality Gate Agents + Pipeline Polish | — | 2026-04-17 |
@@ -50,11 +49,13 @@ Progress: [█████████████████░░░] 79% (15
 | 8  — Visual + Design-Side Connections + Knowledge Graph | v1.0.2 | 2026-04-18 |
 | 9  — Claude Design Integration + Pinterest Connection | v1.0.3 | 2026-04-18 |
 | 10 — Knowledge Layer | v1.0.4 | 2026-04-18 |
-| 10.1 — Optimization Layer + Cost Governance (INSERTED) | v1.0.4.1 | 2026-04-18 |
+| 10.1 — Optimization Layer + Cost Governance (INSERTED) | v1.10.1 | 2026-04-18 |
 | 11 — Self-Improvement | v1.0.5 | 2026-04-18 |
 | 12 — Test Coverage | v1.0.6 | 2026-04-18 |
-| 13 — CI/CD | v1.0.7 | 2026-04-18 |
-| 13.2 — External Authority Watcher (INSERTED) | v1.0.7.2 | 2026-04-19 |
+| 13 — CI/CD | v1.13.0 | 2026-04-18 |
+| 13.1 — Figma MCP Consolidation (INSERTED) | v1.13.1 | 2026-04-19 |
+| 13.2 — External Authority Watcher (INSERTED) | v1.13.2 | 2026-04-19 |
+| 13.3 — Plugin Update Checker (INSERTED) | v1.13.3 | 2026-04-19 |
 
 ## Open follow-ups
 

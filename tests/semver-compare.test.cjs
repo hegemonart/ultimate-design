@@ -37,10 +37,13 @@ const EXPECTED_SEQUENCE = [
 //     (1.MM.P). Off-cadence from the old 1.0.x sequence.
 //   - 1.14.0 → Phase 14 (AI-native design tool connections); first mainline
 //     release under the new milestone.phase.patch scheme.
+//   - 1.14.1 → Security hardening patch (shell injection, CI pinning, prompt
+//     injection consolidation, spend aggregation fixes).
 const OFF_CADENCE_VERSIONS = new Set([
   '1.0.7.2',
   '1.13.3',
   '1.14.0',
+  '1.14.1',
 ]);
 
 test('semver-compare: consecutive versions in sequence are exact patch bumps', () => {

@@ -35,6 +35,8 @@ Flags can be combined: `--refresh --prompt` is valid (re-fetch, then enrich). `-
     - Print: `No cache. Network may be unreachable or the hook has not run yet. Try /gdd:check-update --refresh.`
     - Exit.
 
+<!-- markdownlint-disable MD025 -->
+
 4. **Dismiss path** (if `--dismiss` in flags):
     Compute new config contents and write atomically. The python heredoc receives CONFIG_PATH and LATEST_TAG via the ENVIRONMENT (env-prefix form — `KEY=VALUE python3 <<PY`), NOT via trailing argv. Passing `python3 -c '...' KEY=VALUE` makes Python treat the assignments as `sys.argv`, which the old draft did incorrectly; env-prefix form is the portable fix.
 

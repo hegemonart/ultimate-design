@@ -4,6 +4,23 @@ All notable changes to get-design-done are documented here. Versions follow [sem
 
 ---
 
+## [1.14.1] — 2026-04-19
+
+### Fixed — Security hardening (full codebase review)
+
+- **CR-01** `scripts/build-intel.cjs` — replaced `execSync` template literal with `spawnSync` argv array; eliminates command injection via crafted filenames in the project tree. Added 5 s timeout to all git calls.
+- **CR-02** `hooks/update-check.sh` — validate `LATEST_TAG` against a semver pattern before writing to cache; strip double-quotes from `BODY_EXCERPT` to prevent injection via adversarial release body.
+- **CR-03** `.github/workflows/ci.yml` — pin `ludeeus/action-shellcheck` from `@master` (mutable) to `@2.0.0` (supply-chain hardening).
+- **WR-01** `scripts/injection-patterns.cjs` — new shared source of truth for prompt-injection patterns; both the runtime hook and CI scanner now require from it, eliminating silent pattern drift.
+- **WR-02** `hooks/budget-enforcer.js` — phase spend now read from the lightweight `phase-totals.json` written by the aggregator instead of replaying the full `costs.jsonl` on every agent spawn (O(1) vs O(n)).
+- **WR-04** `hooks/update-check.sh` — allowlist-gate `C_DELTA` after cache read (`major|minor|patch|off-cadence|none`) before it reaches any shell context.
+- **WR-05** `scripts/tests/test-authority-watcher-diff.sh` — replace `find | wc -l` with null-delimited loop; handles filenames with newlines.
+- **WR-06** `tests/regression-baseline.test.cjs` — replace `execSync` template literal with `spawnSync` in git helpers.
+- **WR-07** `tests/optimization-layer.test.cjs` — fix budget schema test to match the actual `loadBudget()` format (`per_task_cap_usd`, `per_phase_cap_usd`, `enforcement_mode`, …); previous test validated a dead schema shape.
+- **IN-02** `hooks/budget-enforcer.js` — detached aggregator child now inherits only `PATH`, not full `process.env`.
+
+---
+
 ## [1.14.0] — 2026-04-19
 
 ### Added — Phase 14: AI-Native Design Tool Connections
