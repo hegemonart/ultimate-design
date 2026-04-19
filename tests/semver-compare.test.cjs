@@ -34,6 +34,7 @@ const EXPECTED_SEQUENCE = [
 //     was reserved for Phase 13.1 (Figma MCP consolidation) per ROADMAP.
 const OFF_CADENCE_VERSIONS = new Set([
   '1.0.7.2',
+  '1.13.3',  // Phase 13.3 (Plugin Update Checker) — first version under the new milestone.phase.sub-phase scheme
 ]);
 
 test('semver-compare: consecutive versions in sequence are exact patch bumps', () => {
