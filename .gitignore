@@ -18,6 +18,13 @@ node_modules/
 # Development planning artifacts (not part of plugin distribution)
 .planning/
 
+# Admin-only scripts and docs (not for plugin users)
+reference/BRANCH-PROTECTION.md
+scripts/apply-branch-protection.sh
+
+# Transient review/audit artifacts
+REVIEW.md
+
 # Claude local state (private — do not distribute)
 .claude/memory/
 .claude/settings.local.json
