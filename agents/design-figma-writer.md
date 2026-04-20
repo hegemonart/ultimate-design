@@ -1,7 +1,7 @@
 ---
 name: design-figma-writer
 description: Writes design decisions back to Figma — annotations, token bindings, Code Connect mappings, and implementation-status write-back. Operates in proposal→confirm mode by default. Accepts --dry-run (emit proposal without executing) and --confirm-shared (required for writes to team library components).
-tools: Read, Write, Bash, Grep, Glob, mcp__figma__use_figma, mcp__figma__get_variable_defs, mcp__figma__get_metadata
+tools: Read, Write, Bash, Grep, Glob, {P}use_figma, mcp__figma__get_variable_defs, mcp__figma__get_metadata, mcp__Figma__use_figma, mcp__Figma__get_variable_defs, mcp__Figma__get_metadata
 color: purple
 model: inherit
 default-tier: sonnet
@@ -11,7 +11,7 @@ parallel-safe: never
 typical-duration-seconds: 120
 reads-only: false
 writes:
-  - "Figma file (via mcp__figma__use_figma) — annotations, token bindings, Code Connect mappings"
+  - "Figma file (via {resolved_prefix}use_figma — remote MCP only) — annotations, token bindings, Code Connect mappings"
 ---
 
 @reference/shared-preamble.md
@@ -26,15 +26,17 @@ You are design-figma-writer. You write design decisions from `.design/DESIGN-CON
 
 ## Step 0 — Remote MCP Probe
 
-Run this probe at agent entry before any other action:
+Writes require a remote Figma MCP variant (`use_figma` is remote-only). Run this probe at agent entry before any other action:
 
 ```
-ToolSearch({ query: "select:mcp__figma__use_figma", max_results: 1 })
-→ Empty result  → Write to output: "Figma remote MCP not available. Register it with: claude mcp add figma --transport http https://mcp.figma.com/v1/sse  Then restart the session." → STOP (do not proceed).
-→ Non-empty     → proceed to Step 1
+ToolSearch({ query: "figma use_figma", max_results: 10 })
+
+Parse tool names matching /^mcp__([^_]*figma[^_]*)__use_figma$/i → write-capable prefix set.
+  Empty → Write to output: "Figma remote MCP not available (writes require the remote server, not desktop). Preferred install: `claude plugin install figma@claude-plugins-official`. Manual: `claude mcp add --transport http figma https://mcp.figma.com/mcp`. Then restart the session." → STOP.
+  One+  → pick prefix via tiebreaker (1) `figma` > others (2) non-`figma-desktop` (3) alphabetical. Record resolved prefix for use in Steps 1–5.
 ```
 
-Note: `mcp__figma__use_figma` is the remote Figma MCP (registered as server `figma`). Reads (`mcp__figma__get_metadata`, `mcp__figma__get_variable_defs`) live on the same server. As of v1.0.7.1, there is no separate read-only desktop MCP — the remote MCP is the single supported Figma connection.
+Note: the remote Figma MCP (canonical server name `figma`, URL `https://mcp.figma.com/mcp`) exposes both reads (`get_metadata`, `get_variable_defs`) and writes (`use_figma`) on the same server. The desktop MCP (`figma-desktop`) exposes reads only and cannot be used for writes — this agent STOPs if only a desktop variant is detected.
 
 ---
 
@@ -72,12 +74,11 @@ Read `.design/DESIGN-CONTEXT.md`. Extract the relevant data for the selected mod
 - For `tokenize`: color/spacing/type literal values that could map to Figma variables — look for hex values, spacing scales, and typography sizes in the decisions section
 - For `mappings`: component names and their source file paths — look for component listings, file paths, and implementation references
 
-Also read the active Figma file structure using the remote MCP (reads and writes share the same server):
+Also read the active Figma file structure. Use the resolved prefix from Step 0 (written here as `{P}` for short — e.g., `mcp__figma__`). Reads and writes share the same server:
 
 ```
-ToolSearch({ query: "select:mcp__figma__get_metadata,mcp__figma__get_variable_defs", max_results: 2 })
-mcp__figma__get_metadata()       // lightweight layer outline
-mcp__figma__get_variable_defs()  // for tokenize mode — variable names and values
+{P}get_metadata()       // lightweight layer outline
+{P}get_variable_defs()  // for tokenize mode — variable names and values
 ```
 
 If `get_metadata` errors (no file accessible), write: "No Figma file is accessible. Open the target file in Figma and retry." and STOP.
@@ -157,12 +158,12 @@ Wait for user response. If response is not "yes", STOP with "Cancelled."
 
 ## Step 5 — Execute Writes
 
-For each operation in the proposal, call `mcp__figma__use_figma` with the appropriate operation payload.
+For each operation in the proposal, call `{P}use_figma` with the appropriate operation payload.
 
 For `annotate`:
 
 ```javascript
-mcp__figma__use_figma({
+{P}use_figma({
   operation: "add_comment",
   layerId: "<layer-id>",
   message: "<annotation text>"
@@ -172,7 +173,7 @@ mcp__figma__use_figma({
 For `tokenize`:
 
 ```javascript
-mcp__figma__use_figma({
+{P}use_figma({
   operation: "set_variable_binding",
   nodeId: "<node-id>",
   field: "fills[0].color",
@@ -183,7 +184,7 @@ mcp__figma__use_figma({
 For `mappings`:
 
 ```javascript
-mcp__figma__use_figma({
+{P}use_figma({
   operation: "set_code_connect",
   componentId: "<component-id>",
   filePath: "<relative-path>",
@@ -266,7 +267,7 @@ If user says "edit": allow user to modify proposal, then re-confirm.
 
 For each confirmed annotation:
 ```javascript
-mcp__figma__use_figma({
+{P}use_figma({
   operation: "add_comment",
   layerId: "<frame-node-id>",
   message: "Implementation: <status> — verified <ISO date>"
@@ -277,7 +278,7 @@ mcp__figma__use_figma({
 
 For each confirmed Code Connect mapping:
 ```javascript
-mcp__figma__use_figma({
+{P}use_figma({
   operation: "set_code_connect",
   componentId: "<component-node-id>",
   filePath: "<relative-code-path>",
@@ -287,7 +288,7 @@ mcp__figma__use_figma({
 
 After all individual mappings, send the batch:
 ```javascript
-mcp__figma__use_figma({
+{P}use_figma({
   operation: "send_code_connect_mappings"
 })
 ```

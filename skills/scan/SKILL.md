@@ -39,18 +39,30 @@ At scan entry, before running any step:
 
 Run both probes below. MCP tools may be in the deferred tool set — **always call ToolSearch first**; without it, a deferred tool invocation fails silently.
 
-**Figma probe (single probe covers both reads and writes — remote MCP exposes `get_metadata`, `get_variable_defs`, `use_figma` on the same server):**
+**Figma probe (variant-agnostic — resolves any server prefix matching `/figma/i`):**
 
 ```
-Step A1 — ToolSearch check:
-  ToolSearch({ query: "select:mcp__figma__get_metadata", max_results: 1 })
-  → Empty result      → figma: not_configured  (skip all Figma steps)
-  → Non-empty result  → proceed to Step A2
+Step A1 — Keyword ToolSearch:
+  ToolSearch({ query: "figma get_metadata use_figma", max_results: 10 })
 
-Step A2 — Live tool call:
-  call mcp__figma__get_metadata
-  → Success           → figma: available   (reads AND use_figma writes both available)
-  → Error             → figma: unavailable  (skip all Figma steps)
+  Parse results for tool names matching:
+    - /^mcp__([^_]*figma[^_]*)__get_metadata$/i  → read-capable prefix set
+    - /^mcp__([^_]*figma[^_]*)__use_figma$/i     → write-capable prefix set
+
+  Empty read set      → figma: not_configured   (skip all Figma steps)
+  One or more matches → proceed to Step A2
+
+Step A2 — Tiebreaker selection:
+  Preference order when multiple read prefixes match:
+    1. Prefer prefixes that appear in BOTH read set and write set
+    2. Prefer `figma` (canonical remote server name)
+    3. Prefer non-`figma-desktop`
+    4. Alphabetical
+
+Step A3 — Live tool call on resolved prefix:
+  call mcp__<prefix>__get_metadata
+  → Success → figma: available (prefix=mcp__<prefix>__, writes=<true|false>)
+  → Error   → figma: unavailable  (skip all Figma steps)
 ```
 
 **Refero probe:**
@@ -228,7 +240,7 @@ Produce a color inventory table:
 
 ### If `figma: available`
 
-Call `mcp__figma__get_variable_defs` (no arguments — returns all variables in the active Figma file).
+Read the resolved prefix from STATE.md `<connections>` (e.g., `prefix=mcp__figma__` or `prefix=mcp__figma-desktop__`) and call `{prefix}get_variable_defs` (no arguments — returns all variables in the active Figma file).
 
 > If no Figma file is open, the call errors. Treat any error as a graceful skip: update STATE.md `<connections>` to `figma: unavailable` and continue with Step 2 results only.
 

@@ -8,7 +8,7 @@ This directory contains connection specifications for external tools and MCPs th
 
 | Connection | Status | Spec File | Notes |
 |-----------|--------|-----------|-------|
-| Figma | Active | [`connections/figma.md`](connections/figma.md) | Uses `mcp__figma__*` tools (remote Figma MCP; reads + writes) |
+| Figma | Active | [`connections/figma.md`](connections/figma.md) | Auto-detects any Figma MCP variant (remote reads+writes, desktop reads-only); prefix resolved at probe time |
 | Refero | Active | [`connections/refero.md`](connections/refero.md) | Uses `mcp__refero__*` tools (verify names via ToolSearch) |
 | Preview | Active | [`connections/preview.md`](connections/preview.md) | Uses `mcp__Claude_Preview__*` tools |
 | Storybook | Active | [`connections/storybook.md`](connections/storybook.md) | HTTP probe: `localhost:6006/index.json` |
@@ -83,18 +83,30 @@ refero: not_configured
 
 **Figma probe (execute at stage entry, after reading STATE.md):**
 
-One probe covers both reads and writes — the remote Figma MCP is a single server exposing `get_metadata`, `get_variable_defs`, `get_design_context`, `get_screenshot`, and `use_figma` together.
+The probe is variant-agnostic — it resolves any server whose prefix matches `/figma/i` (e.g., `figma`, `Figma`, `figma-desktop`, UUID-prefixed remote instances) and records the resolved prefix plus writes capability. Remote MCP exposes `use_figma` (writes-capable). Desktop MCP exposes reads only.
 
 ```
-Step A1 — ToolSearch check:
-  ToolSearch({ query: "select:mcp__figma__get_metadata", max_results: 1 })
-  → Empty result      → figma: not_configured  (skip all Figma steps)
-  → Non-empty result  → proceed to Step A2
+Step A1 — Keyword ToolSearch:
+  ToolSearch({ query: "figma get_metadata use_figma", max_results: 10 })
 
-Step A2 — Live tool call:
-  call mcp__figma__get_metadata
-  → Success           → figma: available   (reads AND use_figma writes both available)
-  → Error             → figma: unavailable (skip all Figma steps)
+  Parse tool names for:
+    /^mcp__([^_]*figma[^_]*)__get_metadata$/i  → read-capable prefix set
+    /^mcp__([^_]*figma[^_]*)__use_figma$/i     → write-capable prefix set
+
+  Empty read set → figma: not_configured (skip all Figma steps)
+  One+ matches  → proceed to Step A2
+
+Step A2 — Tiebreaker selection:
+  Preference order when multiple read prefixes match:
+    (1) both-sets > reads-only
+    (2) `figma` > others
+    (3) non-`figma-desktop` > desktop
+    (4) alphabetical
+
+Step A3 — Live tool call on resolved prefix:
+  call mcp__<prefix>__get_metadata
+  → Success → figma: available (prefix=mcp__<prefix>__, writes=<true|false>)
+  → Error   → figma: unavailable (skip all Figma steps)
 
 Write figma status to STATE.md <connections>.
 ```

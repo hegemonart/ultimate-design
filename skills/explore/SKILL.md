@@ -17,11 +17,20 @@ tools: Read, Write, Bash, Grep, Glob, Task, AskUserQuestion
 
 Probe connection availability and update `.design/STATE.md` `<connections>`:
 
-**A — Figma probe:**
+**A — Figma probe (variant-agnostic):**
 ```
-ToolSearch({ query: "select:mcp__figma__get_metadata", max_results: 1 })
-Empty → figma: not_configured
-Non-empty → call mcp__figma__get_metadata; success → available; error → unavailable
+ToolSearch({ query: "figma get_metadata use_figma", max_results: 10 })
+Parse tool names matching /^mcp__([^_]*figma[^_]*)__(get_metadata|use_figma)$/i
+  into read-capable and write-capable prefix sets.
+Empty read set → figma: not_configured
+One+ matches  → pick prefix via tiebreaker:
+                (1) both-sets > reads-only,
+                (2) `figma` > others,
+                (3) non-`figma-desktop` > desktop,
+                (4) alphabetical.
+Then call {prefix}get_metadata:
+  success → figma: available (prefix=mcp__<prefix>__, writes=<true|false>)
+  error   → figma: unavailable
 ```
 
 **B — Refero probe:**
@@ -131,7 +140,7 @@ Read in this order:
 4. `.design/DESIGN-CONTEXT.md` if it exists — `<gray_areas>` block lists unresolved topics
 5. `./.claude/skills/design-*-conventions.md` if any — locked project conventions, treat as authoritative
 
-If `<connections>` in STATE.md shows `figma: available`, call `mcp__figma__get_variable_defs` and draft tentative D-XX entries (mark `(tentative — confirm with user)`) before asking.
+If `<connections>` in STATE.md shows `figma: available`, read the resolved `prefix=` from the same line and call `{prefix}get_variable_defs`, then draft tentative D-XX entries (mark `(tentative — confirm with user)`) before asking.
 
 ### 3.b — Identify question set
 

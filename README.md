@@ -329,7 +329,7 @@ Every connection is optional. The pipeline degrades gracefully — a grep-based 
 
 | Connection | Type | Purpose |
 |-----------|------|---------|
-| Figma | MCP (`mcp__figma__*`, remote) | Token extraction, design context pre-population, write-back via `use_figma` (annotate, tokenize, Code Connect) |
+| Figma | MCP (auto-detects any `/figma/i` server — remote or desktop) | Token extraction, design context pre-population, write-back via `use_figma` (remote only; annotate, tokenize, Code Connect) |
 | Refero | MCP (`mcp__refero__*`) | Reference design search during exploration |
 | Pinterest | MCP (`mcp__mcp-pinterest__*`) | Visual inspiration boards alongside Refero |
 | Preview (Playwright) | MCP (`mcp__Claude_Preview__*`) | Live page screenshots for visual verification |
@@ -603,13 +603,23 @@ All connections are optional — the pipeline degrades gracefully when any conne
 
 ### Figma MCP (reads + writes)
 
-One remote MCP covers both reads and writes. When active, `explore` reads Figma variables and pre-populates design decisions from your file, and `design-figma-writer` writes decisions back via `use_figma` — annotates frames, tokenizes local styles, registers Code Connect mappings. Proposal → confirm discipline with `--dry-run` and `--confirm-shared` guards. Falls back to code-only analysis when the MCP is not configured. One install command unlocks both:
+The pipeline auto-detects any Figma MCP variant — remote (reads + writes) or desktop (reads only). When active, `explore` reads Figma variables and pre-populates design decisions from your file, and `design-figma-writer` writes decisions back via `use_figma` — annotates frames, tokenizes local styles, registers Code Connect mappings. Proposal → confirm discipline with `--dry-run` and `--confirm-shared` guards. Falls back to code-only analysis when no Figma MCP is configured.
+
+**Preferred install (Claude Code plugin — bundles MCP + Figma's official skills):**
 
 ```
-claude mcp add figma --transport http https://mcp.figma.com/v1/sse
+claude plugin install figma@claude-plugins-official
 ```
 
-Setup: [`connections/figma.md`](connections/figma.md). If you previously installed the local `figma-desktop` MCP, you can remove it — its read tools are now exposed on the remote server.
+**Manual install (remote MCP — reads + writes):**
+
+```
+claude mcp add --transport http figma https://mcp.figma.com/mcp
+```
+
+**Desktop MCP (reads only):** optionally enabled via the Figma desktop app's Dev Mode. Useful when writes are not needed. Register under server name `figma-desktop` — the probe auto-detects it.
+
+Setup: [`connections/figma.md`](connections/figma.md). If you previously registered the remote MCP with the legacy URL `https://mcp.figma.com/v1/sse`, remove and re-add with the current URL `https://mcp.figma.com/mcp` (Streamable HTTP).
 
 ### Refero MCP
 

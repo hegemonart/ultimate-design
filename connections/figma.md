@@ -1,6 +1,11 @@
 # Figma MCP — Connection Specification
 
-This file is the connection specification for the Figma MCP (remote, read + write) within the get-design-done pipeline. One server exposes both read tools (`get_metadata`, `get_design_context`, `get_variable_defs`, `get_screenshot`) and the write tool `use_figma`. See `connections/connections.md` for the full connection index and capability matrix.
+This file is the connection specification for the Figma MCP within the get-design-done pipeline. Figma publishes two MCP variants, both officially supported:
+
+- **Remote MCP** (`https://mcp.figma.com/mcp`) — full read + write. Exposes read tools (`get_metadata`, `get_design_context`, `get_variable_defs`, `get_screenshot`, `get_figjam`, `search_design_system`) and remote-only write tools (`use_figma`, `generate_figma_design`, `create_new_file`, `whoami`).
+- **Desktop MCP** (local HTTP, served by the Figma desktop app in Dev Mode) — reads only. Exposes the same read tools but not `use_figma`. Useful for offline/no-network reads.
+
+The pipeline auto-detects any server whose name matches `/figma/i` (e.g., `figma`, `Figma`, `figma-desktop`, UUID-prefixed instances) and records the resolved prefix plus `writes` capability in `STATE.md`. See `connections/connections.md` for the full connection index and capability matrix.
 
 ---
 
@@ -9,29 +14,46 @@ This file is the connection specification for the Figma MCP (remote, read + writ
 **Prerequisites:**
 
 - A Figma account (OAuth on first use at `mcp.figma.com`).
-- Figma file access for any file you intend to read or write. No desktop app install required.
+- Figma file access for any file you intend to read or write.
+- (Optional for desktop variant) Figma desktop app running with the target file open in Dev Mode.
 
-**Install command (Claude Code):**
+### Option A — Claude Code plugin (preferred)
+
+Anthropic publishes an official Figma plugin that bundles the MCP configuration plus Figma's agent skills:
 
 ```
-claude mcp add figma --transport http https://mcp.figma.com/v1/sse
+claude plugin install figma@claude-plugins-official
 ```
 
-After running this command, restart the Claude Code session. On first use, Claude Code prompts you to complete the OAuth flow at `mcp.figma.com`. One `claude mcp add` unlocks both reads and writes — there is no separate writer MCP.
+Restart the Claude Code session after install. OAuth prompts on first tool call.
+
+### Option B — Manual remote MCP install
+
+```
+claude mcp add --transport http figma https://mcp.figma.com/mcp
+```
+
+Restart the session. OAuth prompts on first tool call. One install unlocks both reads and writes.
+
+> **Note:** The legacy server URL `https://mcp.figma.com/v1/sse` is superseded. Current canonical URL is `https://mcp.figma.com/mcp` (Streamable HTTP). Remove any prior registration using the old URL: `claude mcp remove figma` then re-run the install command above.
+
+### Option C — Desktop MCP (reads only)
+
+The Figma desktop app exposes a local MCP server on Dev Mode. This path is useful when writes are not needed and network access is restricted. Desktop MCP is typically registered under the server name `figma-desktop` — follow the Figma desktop app's Dev Mode instructions for your Figma version.
 
 **Verification:**
 
 After session restart, run:
 
 ```
-ToolSearch({ query: "select:mcp__figma__get_metadata,mcp__figma__use_figma", max_results: 2 })
+ToolSearch({ query: "figma get_metadata use_figma", max_results: 10 })
 ```
 
-Expect two non-empty results. If results are empty, the remote MCP is not registered — re-run the install command above and restart the session.
+The probe accepts any server prefix matching `/figma/i`. At least one result with a `get_metadata` tool is required for reads. A matching `use_figma` tool is required for writes (remote only).
 
-**Migration from the legacy dual-MCP setup:**
+**Migration from older plugin versions:**
 
-Earlier versions of this plugin used two separate Figma MCPs — `figma-desktop` (local HTTP, read-only) and `figma` (remote, writes-only). As of **v1.0.7.1**, the remote MCP exposes full read parity and is the single supported Figma connection. If you installed `figma-desktop` previously, you can remove it:
+Plugin versions before v1.0.7.1 used two separate Figma MCPs — `figma-desktop` (reads) and `figma` (writes). As of v1.0.7.1, the remote MCP exposes full read parity, so a single remote install is sufficient for most users. The desktop MCP remains supported as a reads-only fallback and is auto-detected alongside remote. If you only want the remote path, remove desktop:
 
 ```
 claude mcp remove figma-desktop
@@ -43,26 +65,45 @@ No data is lost — the remote MCP reads the same Figma files.
 
 ## Tools
 
-All tools use the `mcp__figma__` prefix (remote MCP).
+Tool names take the form `mcp__<prefix>__<tool>` where `<prefix>` is the resolved server name from the probe (commonly `figma` for remote or `figma-desktop` for local). The pipeline discovers the prefix at runtime — see **Availability Probe** below. The `mcp__figma__` examples shown here assume a server registered as `figma`.
 
-| Tool | Full name | Returns | Pipeline use |
-|------|-----------|---------|--------------|
-| `get_metadata` | `mcp__figma__get_metadata` | Lightweight outline: node IDs, names, types, position/size. Also the availability probe. | **In scope** — probe (works without a selection); metadata snapshot for figma-write proposal review |
-| `get_variable_defs` | `mcp__figma__get_variable_defs` | Variable collection tree: collection ID, mode names, variable names (hierarchical, e.g. `colors/primary/500`), resolved values, descriptions, scopes | **In scope** — scan: token augmentation (CONN-03); discover: decisions pre-population (CONN-04); figma-write: tokenize mode source |
-| `get_design_context` | `mcp__figma__get_design_context` | Structured React+Tailwind component tree of the current Figma selection | **In scope (secondary)** — discover: existing design decisions for established Figma systems |
-| `get_screenshot` | `mcp__figma__get_screenshot` | Screenshot image of the selected Figma layer or frame | **In scope (opt-in)** — visual reference capture for discovery; not invoked by default |
-| `use_figma` | `mcp__figma__use_figma` | Write operation result | **In scope** — figma-write: all three modes (annotate, tokenize, mappings) |
-| `get_code_connect_map` | `mcp__figma__get_code_connect_map` | Maps Figma component instances to code file paths | Out of scope this phase (reserved for future Code Connect work) |
-| `add_code_connect_map` | `mcp__figma__add_code_connect_map` | Adds Code Connect mapping entries | Out of scope this phase (reserved for future Code Connect work) |
-| `create_design_system_rules` | `mcp__figma__create_design_system_rules` | Generates rule files for design system alignment during code generation | Out of scope this phase |
+**Reads (available on remote and desktop):**
+
+| Tool | Returns | Pipeline use |
+|------|---------|--------------|
+| `get_metadata` | Lightweight outline: node IDs, names, types, position/size. Also the availability probe. | **In scope** — probe (works without a selection); metadata snapshot for figma-write proposal review |
+| `get_variable_defs` | Variable collection tree: collection ID, mode names, variable names (hierarchical, e.g. `colors/primary/500`), resolved values, descriptions, scopes | **In scope** — scan: token augmentation (CONN-03); discover: decisions pre-population (CONN-04); figma-write: tokenize mode source |
+| `get_design_context` | Structured React+Tailwind component tree of the current Figma selection | **In scope (secondary)** — discover: existing design decisions for established Figma systems |
+| `get_screenshot` | Screenshot image of the selected Figma layer or frame | **In scope (opt-in)** — visual reference capture for discovery; not invoked by default |
+| `get_figjam` | FigJam diagram metadata (XML) plus node screenshots | Out of scope this phase (not part of the design pipeline) |
+| `search_design_system` | Matching components, variables, and styles across connected libraries for a text query | Out of scope this phase (reserved for future Code Connect work) |
+| `get_code_connect_map` | Maps Figma component instances to code file paths | Out of scope this phase (reserved for future Code Connect work) |
+| `add_code_connect_map` | Adds Code Connect mapping entries | Out of scope this phase (reserved for future Code Connect work) |
+| `get_code_connect_suggestions` | Suggested Code Connect mappings between Figma and code components | Out of scope this phase |
+| `send_code_connect_mappings` | Confirms and finalizes Code Connect mappings | Out of scope this phase |
+| `create_design_system_rules` | Generates rule files for design system alignment during code generation | Out of scope this phase |
+
+**Writes (remote only):**
+
+| Tool | Returns | Pipeline use |
+|------|---------|--------------|
+| `use_figma` | Write operation result | **In scope** — figma-write: all three modes (annotate, tokenize, mappings) |
+| `generate_figma_design` | Imports/converts a web page into Figma design layers | Out of scope this phase |
+| `generate_diagram` | Generates a FigJam diagram from Mermaid syntax | Out of scope this phase |
+| `create_new_file` | Creates a new blank Figma Design or FigJam file | Out of scope this phase |
+| `whoami` | Authenticated user identity, plans, and seat types | Optional — useful for surfacing Dev seat status before a write |
 
 `get_metadata` is preferred for probing because it works without a file or selection open, keeping the probe lightweight. `get_variable_defs` is the primary workhorse for token extraction and decisions pre-population. `use_figma` is the single entry point for every write.
+
+**Remote-only tools** (`use_figma`, `generate_figma_design`, `create_new_file`, `whoami`, `generate_diagram`): absent from the desktop MCP. When the probe resolves to a desktop-only prefix, stages that require these tools either STOP (figma-write) or fall back silently.
 
 ---
 
 ## Writes (`use_figma`)
 
-`use_figma` is the single write tool. The `design-figma-writer` agent (`agents/design-figma-writer.md`) wraps it in a **proposal → confirm** UX — it builds a numbered operation list and presents it to the user before executing any write. The user must confirm before `use_figma` is called.
+`use_figma` is the single write tool and is **remote only**. The `design-figma-writer` agent (`agents/design-figma-writer.md`) wraps it in a **proposal → confirm** UX — it builds a numbered operation list and presents it to the user before executing any write. The user must confirm before `use_figma` is called.
+
+If the resolved probe prefix points to a desktop variant (no `use_figma`), figma-write STOPs early and instructs the user to register the remote MCP. No partial writes, no silent failures.
 
 ### Three Modes
 
@@ -99,22 +140,34 @@ Both scan and discover call `get_variable_defs` with no explicit selection to re
 
 ## Availability Probe
 
-**Call ToolSearch first — always.** In Claude Code sessions with many MCP servers, `mcp__figma__*` tools may be in the deferred tool set (not loaded into context at session start). Calling a deferred tool directly fails silently or errors. ToolSearch loads the tools into context and confirms their presence in a single call.
+**Call ToolSearch first — always.** In Claude Code sessions with many MCP servers, Figma tools may be in the deferred tool set (not loaded into context at session start). Calling a deferred tool directly fails silently or errors. ToolSearch loads the tools into context and confirms their presence in a single call.
 
-One probe covers both reads and writes — the remote MCP is a single server that exposes `get_metadata`, `get_variable_defs`, `get_design_context`, `get_screenshot`, and `use_figma` together. Presence of `get_metadata` implies `use_figma` is available on the same server.
+The probe is **variant-agnostic**: it accepts any server prefix matching `/figma/i` (e.g., `figma`, `Figma`, `figma-desktop`, `3860b164-...` UUID-prefixed remote instances) and records both the resolved prefix and the writes capability.
 
 **Figma probe sequence:**
 
 ```
-Step 1 — ToolSearch check:
-  ToolSearch({ query: "select:mcp__figma__get_metadata", max_results: 1 })
-  → Empty result      → figma: not_configured  (MCP not registered; OAuth not completed)
-  → Non-empty result  → proceed to Step 2
+Step 1 — Keyword ToolSearch:
+  ToolSearch({ query: "figma get_metadata use_figma", max_results: 10 })
 
-Step 2 — Live tool call:
-  call mcp__figma__get_metadata
-  → Success           → figma: available   (reads AND writes both available on this server)
-  → Error             → figma: unavailable (auth expired, rate-limited, or no file open)
+  Parse results for tool names matching:
+    - /^mcp__([^_]*figma[^_]*)__get_metadata$/i  → captures read-capable prefixes
+    - /^mcp__([^_]*figma[^_]*)__use_figma$/i     → captures write-capable prefixes
+
+  No read match       → figma: not_configured (no Figma MCP registered)
+  One or more matches → proceed to Step 2
+
+Step 2 — Tiebreaker selection:
+  Preference order when multiple prefixes match:
+    1. Prefer prefixes that appear in BOTH the read set and the write set
+    2. Among remaining prefixes, prefer `figma` (canonical remote server name)
+    3. Among remaining prefixes, prefer non-`figma-desktop`
+    4. Alphabetical
+
+Step 3 — Live tool call on resolved prefix:
+  call mcp__<prefix>__get_metadata
+  → Success → figma: available (prefix=mcp__<prefix>__, writes=<true|false>)
+  → Error   → figma: unavailable (auth expired, rate-limited, or no file open)
 ```
 
 Write the result to `.design/STATE.md` `<connections>` immediately after probing.
@@ -150,24 +203,35 @@ Stages do not append a `<blocker>` for a missing Figma connection — Figma is a
 
 ## STATE.md Integration
 
-Every stage writes its probe result to `.design/STATE.md` under the `<connections>` section:
+Every stage writes its probe result to `.design/STATE.md` under the `<connections>` section. The format carries three fields for Figma: status, resolved tool prefix, and writes capability.
 
 ```xml
 <connections>
-figma: available
+figma: available (prefix=mcp__figma__, writes=true)
 refero: not_configured
 </connections>
+```
+
+Other examples:
+
+```
+figma: available (prefix=mcp__figma-desktop__, writes=false)
+figma: available (prefix=mcp__Figma__, writes=false)
+figma: unavailable
+figma: not_configured
 ```
 
 **Status values:**
 
 | Value | Meaning |
 |-------|---------|
-| `available` | `get_metadata` returned a successful response; both reads and `use_figma` writes are expected to work |
+| `available` | A matching `get_metadata` tool was resolved and the live call succeeded. The `writes=` flag indicates whether `use_figma` is also present on the same prefix. |
 | `unavailable` | Tool is in the session but errored (auth expired, no file open, rate-limited) |
-| `not_configured` | ToolSearch returned empty for `mcp__figma__*` — MCP not registered |
+| `not_configured` | No server matching `/figma/i` exposes `get_metadata` — MCP not registered |
 
-The `<connections>` schema is minimal by design. Traceability of which outputs came from Figma is handled via source annotations in DESIGN.md (`source: figma-variables`) and DESIGN-CONTEXT.md ("pre-populated from Figma variables"), not via richer STATE.md fields. There is no separate `figma_writer:` key — one remote server, one status.
+**Consumer contract.** Agents that call Figma tools MUST read the resolved prefix from STATE.md and construct tool names dynamically (`{prefix}get_variable_defs`, `{prefix}use_figma`), rather than hardcoding `mcp__figma__`. Agents that need writes MUST additionally check `writes=true` and STOP early with a clear message when false.
+
+The `<connections>` schema is minimal by design. Traceability of which outputs came from Figma is handled via source annotations in DESIGN.md (`source: figma-variables`) and DESIGN-CONTEXT.md ("pre-populated from Figma variables"), not via richer STATE.md fields.
 
 ---
 
@@ -179,10 +243,10 @@ The `<connections>` schema is minimal by design. Traceability of which outputs c
 
 - **Multi-mode variables (Light/Dark).** Variables may carry values for multiple modes. When present, extract both: `#3B82F6 (light) / #60A5FA (dark)`. DESIGN.md can note dark-mode token existence in the color section.
 
-- **Deferred-tool loading.** Always call `ToolSearch` before any `mcp__figma__*` tool invocation. This applies at every stage entry, even if Figma was `available` in a previous run — tool availability can change between sessions.
+- **Deferred-tool loading.** Always call `ToolSearch` before any Figma tool invocation. This applies at every stage entry, even if Figma was `available` in a previous run — tool availability and the resolved prefix can change between sessions.
 
 - **All writes require user confirmation.** The proposal→confirm UX in `design-figma-writer` ensures the user reviews all operations before any write is executed. There is no auto-approve mode. See `agents/design-figma-writer.md` for the proposal contract.
 
 - **OAuth re-auth.** If `get_metadata` starts returning auth errors after previously working, the OAuth session expired. Re-running the MCP install command is not required — the session refreshes on the next tool call that returns a `reauth` hint. A clean `claude mcp remove figma && claude mcp add ...` is always safe.
 
-- **No `figma-desktop` fallback.** As of v1.0.7.1 the desktop MCP is no longer a supported read path. If you need offline/no-network reads for some reason, run the pipeline's non-Figma fallbacks (grep-based token extraction, interview-only decisions).
+- **Desktop MCP reads-only.** The desktop MCP (typically `figma-desktop`) exposes read tools only. It is auto-detected by the probe and is a supported fallback when writes are not needed. Stages that require writes (figma-write) STOP with an instruction to register the remote MCP.

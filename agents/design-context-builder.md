@@ -1,7 +1,7 @@
 ---
 name: design-context-builder
 description: Detects existing design system state via grep/glob, runs discovery interview asking ONLY unanswered questions, produces .design/DESIGN-CONTEXT.md. Spawned by the discover stage.
-tools: Read, Write, Bash, Grep, Glob, mcp__figma__get_variable_defs, mcp__figma__get_metadata, mcp__refero__search
+tools: Read, Write, Bash, Grep, Glob, mcp__figma__get_variable_defs, mcp__figma__get_metadata, mcp__figma-desktop__get_variable_defs, mcp__figma-desktop__get_metadata, mcp__Figma__get_variable_defs, mcp__Figma__get_metadata, mcp__refero__search
 required_reading:
   - connections/storybook.md
 color: blue
@@ -47,13 +47,15 @@ The orchestrating stage supplies a `<required_reading>` block in the prompt. Rea
 
 ### If `figma: available`
 
+Read the resolved tool prefix from the STATE.md `<connections>` line (e.g., `figma: available (prefix=mcp__figma__, writes=true)` → prefix is `mcp__figma__`). Call this `{P}`.
+
 **ToolSearch first.** Figma tools may be in the deferred tool set — calling them without a prior ToolSearch fails silently.
 
 ```
-ToolSearch({ query: "select:mcp__figma__get_variable_defs", max_results: 1 })
+ToolSearch({ query: "figma get_variable_defs", max_results: 5 })
 ```
 
-Then call `mcp__figma__get_variable_defs` (no arguments — returns all variables in the active Figma file).
+Then call `{P}get_variable_defs` (no arguments — returns all variables in the active Figma file).
 
 > If `get_variable_defs` errors (most commonly because no Figma file is open): skip Step 0 entirely AND update `.design/STATE.md` `<connections>` to `figma: unavailable`. Proceed to Step 1 with no pre-populated decisions.
 

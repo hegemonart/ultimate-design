@@ -19,13 +19,20 @@ user-invocable: true
    - Otherwise: normal transition — set frontmatter stage=discover, <position> stage=discover, status=in_progress, task_progress=0/1.
 2. **Probe connection availability** — ToolSearch runs FIRST because MCP tools may be in the deferred tool set. This is the canonical probe pattern (spec lives in `connections/connections.md`; copied inline because SKILL.md has no include mechanism — if the probe pattern changes, update all stages that copied it).
 
-   **A — Figma probe:**
+   **A — Figma probe (variant-agnostic):**
 
    ```
-   A1. ToolSearch({ query: "select:mcp__figma__get_metadata", max_results: 1 })
-   A2. Empty result → figma: not_configured (skip all Figma paths)
-       Non-empty result → call mcp__figma__get_metadata
-         Success → figma: available
+   A1. ToolSearch({ query: "figma get_metadata use_figma", max_results: 10 })
+   A2. Parse tool names matching /^mcp__([^_]*figma[^_]*)__(get_metadata|use_figma)$/i
+       into read-capable and write-capable prefix sets.
+   A3. Empty read set → figma: not_configured (skip all Figma paths)
+       One or more matches → pick prefix via tiebreaker:
+         (1) both-sets > reads-only,
+         (2) `figma` > others,
+         (3) non-`figma-desktop` > desktop,
+         (4) alphabetical.
+   A4. Call {prefix}get_metadata:
+         Success → figma: available (prefix=mcp__<prefix>__, writes=<true|false>)
          Error   → figma: unavailable
    ```
 

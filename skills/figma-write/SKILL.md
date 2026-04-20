@@ -24,10 +24,9 @@ Flags:
 
 ## Prerequisites
 
-1. Figma desktop app running with Dev Mode enabled
-2. Remote Figma MCP registered: `claude mcp add figma --transport http https://mcp.figma.com/v1/sse`
-3. `.design/DESIGN-CONTEXT.md` exists (run `discover` first)
-4. `figma: available` in `.design/STATE.md` `<connections>` block
+1. Remote Figma MCP registered (writes are remote-only). Preferred: `claude plugin install figma@claude-plugins-official`. Manual: `claude mcp add --transport http figma https://mcp.figma.com/mcp`.
+2. `.design/DESIGN-CONTEXT.md` exists (run `discover` first)
+3. `.design/STATE.md` `<connections>` shows `figma: available (…, writes=true)`. If `writes=false` (desktop-only variant), writes are not supported — the agent will STOP with an instruction to install the remote MCP.
 
 ## Required Reading
 
