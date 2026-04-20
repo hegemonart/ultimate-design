@@ -4,6 +4,20 @@ All notable changes to get-design-done are documented here. Versions follow [sem
 
 ---
 
+## [1.14.2] — 2026-04-20
+
+### Added — Multi-format Claude Design handoff ingestion
+
+- **URL entry point**: detect `https://api.anthropic.com/v1/design/h/<hash>` in agent prompt (native "Send to local coding agent" flow); `WebFetch` with `Content-Type` routing — HTML parsed directly, ZIP downloaded and extracted
+- **ZIP bundle**: extract to `.design/handoff/`, find primary HTML + readme, parse normally, clean up after
+- **PDF format**: `pdftotext` text extraction; grep for token values; all decisions tagged `(tentative — text-only)` since no CSS is present
+- **PPTX format**: slide XML text extraction (`ppt/slides/*.xml`); same tentative-only tagging as PDF
+- Updated synthesizer parsing algorithm step 1 with format dispatch before parsing
+- Updated probe pattern: URL detection takes priority over file path lookup
+- New `handoff_source` values: `claude-design-url`, `claude-design-zip`, `claude-design-pdf`, `claude-design-pptx`
+
+---
+
 ## [1.14.1] — 2026-04-19
 
 ### Fixed — Security hardening (full codebase review)

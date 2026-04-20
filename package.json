@@ -1,6 +1,6 @@
 {
   "name": "@hegemonart/get-design-done",
-  "version": "1.14.1",
+  "version": "1.14.2",
   "description": "A Claude Code plugin for systematic design improvement",
   "author": "Hegemon",
   "homepage": "https://github.com/hegemonart/get-design-done",
@@ -25,6 +25,9 @@
     "CHANGELOG.md",
     "LICENSE"
   ],
+  "bin": {
+    "get-design-done": "./scripts/install.cjs"
+  },
   "publishConfig": {
     "access": "public",
     "provenance": true
