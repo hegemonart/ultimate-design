@@ -150,6 +150,14 @@ Write: graphify: <status> to STATE.md <connections>
 
 After all 4 probes, STATE.md `<connections>` contains all 4 status entries (plus the Wave A `figma:` and `refero:` probes = 6 total entries). Downstream plans (08-02 through 08-05) read these values without re-probing.
 
+**First-run connection nudge:** after writing STATE.md, check whether every probed connection came back `not_configured` AND `.design/config.json > connections_onboarding` is absent. If so, print once at the end of scan output:
+
+```
+Tip: run /gdd:connections to walk through setup for Figma, Storybook, Chromatic, and 9 other integrations.
+```
+
+Suppress the nudge if any probe returned `available` or `unavailable`, or if the user has already run `/gdd:connections` (marker: `connections_onboarding` block present or previously drained).
+
 ### Write STATE.md
 
 Update `.design/STATE.md` with probe results:

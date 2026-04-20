@@ -2,6 +2,8 @@
 
 This directory contains connection specifications for external tools and MCPs that the get-design-done pipeline integrates with. Each connection has its own spec file. This file is the index.
 
+**Getting started:** run `/gdd:connections` for the interactive onboarding wizard — it probes all 12 connections, recommends setup based on your project type, and walks you through installing each one (auto-run for reversible MCP adds, copy-command for everything else). You can also run `/gdd:connections list` for a read-only status check or `/gdd:connections <name>` to jump to a single connection's setup.
+
 ---
 
 ## Active Connections

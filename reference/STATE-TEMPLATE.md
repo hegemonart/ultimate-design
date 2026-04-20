@@ -56,12 +56,21 @@ skipped_stages: ""
 </must_haves>
 
 <connections>
-<!-- Detected at scan entry; updated if connections become available mid-pipeline. -->
+<!-- Detected at scan entry or via /gdd:connections; updated if connections become available mid-pipeline. -->
 <!-- Format: <connection_name>: <available | unavailable | not_configured> -->
+<!-- Key normalization: hyphens become underscores; leading digits are spelled out (21st-dev → twenty_first). -->
 figma: not_configured
 refero: not_configured
+preview: not_configured
+storybook: not_configured
+chromatic: not_configured
+graphify: not_configured
 pinterest: not_configured
 claude_design: not_configured
+paper_design: not_configured
+pencil_dev: not_configured
+twenty_first: not_configured
+magic_patterns: not_configured
 </connections>
 
 <blockers>

@@ -43,7 +43,7 @@ One-time project initialization. Replaces "run scan cold" by gathering context u
    Files named `design-*-conventions.md` are read by explore/plan/design.
    Populated by `/gdd:sketch-wrap-up` and manual edits.
    ```
-10. Print: "Project initialized. Run `/gdd:brief` to capture your design problem, or `/gdd:explore` to scan directly."
+10. Print: "Project initialized. Run `/gdd:brief` to capture your design problem, or `/gdd:explore` to scan directly. Run `/gdd:connections` to wire up optional integrations (Figma, Storybook, Chromatic, etc.)."
 
 ## Do Not
 

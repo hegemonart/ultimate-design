@@ -81,6 +81,35 @@ When `true`, parallel agents run in dedicated git worktrees. Default: `false` (l
 
 Keyed by stage name (`brief`, `explore`, `plan`, `design`, `verify`). Any field above may be overridden per stage.
 
+### `connections.skip`
+
+Optional array of connection names the user has explicitly opted out of. `/gdd:connections` reads this list and never re-prompts for skipped connections. Users re-enable a skipped connection by invoking `/gdd:connections <name>` directly (bypasses the skip list for that run).
+
+```json
+{
+  "connections": {
+    "skip": ["pinterest", "graphify"]
+  }
+}
+```
+
+Valid names: `figma`, `refero`, `preview`, `storybook`, `chromatic`, `graphify`, `pinterest`, `claude-design`, `paper-design`, `pencil-dev`, `21st-dev`, `magic-patterns`.
+
+### `connections_onboarding` (scratch block)
+
+Transient state written by `/gdd:connections` while a setup flow is in progress. Not hand-edited. Shape:
+
+```json
+{
+  "connections_onboarding": {
+    "started_at": "<ISO 8601>",
+    "pending_verification": ["figma", "chromatic"]
+  }
+}
+```
+
+`/gdd:connections` deletes this block when `pending_verification` drains. Its presence after a session restart is the signal that a resume is required (the skill jumps straight to verification).
+
 ## How Agents Read The Profile
 
 Stages are the only code that read `.design/config.json`. When spawning an agent, the stage:

@@ -31,6 +31,16 @@ Next: /gdd:<next-stage>
 
 Recommend next stage via the same logic as `/gdd:next` (route by which artifacts exist).
 
+### First-run connection nudge
+
+After the pipeline state block, check STATE.md `<connections>`. If every entry is `not_configured` AND `.design/config.json > connections_onboarding` is absent (user has never run the wizard), append once:
+
+```
+Tip: run /gdd:connections to see what integrations can plug in (Figma, Storybook, Chromatic, etc.).
+```
+
+Suppress the nudge on subsequent invocations in the same session (track via a transient marker file `.design/.connections-nudge-shown` written at first emit, deleted on next session start by no mechanism — so effectively once per session).
+
 ## Step 3 — Forensic audit (only if `--forensic`)
 
 Run these six checks and print PASS/WARN/FAIL per check:
