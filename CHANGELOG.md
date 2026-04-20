@@ -4,6 +4,18 @@ All notable changes to get-design-done are documented here. Versions follow [sem
 
 ---
 
+## [1.14.3] — 2026-04-20
+
+### Fixed — Plugin manifest bugs blocking v1.14.2 install
+
+- **`.claude-plugin/plugin.json`** — dropped `"./"` from the `skills` array. The Claude Code plugin loader rejects it as `Path escapes plugin directory: ./` even though the spec describes it as legal. Manifest now declares `"skills": ["./skills/"]` only; the plugin loads cleanly from the marketplace.
+- **`.claude-plugin/plugin.json`** — removed the explicit `"hooks": "./hooks/hooks.json"` pointer. Claude Code auto-detects `hooks/hooks.json` at the standard location, so the manifest pointer triggered `Duplicate hooks file`. Hooks still register the same PreToolUse/SessionStart/PostToolUse commands — only the redundant pointer is gone.
+- **`reference/schemas/plugin.schema.json`** — `hooks` is no longer a required field (still permitted for plugins that keep the file elsewhere).
+- **`skills/explore/SKILL.md`** — design interview now runs inline inside `/gdd:explore` instead of being delegated to a `design-discussant` subagent via `Task()`. Subagent spawns in Claude Desktop collapse `AskUserQuestion` to plain markdown; inlining restores the native-picker widget so the interview renders as interactive UI instead of chat text. `/gdd:discuss` and the handoff confirmation flow still use the subagent — only the explore-stage interview moved inline.
+- **`tests/semver-compare.test.cjs`** — registered `1.14.2` and `1.14.3` as recognized off-cadence versions.
+
+---
+
 ## [1.14.2] — 2026-04-20
 
 ### Added — Multi-format Claude Design handoff ingestion

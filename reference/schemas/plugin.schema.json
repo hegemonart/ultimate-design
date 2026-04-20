@@ -14,8 +14,7 @@
     "repository",
     "license",
     "keywords",
-    "skills",
-    "hooks"
+    "skills"
   ],
   "properties": {
     "name": {
