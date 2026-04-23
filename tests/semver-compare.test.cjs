@@ -55,6 +55,7 @@ const OFF_CADENCE_VERSIONS = new Set([
   '1.14.4',
   '1.14.5',
   '1.14.6',
+  '1.14.7',
 ]);
 
 test('semver-compare: consecutive versions in sequence are exact patch bumps', () => {
