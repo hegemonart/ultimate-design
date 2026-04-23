@@ -64,8 +64,10 @@ const AT_PREFIX: SanitizePattern = {
  * Example: `Run /gdd:progress` → `Run (slash command removed)`.
  */
 const SLASH_CMD: SanitizePattern = {
+  // NOTE: trailing-arg group uses [ \t]+ not \s+ to avoid eating the final
+  // newline on `Run /gdd:progress\n` style inputs (the \s class includes \n).
   name: 'slash-cmd',
-  match: /\/gdd:[a-z-]+(?:\s+[^\n]*)?/g,
+  match: /\/gdd:[a-z-]+(?:[ \t]+[^\n]*)?/g,
   replace: '(slash command removed)',
   description: '/gdd:command invocations (stripped — no dispatch target in headless mode)',
 };
@@ -106,8 +108,12 @@ const ASK_USER_Q: SanitizePattern = {
  *   Then proceed.
  */
 const STOP_LINE: SanitizePattern = {
+  // NOTE: leading-whitespace class is [ \t]* not \s* — \s includes \n which
+  // would cause the match to greedily consume the preceding blank line's
+  // newline when STOP is the last line of input, producing one-fewer newline
+  // than the authored separator between "resolution." and EOF.
   name: 'stop-line',
-  match: /^\s*STOP\b.*$/gm,
+  match: /^[ \t]*STOP\b.*$/gm,
   replace: '',
   description: 'Lines starting with STOP (halt directives are interactive-only)',
 };
