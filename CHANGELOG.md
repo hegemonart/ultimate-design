@@ -4,6 +4,61 @@ All notable changes to get-design-done are documented here. Versions follow [sem
 
 ---
 
+## [1.14.5.1] — 2026-04-24
+
+### Phase 14.5 — Safety + Recall Floor (feature release on top of the 1.14.5 Preview MCP bugfix)
+
+Closes two unrelated risks before the Phase 15–19 reference-library expansion and the Phase 20+ autonomy ramp: (a) agents had no typed reference index and no cache-stable L0 preamble; (b) no defense-in-depth around prompt-injected bash, protected-paths violations, runaway blast radius, or the Figma plugin-sandbox hill-climb failure mode. Ships the minimum-viable version of both tracks as one cohesive release.
+
+### Added
+
+**Safety hooks**
+- `hooks/gdd-bash-guard.js` — PreToolUse:Bash guard. 45 dangerous-pattern regexes across 10 families (filesystem destruction, permission escalation, pipe-to-shell, git destruction, system mutation, process nuking, credential exfil, shell obfuscation, path traversal, npm/docker/firewall abuse). `scripts/lib/dangerous-patterns.cjs` normalizes Unicode NFKC + strips ANSI escapes + strips zero-width / bidi overrides before matching so obfuscated attacks (`rm\u200B -rf /`, bidi overrides, hex-encoded `\x72\x6d\x20\x2d\x72\x66`) fail closed.
+- `hooks/gdd-protected-paths.js` + `reference/protected-paths.default.json` — PreToolUse:Edit|Write|Bash guard blocking mutation of `reference/**`, `skills/**`, `commands/**`, `hooks/**`, `.design/archive/**`, `.design/config.json`, `.design/telemetry/**`, `.git/**`, both plugin manifests. User additions in `.design/config.json.protected_paths` MERGE into the default list — users cannot reduce the default-protected set. `scripts/lib/glob-match.cjs` ships a dependency-free `**` glob matcher.
+- `scripts/lib/blast-radius.cjs` — `estimate({touchedPaths, diffStats})` + `estimateMCPCalls({toolCalls})` preflight called by `design-executor` before the first Edit/Write of each task. Defaults: `max_files_per_task: 10`, `max_lines_per_task: 400`, `max_mcp_calls_per_task: 30`. Zero-value limits disable that ceiling. `design-executor` gains a new `## Preflight — Blast-Radius Check` section.
+
+**Injection-scanner extension**
+- `scripts/injection-patterns.cjs` extended from 7 to 22 patterns: classic prompt-injection verbs (incl. `forget previous`), **invisible-Unicode** (zero-width, BOM, bidi overrides), **HTML-comment instruction hijacks** (`<!-- system: …`, hidden divs/spans, zero-font-size tricks), **secret-exfil triggers** (`curl $OPENAI_API_KEY`, `cat .env`, `tar ~ | nc`, `process.env._KEY fetch`, SSH private-key reads). Single source of truth consumed by `hooks/gdd-read-injection-scanner.js`.
+
+**Decision-injector hook (first cross-cycle recall primitive)**
+- `hooks/gdd-decision-injector.js` — PreToolUse:Read on any `.design/**.md | reference/**.md | .planning/**.md` ≥ 1500 bytes. Surfaces the top-15 matching D-XX decisions, L-NN learnings, and cycle-N summary excerpts that reference the opened file's basename or path. Grep backend (ripgrep when available, Node fs fallback); Phase 19.5 will swap in FTS5 transparently.
+
+**Reference registry + L0/L2 cache split**
+- `reference/registry.schema.json` + `reference/registry.json` — typed index of every `reference/*.md` and `.default.json` file (18 entry types: `preamble | meta-rules | heuristic | output-contract | defaults | schema | data | motion | surfaces | authority-feed | influences | easing | taxonomy | principles | emotional-design | experience | palette | style-vocabulary`). Round-trip enforced by `scripts/lib/reference-registry.cjs.validateRegistry()`.
+- `scripts/build-intel.cjs` re-runs `validateRegistry()` on any `reference/**` change.
+- `reference/meta-rules.md` (tier L0) — 5 framework-invariant subsections extracted verbatim from `reference/shared-preamble.md`. `shared-preamble.md` becomes an L0 aggregator (imports `meta-rules.md` first), shrunk from ~6.5KB to <4KB. Stabilizes the Anthropic 5-min prompt-cache prefix.
+- `reference/cycle-handoff-preamble.md` — "reference, not current requests" framing prose imported by `/gdd:pause` and `/gdd:resume`.
+- `reference/retrieval-contract.md` — 3-layer `search → metadata → full-doc` protocol with per-row token-cost labels. Imported by `/gdd:progress`, `/gdd:resume`, `/gdd:reflect`, `/gdd:pause`.
+
+**Figma authoring-intent guard + MCP circuit-breaker**
+- `reference/figma-sandbox.md` — 4 Figma plugin-sandbox pitfalls encoded as hard rules (`loadFontAsync` no-cache, `findOne` O(N), `appendChild` AutoLayout recomputation, per-call ~5–10s timeout).
+- `reference/mcp-budget.default.json` + `reference/schemas/mcp-budget.schema.json` — defaults: `max_calls_per_task: 30`, `max_consecutive_timeouts: 3`, `reset_on_success: true`, tracked tools `mcp__*use_figma | use_paper | use_pencil`.
+- `agents/design-figma-writer` Step 0.5 **Authoring-Intent Guard** — bilingual EN/RU pattern set classifies invocations as author-intent vs decision-intent. Author-intent STOPs with a redirect to `figma:figma-generate-design` and cites the 4 pitfalls. Decision-intent proceeds. Bumped `size_budget` LARGE → XL.
+- `hooks/gdd-mcp-circuit-breaker.js` — PostToolUse on `mcp__*use_figma | use_paper | use_pencil`. Appends `{ts, tool, outcome, consecutive_timeouts, total_calls}` rows to `.design/telemetry/mcp-budget.jsonl`. Breaks with `{continue:false}` at threshold + appends a STATE.md blocker.
+- README.md + `connections/figma.md` gain the authoring-redirect callout + 4-pitfalls summary.
+
+**Tests** (8 new files, ~60 new assertions):
+- `bash-guard`, `protected-paths`, `blast-radius`, `decision-injector`, `reference-registry`, `meta-rules-split`, `figma-authoring-guard`, `mcp-circuit-breaker` all added. `read-injection-scanner.test.cjs` extended with bidi-override + HTML-comment hijack + secret-exfil + benign-regression cases.
+
+### Changed
+
+- `agents/design-executor.md` — new Preflight Blast-Radius Check + MCP Budget sections.
+- `agents/design-figma-writer.md` — Step 0.5 Authoring-Intent Guard; `size_budget: XL`.
+- `reference/shared-preamble.md` — rewritten as L0 aggregator.
+- `scripts/build-intel.cjs` — registry round-trip on `reference/**` changes.
+- `skills/{progress,resume,reflect,pause}/SKILL.md` — import `reference/retrieval-contract.md` (+ `cycle-handoff-preamble.md` for pause + resume).
+- `hooks/hooks.json` — registers bash-guard, protected-paths, decision-injector, MCP circuit-breaker.
+- Plugin manifests — add `safety-hardening`, `protected-paths`, `decision-injector`, `reference-registry`, `mcp-circuit-breaker` keywords.
+- `tests/semver-compare.test.cjs` — `1.14.5.1` added to `OFF_CADENCE_VERSIONS`.
+
+### Security
+
+- Bash guard normalizes Unicode (NFKC + strip zero-width + bidi) and ANSI escapes before pattern match — blocks bidi-override obfuscation, zero-width-injected verbs, and ANSI-colored reformulations.
+- Read-injection scanner flags invisible-Unicode sequences, HTML-comment hijacks, and secret-exfil triggers (7 → 22 patterns).
+- Protected-paths enforces a merge-only glob list — user configs cannot reduce the default-protected set.
+
+---
+
 ## [1.14.5] — 2026-04-23
 
 ### Fixed — Preview MCP silently skipped in verify even when available ([#19](https://github.com/hegemonart/get-design-done/issues/19))
