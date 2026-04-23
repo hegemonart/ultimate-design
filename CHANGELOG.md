@@ -4,6 +4,35 @@ All notable changes to get-design-done are documented here. Versions follow [sem
 
 ---
 
+## [1.14.7] — 2026-04-24
+
+### Phase 14.6 — Test Coverage Completion (Phase 12 Wave C closeout)
+
+Closes the Phase 12 test-coverage slate that had Waves A + B shipped but Wave C (plans `12-05` / `12-06` / `12-07`) never executed. The plans were migrated to **Phase 14.6** (`.planning/phases/14.6-test-coverage-completion/`) and the gdd-unique test files those plans targeted are now validated end-to-end alongside the pre-existing suite.
+
+### Verified — gdd-unique test coverage (no code diff vs 1.14.6)
+
+Inspection during Phase 14.6 execution confirmed that all 13 gdd-unique test files from the Wave-C migration are present in `tests/` and pass under `npm test`. No net-new test source ships with this release — Phase 14.6's substantive deliverable is the validation, documentation, and closeout bump.
+
+| Area | Test files covered |
+|---|---|
+| Pipeline + data | `pipeline-smoke`, `mapper-schema`, `parallelism-engine`, `touches-analysis`, `cycle-lifecycle`, `intel-consistency` |
+| Feature correctness | `sketch-determinism`, `connection-probe`, `figma-writer-dry-run`, `reflection-proposal`, `deprecation-redirect`, `nng-coverage`, `read-injection-scanner` |
+
+Full suite: **343 tests, 342 pass, 1 skipped, 0 fail**.
+
+### Changed
+
+- `.claude-plugin/plugin.json`, `.claude-plugin/marketplace.json` (outer + `plugins[0]`), `package.json` — version `1.14.6` → `1.14.7`.
+- `tests/semver-compare.test.cjs` — `1.14.7` registered in `OFF_CADENCE_VERSIONS`.
+
+### Notes
+
+- Phase 12 ROADMAP entry remains **Complete** (scope-reduced); Phase 14.6 is now marked **Complete** with the Wave-C + closeout scope that was split out on 2026-04-24.
+- Phase 14.7 (First-Run Proof Path) retains its reserved release slot and will ship as a subsequent PATCH bump (the original `v1.14.7` reservation shifts forward to the next available patch when Phase 14.7 ships).
+
+---
+
 ## [1.14.6] — 2026-04-24
 
 ### Phase 14.5 — Safety + Recall Floor
