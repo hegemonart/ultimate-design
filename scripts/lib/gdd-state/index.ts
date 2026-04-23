@@ -8,18 +8,20 @@
 //   * ParsedState (type)            — consumer-visible shape
 //   * Stage (type)                  — stage enum
 //
-// Plan 20-02 wires the gate function in; for now `transition()` calls a
-// stub that always returns `{ pass: true, blockers: [] }`. Plan 20-04
-// will migrate the locally-defined error classes (TransitionGateFailed,
-// LockAcquisitionError, ParseError) into the unified GDDError taxonomy.
+// Plan 20-02 wired the real transition gates in via `gateFor(from, to)`
+// imported from `./gates.ts`. Plan 20-04 will migrate the locally-defined
+// error classes (TransitionGateFailed, LockAcquisitionError, ParseError)
+// into the unified GDDError taxonomy.
 
 import { readFileSync, writeFileSync, renameSync, unlinkSync, existsSync } from 'node:fs';
 
 import { acquire } from './lockfile.ts';
 import { parse } from './parser.ts';
 import { serialize } from './mutator.ts';
+import { gateFor } from './gates.ts';
 import {
   TransitionGateFailed,
+  isStage,
   type ParsedState,
   type Stage,
   type TransitionResult,
@@ -110,16 +112,20 @@ export async function mutate(
  * Advance to `toStage` under the locked RMW protocol.
  *
  * Steps:
- *   1. Call the transition gate (stub until Plan 20-02).
- *   2. If `pass: false` — throw TransitionGateFailed with blockers.
- *   3. If `pass: true` — mutate STATE.md:
+ *   1. Read current state (outside the lock) to pass to the gate.
+ *   2. Resolve the gate via `gateFor(position.stage, toStage)`.
+ *        - `null` → TransitionGateFailed "Invalid transition" (skip-stage,
+ *          backward, same-stage, or from outside the Stage union).
+ *   3. Invoke the gate. If `pass: false`, throw TransitionGateFailed with
+ *      the gate's blockers verbatim.
+ *   4. If `pass: true`, mutate STATE.md under the lock:
  *        - frontmatter.stage = toStage
  *        - position.stage = toStage
  *        - frontmatter.last_checkpoint = now (ISO)
  *        - timestamps[`${toStage}_started_at`] = now (ISO)
  *
  * Returns the updated state plus the gate response (for callers that
- * want to log blockers even on pass).
+ * want to log blockers — on pass, `blockers` is always `[]`).
  */
 export async function transition(
   path: string,
@@ -129,9 +135,24 @@ export async function transition(
   // mutate() below will re-read under the lock before applying changes.
   // This two-phase pattern matches the GSD reference implementation.
   const beforeMutate = await read(path);
-  const gate = await runGate(beforeMutate, toStage);
-  if (!gate.pass) {
-    throw new TransitionGateFailed(toStage, gate.blockers);
+  const from: string = beforeMutate.position.stage;
+  // `position.stage` is typed as `string` in ParsedState (parser tolerates
+  // `scan` and other pre-brief values). Narrow it to `Stage` before asking
+  // the gate registry — anything outside the union is an invalid FROM.
+  if (!isStage(from)) {
+    throw new TransitionGateFailed(toStage, [
+      `Invalid transition: from="${from}" is not a recognized Stage`,
+    ]);
+  }
+  const gate = gateFor(from, toStage);
+  if (gate === null) {
+    throw new TransitionGateFailed(toStage, [
+      `Invalid transition: ${from} → ${toStage}`,
+    ]);
+  }
+  const gateResult = gate(beforeMutate);
+  if (!gateResult.pass) {
+    throw new TransitionGateFailed(toStage, gateResult.blockers);
   }
   const nowIso: string = new Date().toISOString();
   const nextState = await mutate(path, (s): ParsedState => {
@@ -141,17 +162,5 @@ export async function transition(
     s.timestamps[`${toStage}_started_at`] = nowIso;
     return s;
   });
-  return { pass: true, blockers: gate.blockers, state: nextState };
-}
-
-/**
- * Stub gate for Plan 20-01. Plan 20-02 replaces this with the real
- * set of gate rules. The shape is the stable contract — do not alter it
- * without also updating transition().
- */
-async function runGate(
-  _state: ParsedState,
-  _toStage: Stage,
-): Promise<{ pass: boolean; blockers: string[] }> {
-  return { pass: true, blockers: [] };
+  return { pass: true, blockers: gateResult.blockers, state: nextState };
 }
