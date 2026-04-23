@@ -46,7 +46,9 @@ const EXPECTED_SEQUENCE = [
 //   - 1.14.4 → Figma MCP: variant-agnostic probe, current canonical URL
 //     (mcp.figma.com/mcp), plugin-install path, desktop-variant auto-detect.
 //   - 1.14.5 → Safety + Recall Floor scaffolding (Phase 14.5 CI/test hygiene).
-//   - 1.14.7 → Phase 14.7 First-Run Proof Path (/gdd:start skill, nudge hook,
+//   - 1.14.7 → reserved slot; not shipped from main — Phase 14.7 work
+//     ships as v1.14.8 to avoid tag-collision risk with parallel worktrees.
+//   - 1.14.8 → Phase 14.7 First-Run Proof Path (/gdd:start skill, nudge hook,
 //     design-start-writer agent, detect-ui-root + findings-engine helpers).
 //     v1.14.6 reserved for Phase 14.6 test-coverage-completion; not shipped yet.
 const OFF_CADENCE_VERSIONS = new Set([
@@ -59,6 +61,7 @@ const OFF_CADENCE_VERSIONS = new Set([
   '1.14.4',
   '1.14.5',
   '1.14.7',
+  '1.14.8',
 ]);
 
 test('semver-compare: consecutive versions in sequence are exact patch bumps', () => {

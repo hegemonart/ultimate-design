@@ -4,7 +4,7 @@ All notable changes to get-design-done are documented here. Versions follow [sem
 
 ---
 
-## [1.14.7] — 2026-04-24
+## [1.14.8] — 2026-04-24
 
 ### Added — Phase 14.7 First-Run Proof Path
 
@@ -25,7 +25,7 @@ Phase 15 target version unchanged (`v1.15.0`). `v1.14.6` remains reserved for Ph
 ### Scope notes
 
 - The first-run report **recommends** commands; it never auto-applies fixes. `/gdd:fast` suggestions are printed as ready-to-run text.
-- `/gdd:do` is intentionally **not** surfaced as a suggested command in v1.14.7 (revisit at Phase 15 per Phase 14.7 D-05).
+- `/gdd:do` is intentionally **not** surfaced as a suggested command in v1.14.8 (revisit at Phase 15 per Phase 14.7 D-05).
 
 ---
 
