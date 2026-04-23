@@ -62,6 +62,51 @@ export interface DesignConfigJson {
 
 export type ConfigSchema = DesignConfigJson;
 
+// ---- events.schema.json ----
+/**
+ * One line of .design/telemetry/events.jsonl — the append-only telemetry stream produced by Plan 20-06. Each event is a single JSON object followed by a newline. See .planning/phases/20-gdd-sdk-foundation/20-06-PLAN.md.
+ */
+export interface Event {
+  /**
+   * Free-form event type identifier. Pre-registered seeds: state.mutation, state.transition, stage.entered, stage.exited, hook.fired, error.
+   */
+  type: string;
+  /**
+   * ISO-8601 timestamp of event emission.
+   */
+  timestamp: string;
+  /**
+   * Stable identifier per GDD pipeline run; correlates events across stages.
+   */
+  sessionId: string;
+  /**
+   * Optional — present when the event is scoped to a pipeline stage.
+   */
+  stage?: 'brief' | 'explore' | 'plan' | 'design' | 'verify';
+  /**
+   * Optional — present when the event is scoped to a cycle identifier.
+   */
+  cycle?: string;
+  /**
+   * Event-type-specific payload. Opaque at the envelope level.
+   */
+  payload: {};
+  /**
+   * Writer-injected provenance. Never set by callers.
+   */
+  _meta?: {
+    pid: number;
+    host: string;
+    source: string;
+  };
+  /**
+   * Writer-set flag indicating the payload exceeded maxLineBytes and has been replaced by a placeholder.
+   */
+  _truncated?: boolean;
+}
+
+export type EventsSchema = Event;
+
 // ---- hooks.schema.json ----
 /**
  * Shape of hooks/hooks.json — event-triggered commands registered by the plugin.

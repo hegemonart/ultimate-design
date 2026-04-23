@@ -40,6 +40,7 @@ import type {
   HooksSchema,
   IntelSchema,
   AuthoritySnapshotSchema,
+  EventsSchema,
 } from '../reference/schemas/generated.js';
 
 export type {
@@ -49,6 +50,7 @@ export type {
   HooksSchema,
   IntelSchema,
   AuthoritySnapshotSchema,
+  EventsSchema,
 };
 
 /**
@@ -125,6 +127,18 @@ export const PAIRS: readonly Pair[] = [
     schema: 'reference/schemas/authority-snapshot.schema.json',
     // .design/authority-snapshot.json is runtime-only (gitignored via .design/).
     // Only schema-compile it.
+    data: null,
+    required: false,
+  },
+  {
+    name: 'events',
+    schema: 'reference/schemas/events.schema.json',
+    // .design/telemetry/events.jsonl is runtime-only (gitignored). It is
+    // JSONL (one JSON object per line) rather than a single JSON document,
+    // so we cannot point ajv-cli at it as a `data` subject — each *line*
+    // is the schema subject, not the file. Schema-compile only here;
+    // per-line structural discipline is enforced by the EventWriter at
+    // runtime (Plan 20-06). See scripts/lib/event-stream/writer.ts.
     data: null,
     required: false,
   },
