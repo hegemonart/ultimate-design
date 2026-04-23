@@ -123,9 +123,9 @@ function resolveTier(agent, agentDefaultTier, overrides) {
 // and rewrites .design/agent-metrics.json atomically.
 function spawnAggregator() {
   try {
-    const aggregatorPath = path.join(process.cwd(), 'scripts', 'aggregate-agent-metrics.js');
+    const aggregatorPath = path.join(process.cwd(), 'scripts', 'aggregate-agent-metrics.ts');
     if (!fs.existsSync(aggregatorPath)) return; // script not installed — fail open
-    const child = spawn('node', [aggregatorPath], {
+    const child = spawn('node', ['--experimental-strip-types', aggregatorPath], {
       cwd: process.cwd(),
       detached: true,
       stdio: 'ignore',
