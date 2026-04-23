@@ -133,46 +133,20 @@ export interface TransitionResult extends GateResult {
   state: ParsedState;
 }
 
-/** Error thrown when a transition gate vetos a stage advance. */
-export class TransitionGateFailed extends Error {
-  readonly blockers: string[];
-  constructor(toStage: Stage, blockers: string[]) {
-    super(
-      `transition to "${toStage}" blocked by gate: ${blockers.join('; ') || '(no detail)'}`,
-    );
-    this.name = 'TransitionGateFailed';
-    this.blockers = blockers;
-  }
-}
-
-/**
- * Error thrown when `acquire()` cannot obtain the lockfile within
- * `maxWaitMs`. Carries the contents of the offending lockfile (as
- * text — may be JSON, may be garbage if corrupted) so callers can
- * surface them to operators.
- */
-export class LockAcquisitionError extends Error {
-  readonly lockPath: string;
-  readonly lockContents: string;
-  constructor(lockPath: string, lockContents: string, waitedMs: number) {
-    super(
-      `failed to acquire lock at ${lockPath} after ${waitedMs}ms; current holder: ${lockContents}`,
-    );
-    this.name = 'LockAcquisitionError';
-    this.lockPath = lockPath;
-    this.lockContents = lockContents;
-  }
-}
-
-/** Error thrown by `parse()` when the input cannot be interpreted. */
-export class ParseError extends Error {
-  readonly line: number;
-  constructor(message: string, line: number) {
-    super(`STATE.md parse error at line ${line}: ${message}`);
-    this.name = 'ParseError';
-    this.line = line;
-  }
-}
+// Error classes migrated to the unified GDDError taxonomy in Plan 20-04.
+// Re-exported here so existing consumers (tests, downstream modules) keep
+// importing from `gdd-state/types.ts` unchanged.
+//
+//   * TransitionGateFailed  — StateConflictError subclass; retryable
+//   * LockAcquisitionError  — StateConflictError subclass; retryable
+//   * ParseError            — ValidationError subclass; fix your STATE.md
+//
+// See `scripts/lib/gdd-errors/index.ts` for the taxonomy definition.
+export {
+  TransitionGateFailed,
+  LockAcquisitionError,
+  ParseError,
+} from '../gdd-errors/index.ts';
 
 /** Type-guard for `Stage`. */
 export function isStage(value: unknown): value is Stage {

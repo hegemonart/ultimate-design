@@ -194,3 +194,25 @@ export class TransitionGateFailed extends StateConflictError {
     this.blockers = Object.freeze([...blockers]);
   }
 }
+
+/**
+ * Error thrown by STATE.md `parse()` when the input cannot be
+ * interpreted. `ValidationError` semantics: the caller (likely the
+ * operator or an upstream generator) gave us malformed input — fix
+ * your STATE.md and retry.
+ *
+ * The `line` instance property points at the 1-indexed line in the
+ * source markdown where the parser gave up. It's also mirrored into
+ * the frozen `context` object.
+ */
+export class ParseError extends ValidationError {
+  readonly line: number;
+  constructor(message: string, line: number, context?: Record<string, unknown>) {
+    super(
+      `STATE.md parse error at line ${line}: ${message}`,
+      'PARSE_ERROR',
+      { ...context, line },
+    );
+    this.line = line;
+  }
+}

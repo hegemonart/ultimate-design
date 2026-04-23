@@ -9,9 +9,10 @@
 //   * Stage (type)                  — stage enum
 //
 // Plan 20-02 wired the real transition gates in via `gateFor(from, to)`
-// imported from `./gates.ts`. Plan 20-04 will migrate the locally-defined
-// error classes (TransitionGateFailed, LockAcquisitionError, ParseError)
-// into the unified GDDError taxonomy.
+// imported from `./gates.ts`. Plan 20-04 migrated the error classes
+// (TransitionGateFailed, LockAcquisitionError, ParseError) to the
+// unified `gdd-errors` taxonomy — `types.ts` re-exports them verbatim
+// so consumers of `gdd-state` need no changes.
 
 import { readFileSync, writeFileSync, renameSync, unlinkSync, existsSync } from 'node:fs';
 
