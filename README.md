@@ -491,7 +491,7 @@ See [`connections/magic-patterns.md`](connections/magic-patterns.md) for probe p
 
 ## Safety + Recall Floor
 
-Starting with v1.14.5.1, GDD ships three defense-in-depth hooks, the first cross-cycle recall primitive, and a typed reference index:
+Starting with v1.14.6, GDD ships three defense-in-depth hooks, the first cross-cycle recall primitive, and a typed reference index:
 
 - **Bash guard** (`hooks/gdd-bash-guard.js`) — PreToolUse:Bash blocks ~45 dangerous shell patterns after Unicode NFKC + ANSI + zero-width/bidi normalization, so `rm\u200B -rf /`, bidi-override obfuscations, and hex-encoded exec sequences fail closed.
 - **Protected paths** (`hooks/gdd-protected-paths.js`) — PreToolUse:Edit|Write|Bash refuses to mutate `reference/**`, `skills/**`, `commands/**`, `hooks/**`, `.design/archive/**`, `.design/config.json`, `.design/telemetry/**`, `.git/**`, both plugin manifests, and anything the user appends under `.design/config.json.protected_paths` (merge-only — user configs cannot reduce the default set).

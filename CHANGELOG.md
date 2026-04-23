@@ -4,9 +4,9 @@ All notable changes to get-design-done are documented here. Versions follow [sem
 
 ---
 
-## [1.14.5.1] — 2026-04-24
+## [1.14.6] — 2026-04-24
 
-### Phase 14.5 — Safety + Recall Floor (feature release on top of the 1.14.5 Preview MCP bugfix)
+### Phase 14.5 — Safety + Recall Floor
 
 Closes two unrelated risks before the Phase 15–19 reference-library expansion and the Phase 20+ autonomy ramp: (a) agents had no typed reference index and no cache-stable L0 preamble; (b) no defense-in-depth around prompt-injected bash, protected-paths violations, runaway blast radius, or the Figma plugin-sandbox hill-climb failure mode. Ships the minimum-viable version of both tracks as one cohesive release.
 
@@ -49,7 +49,7 @@ Closes two unrelated risks before the Phase 15–19 reference-library expansion 
 - `skills/{progress,resume,reflect,pause}/SKILL.md` — import `reference/retrieval-contract.md` (+ `cycle-handoff-preamble.md` for pause + resume).
 - `hooks/hooks.json` — registers bash-guard, protected-paths, decision-injector, MCP circuit-breaker.
 - Plugin manifests — add `safety-hardening`, `protected-paths`, `decision-injector`, `reference-registry`, `mcp-circuit-breaker` keywords.
-- `tests/semver-compare.test.cjs` — `1.14.5.1` added to `OFF_CADENCE_VERSIONS`.
+- `tests/semver-compare.test.cjs` — `1.14.6` added to `OFF_CADENCE_VERSIONS`.
 
 ### Security
 
