@@ -29,6 +29,10 @@
 // invalid_request_error in some SDK surfaces; we want the more specific
 // OperationFailedError classification rather than ValidationError.
 
+import { createRequire } from 'node:module';
+import { existsSync } from 'node:fs';
+import { isAbsolute, join, resolve, dirname } from 'node:path';
+
 import {
   ValidationError,
   OperationFailedError,
@@ -36,8 +40,36 @@ import {
   type GDDError,
 } from '../gdd-errors/index.ts';
 
-// eslint-disable-next-line @typescript-eslint/no-var-requires
-const transportClassifier = require('../error-classifier.cjs') as {
+/**
+ * Build an absolute path to a repo-root-relative file. We can't use
+ * `import.meta.url` here because tsc's Node16 module mode classifies
+ * this .ts file as CommonJS output for typecheck purposes even though
+ * it actually runs as ESM under `--experimental-strip-types`. Instead
+ * we locate the repo root by walking up from `process.cwd()` until we
+ * find `package.json`, memoize the result, and resolve relative paths
+ * against that anchor. This survives cwd changes during test runs
+ * (sandbox chdir) because we resolve once at module load time.
+ */
+function findRepoRoot(): string {
+  let dir = process.cwd();
+  for (let i = 0; i < 8; i++) {
+    if (existsSync(join(dir, 'package.json'))) return dir;
+    const parent = dirname(dir);
+    if (parent === dir) break;
+    dir = parent;
+  }
+  return process.cwd();
+}
+const REPO_ROOT = findRepoRoot();
+
+/**
+ * Build a `createRequire` loader anchored to the repo root. From this
+ * loader we resolve our `.cjs` siblings via absolute path strings.
+ */
+const nodeRequire = createRequire(join(REPO_ROOT, 'package.json'));
+const transportClassifier = nodeRequire(
+  resolve(REPO_ROOT, 'scripts/lib/error-classifier.cjs'),
+) as {
   classify: (err: unknown) => {
     reason: string;
     retryable: boolean;

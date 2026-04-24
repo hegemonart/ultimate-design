@@ -44,13 +44,33 @@ export type { BudgetCap, SessionRunnerOptions, SessionResult, TurnCap } from './
 export { mapSdkError } from './errors.ts';
 export { TranscriptWriter } from './transcript.ts';
 
-// CommonJS primitives — `.cjs` files loaded via require().
-// eslint-disable-next-line @typescript-eslint/no-var-requires
-const jitteredBackoff = require('../jittered-backoff.cjs') as {
+// CommonJS primitives — `.cjs` files loaded via createRequire. See
+// errors.ts for the full rationale; same pattern here. We resolve paths
+// against a repo-root anchor discovered at module load time so the
+// session-runner survives tests that chdir into sandboxes.
+import { createRequire } from 'node:module';
+import { existsSync } from 'node:fs';
+import { dirname as _dirname, join as _join, resolve as _resolve } from 'node:path';
+function _findRepoRoot(): string {
+  let dir = process.cwd();
+  for (let i = 0; i < 8; i++) {
+    if (existsSync(_join(dir, 'package.json'))) return dir;
+    const parent = _dirname(dir);
+    if (parent === dir) break;
+    dir = parent;
+  }
+  return process.cwd();
+}
+const _REPO_ROOT = _findRepoRoot();
+const _nodeRequire = createRequire(_join(_REPO_ROOT, 'package.json'));
+const jitteredBackoff = _nodeRequire(
+  _resolve(_REPO_ROOT, 'scripts/lib/jittered-backoff.cjs'),
+) as {
   delayMs: (attempt: number, opts?: { baseMs?: number; maxMs?: number; factor?: number; jitter?: number }) => number;
 };
-// eslint-disable-next-line @typescript-eslint/no-var-requires
-const rateGuard = require('../rate-guard.cjs') as {
+const rateGuard = _nodeRequire(
+  _resolve(_REPO_ROOT, 'scripts/lib/rate-guard.cjs'),
+) as {
   remaining: (provider: string) => {
     provider: string;
     remaining: number;
@@ -225,10 +245,20 @@ function collectToolUse(
     toolCalls.push({ name: ch.name ?? '', input: ch.input ?? null });
     return;
   }
-  // The SDK often nests tool_use inside an `assistant` message.content[].
-  const content = ch.message?.content;
-  if (Array.isArray(content)) {
-    for (const block of content) {
+  // The SDK nests tool_use inside `content` blocks. Depending on the
+  // chunk subtype it may land at the top level (`ch.content`) or one
+  // level deeper (`ch.message.content`); check both.
+  const topContent = ch.content;
+  if (Array.isArray(topContent)) {
+    for (const block of topContent) {
+      if (block !== null && typeof block === 'object' && block.type === 'tool_use') {
+        toolCalls.push({ name: block.name ?? '', input: block.input ?? null });
+      }
+    }
+  }
+  const innerContent = ch.message?.content;
+  if (Array.isArray(innerContent)) {
+    for (const block of innerContent) {
       if (block !== null && typeof block === 'object' && block.type === 'tool_use') {
         toolCalls.push({ name: block.name ?? '', input: block.input ?? null });
       }
@@ -626,12 +656,12 @@ function asErrorOutcome(err: unknown): AttemptOutcome {
 }
 
 /** Lazy import of the real SDK. Kept in its own function so tests can
- *  inject `queryOverride` without pulling the SDK into the test process. */
+ *  inject `queryOverride` without pulling the SDK into the test process.
+ *
+ *  Uses the repo-root-anchored `createRequire` loader (see top of file)
+ *  so the SDK resolves regardless of cwd. */
 async function loadSdkQuery(): Promise<(args: { prompt: unknown; options?: unknown }) => AsyncIterable<unknown>> {
-  // Dynamic require so unit tests that override query() don't need the
-  // SDK's runtime preconditions (ANTHROPIC_API_KEY, fetch polyfills, etc.).
-  // eslint-disable-next-line @typescript-eslint/no-var-requires
-  const sdk = require('@anthropic-ai/claude-agent-sdk') as {
+  const sdk = _nodeRequire('@anthropic-ai/claude-agent-sdk') as {
     query: (args: { prompt: unknown; options?: unknown }) => AsyncIterable<unknown>;
   };
   return sdk.query;

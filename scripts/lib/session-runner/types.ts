@@ -43,6 +43,32 @@ export interface TurnCap {
 }
 
 /**
+ * Subset of the SDK `query({options})` call that the runner actually
+ * passes. Tests that stub `query()` can declare their parameter type as
+ * any superset of this shape; the runner only reads `abortSignal`,
+ * `allowedTools`, and `systemPrompt` from the forwarded object.
+ */
+export interface QueryOptionsForwarded {
+  abortSignal?: AbortSignal;
+  allowedTools?: string[];
+  systemPrompt?: string;
+  [extra: string]: unknown;
+}
+
+/** Invocation shape passed to queryOverride and the real SDK's `query()`. */
+export interface QueryInvocation {
+  prompt: unknown;
+  options?: QueryOptionsForwarded;
+}
+
+/**
+ * Test-injectable stand-in for the SDK's `query()`. Any function whose
+ * parameter accepts `{ prompt, options? }` and returns an async iterable
+ * over unknown chunks is compatible.
+ */
+export type QueryOverride = (args: QueryInvocation) => AsyncIterable<unknown>;
+
+/**
  * One shot at the Agent SDK. Callers that need retries or backoff should
  * rely on the built-in retry-once mechanism rather than wrapping this.
  *
@@ -75,8 +101,17 @@ export interface SessionRunnerOptions {
   signal?: AbortSignal;
   /** Max retry attempts on retryable errors (default: 2, first try + retry-once). */
   maxRetries?: number;
-  /** Override the SDK `query()` import (for tests). Default imports real SDK. */
-  queryOverride?: (...args: unknown[]) => AsyncIterable<unknown>;
+  /**
+   * Override the SDK `query()` import (for tests). Default imports real SDK.
+   *
+   * The parameter is a single `args` object matching the SDK's call shape
+   * `{ prompt, options }` where `options` carries at minimum `abortSignal`
+   * plus the SDK's own extras. Tests can narrow `options` in their
+   * declaration and still satisfy the type because the runner only ever
+   * passes `abortSignal`, `systemPrompt`, and `allowedTools` — none of
+   * which widen the test's declared shape.
+   */
+  queryOverride?: QueryOverride;
   /** Override the prompt sanitizer (for tests). Default calls prompt-sanitizer.sanitize(). */
   sanitizeOverride?: (raw: string) => {
     sanitized: string;
