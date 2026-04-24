@@ -270,7 +270,7 @@ Thousand separator conventions differ significantly across markets:
 |--------|--------------------|------------------|
 | United States, United Kingdom | `,` (comma) | `.` (period) |
 | Germany, Brazil, most of continental Europe | `.` (period) | `,` (comma) |
-| France, Switzerland (French) | ` ` (narrow space) | `,` (comma) |
+| France, Switzerland (French) | `\u202f` (narrow no-break space) | `,` (comma) |
 | India | `,` but with South Asian grouping (2-2-3) | `.` (period) |
 | Arabic locales | `٬` or `,` depending on region | `٫` or `.` |
 
