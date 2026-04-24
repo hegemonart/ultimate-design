@@ -13,7 +13,7 @@ Use this before any design artifact goes to the user or into a PR.
 - [ ] Cited references in output so user can redirect
 
 ### Context check
-- [ ] `.impeccable.md` exists at project root
+- [ ] `DESIGN-CONTEXT.md` (or `DESIGN.md`) exists at project root with direction stated
 - [ ] `DESIGN.md` exists at project root
 - [ ] Design direction explicitly stated (brutalist / editorial / …)
 - [ ] User approved direction before Phase 3
@@ -66,7 +66,7 @@ Use this before any design artifact goes to the user or into a PR.
 ### Technical check (code artifacts)
 - [ ] Browser: running in preview; no console errors
 - [ ] Dev server responds with HTTP 200 on expected routes
-- [ ] Mobile viewport tested (or `impeccable-adapt` run)
+- [ ] Mobile viewport tested (320px, 375px, 390px, 428px breakpoints)
 - [ ] Tap delay removed (`touch-action: manipulation`)
 - [ ] Images use WebP/AVIF + `srcset` + lazy-loading where appropriate
 
@@ -83,7 +83,7 @@ Use this before any design artifact goes to the user or into a PR.
 When the change is a single-screen tweak, use this shortened list:
 
 - [ ] Pulled 1–2 references before touching code
-- [ ] Change respects `.impeccable.md` direction (didn't sneak in a different tone)
+- [ ] Change respects stated brand direction from `DESIGN-CONTEXT.md` (no tone drift)
 - [ ] Interactive element has all 8 states
 - [ ] No item on the absolute-ban list (anti-patterns.md)
 - [ ] Contrast AA
