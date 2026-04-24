@@ -6,6 +6,7 @@ color: yellow
 default-tier: sonnet
 tier-rationale: "Follows an Opus-authored plan; executes rather than plans"
 size_budget: XXL
+size_budget_rationale: "Phase 17 added Benchmark Spec Pre-Flight section for type:components (+17 lines)"
 parallel-safe: conditional-on-touches
 typical-duration-seconds: 60
 reads-only: false
@@ -128,7 +129,7 @@ For `audit` tasks: grep the codebase using patterns from `reference/anti-pattern
 
 ### Type: typography
 
-Read `reference/typography.md` before starting.
+Read `reference/typography.md` before starting. If `reference/variable-fonts-loading.md` is present, also read it — apply variable font axis guidance, font-display trade-offs, fallback metric overrides (size-adjust, ascent-override), and FOIT/FOUT rules to any web font or @font-face decisions in this task.
 
 1. **Identify current state**: grep all font-size values in the codebase. List every unique value.
 2. **Design the target scale**: from the `<decisions>` in DESIGN-CONTEXT.md, pick the modular ratio (default: 1.25, base 16px). Compute: 12/14/16/20/24/30/36/48px (or `text-xs` through `text-5xl` in Tailwind).
@@ -177,7 +178,7 @@ before committing final values.
 
 ### Type: layout
 
-Read `reference/layout.md` (if present) and relevant DESIGN-CONTEXT.md decisions before starting. If the layout task involves charts, dashboards, or data display, also read `reference/data-visualization.md` for chart-choice and dashboard-pattern guidance.
+Read `reference/layout.md` (if present) and relevant DESIGN-CONTEXT.md decisions before starting. If `reference/css-grid-layout.md` is present, also read it — apply modern Grid patterns (subgrid, container queries with `@container`, fluid `clamp()` typography, logical properties, safe-area insets, anchor positioning). If `reference/image-optimization.md` is present, apply it to any image-related layout decisions (format choice, srcset/sizes, lazy-loading, CDN transforms, image budget enforcement). If the layout task involves charts, dashboards, or data display, also read `reference/data-visualization.md` for chart-choice and dashboard-pattern guidance.
 
 1. **Inventory layout structure**: identify all grid, flex, and positioning patterns in scope files.
 2. **Check spacing consistency**: grep for magic spacing values (px or rem) not from a spacing scale. Map to nearest scale step.
@@ -220,7 +221,7 @@ Work through the accessibility checklist:
 
 ### Type: motion
 
-Read `reference/motion.md` and `reference/framer-motion-patterns.md` before starting.
+Read `reference/motion.md` and `reference/framer-motion-patterns.md` before starting. If `reference/motion-advanced.md` is present, also read it — apply advanced patterns (gesture/drag mechanics, clip-path animations, blur-to-mask crossfades, CSS transitions vs keyframes for interruptible UI, WAAPI, Framer Motion hardware-accel gotcha, motion cohesion rules, next-day review process). If `reference/motion-easings.md` is present, use canonical `--ease-*` tokens rather than raw cubic-bezier strings. If `reference/motion-spring.md` is present, use named presets (gentle/wobbly/stiff/slow) for spring configurations.
 
 `reference/framer-motion-patterns.md` contains Framer Motion-specific implementation patterns that complement the framework-agnostic rules in `reference/motion.md`. When the codebase uses Framer Motion (detectable by `framer-motion` imports), apply the patterns from that file: spring/tween configuration, `AnimatePresence` with `initial={false}`, layout animations, variants with `staggerChildren`, gesture props (`whileHover`, `whileTap` at scale 0.96), `useReducedMotion` or `MotionConfig reducedMotion="user"` for a11y, and the hard constraint that `bounce: 0` for all micro-interactions.
 
@@ -237,25 +238,10 @@ Also: verify exit animations are 60–70% of enter duration.
 
 ---
 
-### Type: forms
-
-Read `reference/form-patterns.md` before starting. This is the authoritative guide for all form design tasks.
-
-1. **Audit label position**: check for placeholder-only labels (WCAG fail) — convert to top-aligned or floating labels.
-2. **Audit validation timing**: on-blur is the default; on-change only for character counters and password strength meters.
-3. **Audit autocomplete tokens**: ensure `autocomplete` attributes match the full taxonomy in `reference/form-patterns.md` Section 6.
-4. **Audit inputmode hints**: check `inputmode` and `enterkeyhint` for mobile keyboard optimization.
-5. **Audit password fields**: show/hide toggle required; paste must be allowed; `autocomplete="new-password"` on creation, `autocomplete="current-password"` on login.
-6. **Multi-step forms**: verify step count is shown upfront; back navigation preserves state.
-7. **Apply fixes** and document each change with the pattern reference it addresses.
-
----
-
 ### Type: copy
 
 Read `reference/anti-patterns.md` copy section before starting.
 Read `reference/brand-voice.md` — voice axes, archetype library, and tone-by-context table provide the authoritative copy standards for this task type.
-If the scope includes onboarding flows or empty states, also read `reference/onboarding-progressive-disclosure.md` for first-run copy conventions.
 
 1. **Audit all user-visible text**: scan files in scope for button labels, error messages, empty states, tooltips, placeholder text.
 2. **Apply UX copy standards**:
@@ -302,6 +288,23 @@ Read `reference/anti-patterns.md`, `reference/design-system-guidance.md`, and DE
 ### Type: component
 
 Read all relevant reference files for this component's concerns (typography, color, accessibility, motion) before starting.
+
+#### Benchmark Spec Pre-Flight
+
+Before executing the task, check for a benchmark spec:
+
+```bash
+# Extract component name from task description (PascalCase → kebab-case)
+ls reference/components/<name>.md 2>/dev/null
+```
+
+If `reference/components/<name>.md` exists:
+1. Read the spec's **Anatomy**, **States**, **Variants**, and **Keyboard & Accessibility** sections
+2. Use these as the authoritative contract for the implementation — do not re-discover naming conventions, ARIA roles, or keyboard patterns that the spec already defines
+3. In the task output file (`task-NN.md`), add a line: `Spec pre-flight: reference/components/<name>.md — [N] states, [M] variants, WAI-ARIA contract applied`
+4. Flag any deviation between the task instructions and the spec in the `## Deviations` section
+
+If no spec exists, skip silently and proceed normally (graceful degradation).
 
 1. **Read the component spec from the task's Action field**: understand what the component does, its states, its variants.
 2. **Apply ALL relevant reference guidelines simultaneously**: typography scale, color token usage, accessibility requirements (ARIA, focus management, keyboard nav), motion constraints.

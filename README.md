@@ -83,6 +83,14 @@ Built-in quality gates catch real problems: Handoff Faithfulness scoring on Clau
 - **New `type:forms` executor task type** — `design-executor` now has a dedicated 7-step checklist for form audits: label position, validation timing, autocomplete tokens, inputmode hints, password UX, multi-step state, and CAPTCHA compliance.
 - **Platform + locale detection in context-builder** — `design-context-builder` now explicitly prompts for locale/RTL/CJK requirements (Area 2) and device targets with platform references (Area 6), ensuring downstream agents receive the full platform context.
 
+### v1.18.0 Highlights — Advanced Craft References + Motion Vocabulary
+
+- **4 advanced craft references** — `variable-fonts-loading.md` (variable axes, font-display trade-offs, WOFF2 subsetting, fallback metric overrides, GRAD axis for dark mode), `image-optimization.md` (WebP/AVIF/JPEG XL matrix, srcset math, LQIP/BlurHash, CDN transforms, image budgets), `css-grid-layout.md` (subgrid, container queries, fluid `clamp()` typography, logical properties, safe areas, anchor positioning), `motion-advanced.md` (spring physics, FLIP, View Transitions API, gesture/drag mechanics, clip-path animations, blur crossfades, Framer Motion hardware-accel gotcha, motion cohesion, next-day review).
+- **Motion vocabulary (RN MIT upstream)** — `motion-easings.md` (12 canonical curve presets, `--ease-*` token catalog), `motion-interpolate.md` (input→output range + 4 extrapolation modes: extend/identity/clamp/wrap), `motion-spring.md` (gentle/wobbly/stiff/slow presets with 60fps settle-times). Optional math helpers at `scripts/lib/easings.cjs` and `scripts/lib/spring.cjs`.
+- **Transition taxonomy (hyperframes Apache-2.0)** — `motion-transition-taxonomy.md` names 8 controlled families (3d, blur, cover, destruction, dissolve, distortion, grid, light) so motion-mapper output diffs cleanly cycle-over-cycle.
+- **Structured motion-map output** — `motion-mapper` now emits a JSON block at the top of `.design/map/motion.md` conforming to `reference/output-contracts/motion-map.schema.json`. Every animation binding declares easing (canonical or custom+justification), transition family, duration class, and trigger type. `scripts/lib/parse-contract.cjs` validates and returns structured data or actionable error.
+- **Agent wiring** — `token-mapper` gains easing consolidation (raw `cubic-bezier()` → `--ease-*` token recommendations); `design-executor` reads craft references per task type; `design-auditor` scores gesture patterns and clip-path animations as advanced-craft signal (positive, not a penalty).
+
 ### v1.15.0 Highlights — Design Knowledge Expansion
 
 - **10 new foundational references** — `iconography.md`, `performance.md`, `brand-voice.md`, `visual-hierarchy-layout.md`, `gestalt.md`, `design-system-guidance.md`, `design-systems-catalog.md`, `framer-motion-patterns.md`, `palette-catalog.md`, `style-vocabulary.md`. Agents now have authoritative answers on icon sizing, Web Vitals budgets, brand voice axes, Gestalt principles, DS governance, and 40+ industry-vertical color palettes.
@@ -393,6 +401,39 @@ After each design cycle, `/gdd:reflect` reads `.design/learnings/`, `.design/tel
 - **Global skill promotion** — project findings promoted to `~/.claude/gdd/global-skills/` for cross-project use
 
 **Nothing auto-applies.** Every proposal requires explicit review via `/gdd:apply-reflections` — diff, accept, skip, or edit each one. The discipline mirrors the `design-figma-writer` proposal→confirm pattern.
+
+---
+
+## Component Benchmark Corpus
+
+Per-component design specifications harvested from 18 major design systems and synthesized into a locked, agent-consumable format. Every spec is ≤350 lines, greppable, diff-friendly, and cross-linked to `reference/anti-patterns.md`.
+
+**Wave 1 — Inputs (v1.16.0)**: Button · Input · Select/Combobox · Checkbox · Radio · Switch · Link · Label
+
+**Wave 2 — Containers (v1.16.0)**: Card · Modal/Dialog · Drawer/Sheet · Popover · Tooltip · Accordion · Tabs
+
+**Wave 3 — Feedback (v1.17.0)**: Toast · Alert · Progress · Skeleton · Badge · Chip
+
+**Wave 4 — Navigation & Data (v1.17.0)**: Menu · Navbar · Sidebar · Breadcrumbs · Pagination · Table · List · Tree · Command-palette
+
+**Wave 5 — Advanced (v1.17.0)**: Date-picker · Slider · File-upload · Rich-text editor · Stepper
+
+**Total: 35 specs** across 5 waves. Each spec: WAI-ARIA keyboard contracts (verbatim), NORM/DIVERGE convergence analysis, grep signatures for `design-auditor` conformance scoring, and a failing-example block.
+
+**Pipeline integration (v1.17.0):**
+- `design-auditor` — detects component implementations via grep signatures, scores conformance against specs, emits Component Conformance addendum
+- `design-executor` — reads matching spec as pre-flight contract for `type:components` tasks
+- `design-doc-writer` — scaffolds handoff docs from spec anatomy/variants when a benchmark spec exists
+- `design-pattern-mapper` — writes `.design/map/component-convergence.md` (matched/absent components + convergence %)
+
+```bash
+/gdd:benchmark button                  # harvest + synthesize a single spec
+/gdd:benchmark --wave 1                # run all Wave 1 specs
+/gdd:benchmark --list                  # coverage table
+/gdd:benchmark --refresh modal-dialog  # re-harvest after design-system update
+```
+
+Sources: `connections/design-corpora.md` — Material 3, Apple HIG, Radix, WAI-ARIA APG, shadcn/ui, Polaris, Carbon, Fluent 2, Primer, Atlassian, Ant Design, Mantine, Chakra, Base Web, Nord, Spectrum, Lightning, Gestalt (Pinterest).
 
 ---
 

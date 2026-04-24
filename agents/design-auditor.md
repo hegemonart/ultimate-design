@@ -6,7 +6,8 @@ color: green
 model: inherit
 default-tier: sonnet
 tier-rationale: "Emits structured findings from code inspection; Sonnet balances depth with cost"
-size_budget: XL
+size_budget: XXL
+size_budget_rationale: "Phase 17 added Component Conformance addendum (+54 lines for spec-grep detection + conformance scoring algorithm)"
 parallel-safe: always
 typical-duration-seconds: 45
 reads-only: false
@@ -52,6 +53,10 @@ Minimum expected files:
 - `reference/performance.md` — Core Web Vitals budgets, JS/font/image budgets, React runtime performance
 - `reference/style-vocabulary.md` — UI aesthetic catalog; use when scoring Pillar 3 (Color) style-coherence sub-check and Pillar 2 (Visual Hierarchy) signature-effects verification
 - `reference/design-systems-catalog.md` — 18-system index for identifying pattern precedents and system alignment
+- `reference/variable-fonts-loading.md` (if present) — variable font axes, font-display trade-offs, fallback metric overrides; use when auditing Pillar 4 (Typography)
+- `reference/image-optimization.md` (if present) — format matrix, srcset/sizes, LQIP/BlurHash, CDN transforms, image budgets; use when auditing Pillar 5 (Layout & Spacing) for image-heavy UIs
+- `reference/css-grid-layout.md` (if present) — subgrid, container queries, fluid clamp() typography, logical properties; use when auditing Pillar 5 (Layout & Spacing)
+- `reference/motion-advanced.md` (if present) — advanced motion patterns; score gesture/drag mechanics, clip-path animations, blur crossfades as "advanced craft" signal (positive, not a penalty) in Pillar 7 (Micro-Polish)
 - `reference/form-patterns.md` — label position, validation timing, autofill tokens, password UX (use for forms-pillar checks)
 - `reference/onboarding-progressive-disclosure.md` — first-run patterns, feature discovery, anti-patterns (use when onboarding flows are in scope)
 - `reference/data-visualization.md` — chart-choice matrix, color-blind palettes, axis conventions (use for chart-heavy projects)
@@ -449,6 +454,60 @@ grep -rEl "from ['\"]framer-motion['\"]" src/ --include="*.tsx" --include="*.jsx
 ```
 
 If framer-motion is in use and neither `reducedMotion="user"` in `MotionConfig` nor `useReducedMotion` calls are found, flag this as a high-priority accessibility gap in the Priority Fix List.
+
+---
+
+## Component Conformance Addendum
+
+After the 7-pillar scoring is complete, run this addendum to detect component implementations and score their conformance against `reference/components/` benchmark specs. Findings appear in `.design/DESIGN-AUDIT.md` as an informational section after the pillar scores — they do not affect the /28 total.
+
+### Step 1: Discover available specs
+
+```bash
+ls reference/components/*.md | grep -v TEMPLATE | grep -v README
+```
+
+### Step 2: Detect implementations in codebase
+
+For each spec, run its **Grep Signatures** against the source root (from `STATE.md source_roots`, default `src/`). A component is "detected" if ≥1 grep signature pattern matches. Examples:
+
+```bash
+# Check for Button implementation
+grep -rn "role=\"button\"\|<button\b\|Button\b" src/ --include="*.tsx" --include="*.jsx" | head -5
+
+# Check for Toast implementation
+grep -rn "role=\"status\"\|role=\"alert\"\|toast\|Toast\b" src/ --include="*.tsx" --include="*.jsx" | head -5
+```
+
+### Step 3: Score conformance per detected component
+
+For each detected component, check:
+- **States covered**: count how many States from the spec are implemented (look for aria states, visual states)
+- **Variants covered**: count how many spec Variants exist in the codebase
+- **A11y contract**: spot-check 2–3 WAI-ARIA items from the Keyboard & Accessibility section
+
+Score = (implemented items) / (total spec items checked) × 100. Round to nearest 10%.
+
+### Step 4: Emit in DESIGN-AUDIT.md
+
+Add after the Priority Fix List:
+
+```markdown
+## Component Conformance
+
+> Informational addendum — does not affect /28 pillar score.
+> Specs from `reference/components/` benchmarked against codebase.
+
+| Component | Detected | Conformance | Key Gaps |
+|-----------|----------|-------------|----------|
+| Button | ✓ | 80% | Missing `aria-busy` on loading state |
+| Toast | ✓ | 60% | Missing `role="alert"` on error variant |
+| Table | ✗ | — | No implementation found |
+
+**Summary**: N/M specs detected in codebase; average conformance X%.
+```
+
+If `reference/components/` does not exist or contains no specs, skip this section entirely (graceful degradation).
 
 ---
 
