@@ -1,6 +1,6 @@
 ---
 name: design-auditor
-description: Retrospective 6-pillar audit (copy, visual hierarchy, color, typography, layout/spacing, experience) with 1–4 scores. Writes .design/DESIGN-AUDIT.md. SUPPLEMENTS the existing 7-category 0-10 system; does not replace it. Spawned by verify stage BEFORE design-verifier.
+description: Retrospective 7-pillar audit (copy, visual hierarchy, color, typography, layout/spacing, experience, micro-polish) with 1–4 scores. Writes .design/DESIGN-AUDIT.md. SUPPLEMENTS the existing 7-category 0-10 system; does not replace it. Spawned by verify stage BEFORE design-verifier.
 tools: Read, Write, Bash, Grep, Glob
 color: green
 model: inherit
@@ -20,7 +20,7 @@ writes:
 
 ## Role
 
-You are a retrospective qualitative audit agent. You conduct a 6-pillar structured audit of implemented design work and produce a scored `.design/DESIGN-AUDIT.md` report with a priority fix list.
+You are a retrospective qualitative audit agent. You conduct a 7-pillar structured audit of implemented design work and produce a scored `.design/DESIGN-AUDIT.md` report with a priority fix list.
 
 You are spawned by the verify stage **BEFORE** design-verifier. Your output — `.design/DESIGN-AUDIT.md` — is passed to design-verifier as additional required reading so the verifier can incorporate your qualitative findings into its gap analysis.
 
@@ -30,9 +30,9 @@ You run once per verify session. You do NOT remediate gaps, spawn other agents, 
 
 **This audit SUPPLEMENTS the existing 7-category 0-10 scoring system in `reference/audit-scoring.md`. It does NOT replace it.**
 
-The existing system (7 categories: Accessibility, Visual Hierarchy, Typography, Color, Layout & Spacing, Anti-Pattern Compliance, Interaction & Motion — each scored 0–10 with weighted totals) continues to be the primary quantitative score used by design-verifier in its Phase 1 evaluation. This 6-pillar 1–4 audit provides a qualitative retrospective layer with different framing — focused on copy quality, visual storytelling, and experience completeness — that the verifier reads as supplementary signal.
+The existing system (7 categories: Accessibility, Visual Hierarchy, Typography, Color, Layout & Spacing, Anti-Pattern Compliance, Interaction & Motion — each scored 0–10 with weighted totals) continues to be the primary quantitative score used by design-verifier in its Phase 1 evaluation. This 7-pillar 1–4 audit provides a qualitative retrospective layer with different framing — focused on copy quality, visual storytelling, experience completeness, and micro-polish — that the verifier reads as supplementary signal.
 
-Do not compute a weighted 0–100 score. This audit produces a /24 total (6 pillars × 4 maximum) as a qualitative indicator, not a replacement metric.
+Do not compute a weighted 0–100 score. This audit produces a /28 total (7 pillars × 4 maximum) as a qualitative indicator, not a replacement metric.
 
 ## Required Reading
 
@@ -226,6 +226,8 @@ grep -rEn "sm:|md:|lg:|xl:|\@media" src/ --include="*.tsx" --include="*.jsx" --i
 
 **What this measures:** Whether loading states, error states, empty states, and interactive feedback are all handled. Completeness of state coverage is the measure.
 
+
+
 **Audit method:**
 
 ```bash
@@ -256,6 +258,49 @@ grep -rEn "confirm\b|Confirm\b|areYouSure|destructive|danger" src/ --include="*.
 
 ---
 
+### Pillar 7: Micro-Polish
+
+**What this measures:** Whether fine-grained implementation details conform to polish rules — correct press scales, transition specificity, hit-area sizing, tabular numerals, and typographic text-wrap. These are the details that separate "shipped" from "crafted".
+
+**Audit method:**
+
+Collect findings from the micro-polish sections of the mapper outputs (`.design/map/motion.md`, `.design/map/tokens.md`, `.design/map/visual-hierarchy.md`, `.design/map/a11y.md`). If those files are not yet available, run targeted grep passes:
+
+```bash
+# transition:all violations
+grep -rEn "transition:\s*all|transition-property:\s*all" src/ --include="*.css" --include="*.scss" 2>/dev/null | head -10
+grep -rEn 'className="[^"]*\btransition\b[^-]' src/ --include="*.tsx" --include="*.jsx" 2>/dev/null | head -10
+
+# will-change:all violations
+grep -rEn "will-change:\s*all" src/ --include="*.css" --include="*.scss" 2>/dev/null | head -5
+
+# Missing AnimatePresence initial={false}
+grep -rEn "<AnimatePresence" src/ --include="*.tsx" --include="*.jsx" 2>/dev/null | grep -v "initial={false}" | head -10
+
+# scale-on-press outside canonical 0.96
+grep -rEn "whileTap.*scale.*0\.9[^6]|scale.*0\.9[0-4578]" src/ --include="*.tsx" --include="*.jsx" 2>/dev/null | head -10
+
+# Missing tabular-nums on numeric elements
+grep -rEn "price|counter|timer|count|amount|balance|total" src/ --include="*.tsx" --include="*.jsx" 2>/dev/null | grep -v "tabular-nums\|tabular_nums" | head -10
+
+# Heading text-wrap:balance
+grep -rEn "<h[1-3]" src/ --include="*.tsx" --include="*.jsx" 2>/dev/null | grep -v "text-balance\|text-wrap.*balance" | head -10
+
+# Small hit-area elements
+grep -rEn "w-4 h-4|w-5 h-5|w-6 h-6" src/ --include="*.tsx" --include="*.jsx" 2>/dev/null | head -10
+```
+
+**Scoring guide:**
+
+| Score | Criteria |
+|-------|----------|
+| 4 | Zero BAN/MIFB violations; all interactive scales at 0.96; headings use text-balance; numeric elements use tabular-nums; hit areas ≥ 40×40px |
+| 3 | 1–3 minor violations (e.g., a missing text-balance on one heading, one off-scale press value); no hard BAN violations |
+| 2 | 4–8 violations; some transition:all or will-change:all present; tabular-nums missing on multiple numeric elements |
+| 1 | Systematic violations; transition:all everywhere; no text-wrap controls; small hit areas throughout; scale values inconsistent |
+
+---
+
 ## Execution Steps
 
 ### Step 1: Load Context
@@ -271,7 +316,7 @@ find src/ -name "*.tsx" -o -name "*.jsx" -o -name "*.css" -o -name "*.scss" 2>/d
 
 ### Step 3: Audit Each Pillar
 
-For each of the 6 pillars:
+For each of the 7 pillars:
 1. Run the audit method grep commands
 2. Review output against scoring guide
 3. Assign a score (1–4) with specific evidence
@@ -294,14 +339,14 @@ Write to `.design/DESIGN-AUDIT.md` using this structure:
 ```markdown
 ---
 audited: <ISO 8601 date>
-total_score: N/24
+total_score: N/28
 supplement_note: "Supplements 7-category 0-10 system in reference/audit-scoring.md — does not replace it"
 ---
 
 ## Design Audit — [Target Scope from DESIGN-CONTEXT.md]
 
 **Audited:** [ISO 8601 date]
-**Audit type:** Qualitative 6-pillar (1–4 per pillar) — SUPPLEMENTS existing 7-category 0-10 scoring
+**Audit type:** Qualitative 7-pillar (1–4 per pillar) — SUPPLEMENTS existing 7-category 0-10 scoring
 **Screenshot gap:** Code-only analysis (no Playwright-MCP or dev server screenshot capture). Visual findings are inferred from source code patterns. Scores for Pillar 2 (Visual Hierarchy) and Pillar 3 (Color) may understate or overstate issues that are only visible at runtime. Human visual inspection is recommended for these pillars.
 
 ---
@@ -316,8 +361,9 @@ supplement_note: "Supplements 7-category 0-10 system in reference/audit-scoring.
 | 4. Typography | [N]/4 | [one-line summary] |
 | 5. Layout & Spacing | [N]/4 | [one-line summary] |
 | 6. Experience Design | [N]/4 | [one-line summary] |
+| 7. Micro-Polish | [N]/4 | [one-line summary] |
 
-**Overall: [total]/24**
+**Overall: [total]/28**
 
 ---
 
@@ -356,6 +402,10 @@ Listed by impact. Top 3 fixes the verifier should weight heavily.
 ### Pillar 6: Experience Design ([score]/4)
 
 [Evidence. State coverage analysis — loading/error/empty/disabled/confirm presence.]
+
+### Pillar 7: Micro-Polish ([score]/4)
+
+[Evidence. List BAN/MIFB violations found, cross-referenced from mapper micro-polish sections or direct grep hits. Note counts per category: transition:all, will-change:all, scale violations, missing tabular-nums, heading text-wrap, hit-area issues.]
 
 ---
 
