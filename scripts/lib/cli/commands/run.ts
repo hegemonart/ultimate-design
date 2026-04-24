@@ -1,4 +1,5 @@
-// scripts/lib/cli/commands/run.ts — Plan 21-09 Task 2 (SDK-21).
+// scripts/lib/cli/commands/run.ts — Plan 21-09 Task 2 (SDK-21),
+// extended by Plan 21-11 Task 3 (dry-run).
 //
 // `gdd-sdk run` — drives the full design pipeline via
 // `pipeline-runner.run()`. Builds a PipelineConfig from CLI flags,
@@ -12,9 +13,19 @@
 //   * 1 — PipelineStatus === 'halted'.
 //   * 2 — PipelineStatus === 'awaiting-gate'.
 //   * 3 — argument / config error (missing prompts, malformed flags).
+//
+// --dry-run (Plan 21-11):
+//   Installs a mocked session-runner that reads canned SessionResult
+//   objects from `<cwd>/expected-outputs/canned-<stage>.json` plus a
+//   permissive transition-stage override. Each mock "session" also
+//   writes the stage-appropriate artifact (DESIGN-PATTERNS.md,
+//   DESIGN-PLAN.md, DESIGN.md, SUMMARY.md) under `<cwd>/.design/`
+//   so callers can assert artifact shape without a real API call.
+//   Zero API cost. Intended for CI; the fixture at
+//   `test-fixture/headless-e2e/` is the canonical consumer.
 
-import { readFileSync } from 'node:fs';
-import { resolve as resolvePath } from 'node:path';
+import { readFileSync, writeFileSync, mkdirSync, existsSync } from 'node:fs';
+import { resolve as resolvePath, join as joinPath, dirname as dirnamePath } from 'node:path';
 
 import {
   run as defaultPipelineRun,
@@ -22,11 +33,13 @@ import {
   type HumanGateInfo,
   type PipelineConfig,
   type PipelineResult,
+  type RunOverrides,
   type Stage,
   type StageOutcome,
 } from '../../pipeline-runner/index.ts';
 import { getLogger } from '../../logger/index.ts';
 import { ValidationError } from '../../gdd-errors/index.ts';
+import type { SessionResult, SessionRunnerOptions } from '../../session-runner/types.ts';
 
 import {
   coerceFlags,
@@ -47,6 +60,8 @@ const RUN_FLAGS: readonly FlagSpec[] = [
   { name: 'stop-after', type: 'string' },
   { name: 'prompt-file', type: 'string' },
   { name: 'gate-reply', type: 'string' },
+  { name: 'dry-run', type: 'boolean', default: false },
+  { name: 'fixture', type: 'string' },
 ];
 
 const USAGE = `gdd-sdk run [flags]
@@ -71,6 +86,14 @@ Flags:
   --json                   Emit machine-parseable JSON to stdout
   --text                   Force human-readable output (default)
   --headless / --interactive  Override logger auto-mode
+  --dry-run                Mock mode: read canned SessionResults from
+                           <fixture>/expected-outputs/canned-<stage>.json
+                           and write stub artifacts under <cwd>/.design/.
+                           Zero API cost; used by the E2E fixture test
+                           harness (test-fixture/headless-e2e/).
+  --fixture <dir>          Override the fixture root whose
+                           expected-outputs/ directory supplies canned
+                           SessionResults. Defaults to --cwd.
 
 Exit codes:
   0  completed / stopped-after
@@ -213,9 +236,34 @@ export async function runCommand(
 
   const pipelineRun: PipelineRunFn = deps.pipelineRun ?? defaultPipelineRun;
 
+  // Plan 21-11: --dry-run installs canned session overrides + a
+  // permissive transition shim. Artifacts are written to disk by the
+  // override so assertions can still check artifact shape.
+  let overrides: RunOverrides = {};
+  if (flags['dry-run'] === true) {
+    const fixtureDir: string =
+      typeof flags['fixture'] === 'string' && (flags['fixture'] as string).length > 0
+        ? resolvePath(process.cwd(), flags['fixture'] as string)
+        : cwd;
+    try {
+      overrides = buildDryRunOverrides(cwd, fixtureDir);
+    } catch (err) {
+      stderr.write(`gdd-sdk run: ${errMessage(err)}\n`);
+      return 3;
+    }
+    try {
+      getLogger().info('cli.run.dry_run_enabled', {
+        fixture: fixtureDir,
+        cwd,
+      });
+    } catch {
+      // Swallow logger failures.
+    }
+  }
+
   let result: PipelineResult;
   try {
-    result = await pipelineRun(config);
+    result = await pipelineRun(config, overrides);
   } catch (err) {
     // pipeline-runner is contracted never to throw, but belt-and-braces:
     // surface the error as exit 3 rather than crashing.
@@ -395,4 +443,214 @@ function formatOutcome(outcome: StageOutcome): string {
       ? ` blockers=[${outcome.blockers.join('; ')}]`
       : '';
   return `${outcome.stage}: ${outcome.status}${retries}${blockers}`;
+}
+
+// ---------------------------------------------------------------------------
+// Dry-run support — Plan 21-11 Task 3.
+//
+// Reads canned SessionResult objects from
+// `<fixtureDir>/expected-outputs/canned-<stage>.json` and writes a
+// stub artifact per stage under `<cwd>/.design/` so downstream
+// assertions can still grep for artifact shape. Transition-stage gate
+// is bypassed with an always-OK override (the dry-run is about shape
+// assertions, not full state-machine gating — that is exercised by
+// the pipeline-runner unit test suite).
+// ---------------------------------------------------------------------------
+
+/**
+ * Per-stage "pretend LLM output" that the dry-run override writes to
+ * `.design/`. Each payload embeds the structural tokens that the Plan
+ * 21-11 harness asserts on (`## Tokens`, `## Components`, `Wave`, etc.).
+ */
+const DRY_RUN_ARTIFACTS: Readonly<Record<Stage, readonly { readonly path: string; readonly body: string }[]>> =
+  Object.freeze({
+    brief: [
+      {
+        path: '.design/BRIEF.md',
+        body: [
+          '# Design Brief — dry-run',
+          '',
+          '**Goal:** Audit design-system consistency; extract tokens; normalize spacing.',
+          '',
+          '## BRIEF COMPLETE',
+          '',
+        ].join('\n'),
+      },
+    ],
+    explore: [
+      {
+        path: '.design/DESIGN-PATTERNS.md',
+        body: [
+          '# Design Patterns — dry-run',
+          '',
+          '## Tokens',
+          '- #0066ff (button primary)',
+          '- #111 (heading)',
+          '- #f5f5f5 (page bg)',
+          '- #ffffff (card bg)',
+          '',
+          '## Components',
+          '- Button (2 variants: Start, Continue)',
+          '- Card (title + children slot)',
+          '',
+          '## Accessibility',
+          '- Button has no focus-visible ring; recommend outline or ring token.',
+          '',
+          '## Visual Hierarchy',
+          '- h1 28px / h2 inherits; recommend locking to scale token.',
+          '',
+          '## EXPLORE COMPLETE',
+          '',
+        ].join('\n'),
+      },
+    ],
+    plan: [
+      {
+        path: '.design/DESIGN-PLAN.md',
+        body: [
+          '# Design Plan — dry-run',
+          '',
+          '## Wave 1 — Token extraction',
+          'Type: refactor',
+          'Touches: src/components/Button.tsx, src/components/Card.tsx',
+          'Parallel: yes',
+          'Acceptance: every hex literal replaced with a CSS custom property.',
+          '',
+          '## Wave 2 — Spacing normalization',
+          'Type: refactor',
+          'Touches: src/components/Button.tsx, src/components/Card.tsx, src/App.tsx',
+          'Parallel: no',
+          'Acceptance: all padding values are multiples of 4px.',
+          '',
+          '## PLAN COMPLETE',
+          '',
+        ].join('\n'),
+      },
+    ],
+    design: [
+      {
+        path: '.design/DESIGN.md',
+        body: [
+          '# Design — dry-run',
+          '',
+          '## Tokens',
+          '- --color-primary: #0066ff',
+          '- --color-text: #111',
+          '- --space-2: 8px',
+          '- --space-3: 12px',
+          '- --space-4: 16px',
+          '',
+          '## DESIGN COMPLETE',
+          '',
+        ].join('\n'),
+      },
+    ],
+    verify: [
+      {
+        path: '.design/SUMMARY.md',
+        body: [
+          '# Summary — dry-run',
+          '',
+          '- M-01: pass (every hex literal extracted into a token)',
+          '- M-02: pass (all padding values are multiples of 4px)',
+          '',
+          '## VERIFY COMPLETE',
+          '',
+        ].join('\n'),
+      },
+    ],
+  });
+
+/**
+ * Build the RunOverrides bundle that drives --dry-run.
+ *
+ * Reads and validates each canned-<stage>.json up-front so missing or
+ * malformed files fail fast (exit 3) before the pipeline enters stage
+ * dispatch.
+ */
+function buildDryRunOverrides(cwd: string, fixtureDir: string): RunOverrides {
+  // Pre-load every canned SessionResult so missing/malformed files
+  // surface as a single validation error, not partway through a run.
+  const canned: Record<Stage, SessionResult> = {
+    brief: loadCannedSession(fixtureDir, 'brief'),
+    explore: loadCannedSession(fixtureDir, 'explore'),
+    plan: loadCannedSession(fixtureDir, 'plan'),
+    design: loadCannedSession(fixtureDir, 'design'),
+    verify: loadCannedSession(fixtureDir, 'verify'),
+  };
+
+  const runOverride = async (opts: SessionRunnerOptions): Promise<SessionResult> => {
+    // `opts.stage` is narrower than the pipeline Stage union in one
+    // direction (adds `init` + `custom`). We only ever run pipeline
+    // stages under --dry-run, but narrow defensively.
+    const stage = opts.stage as Stage;
+    writeDryRunArtifacts(cwd, stage);
+    // Force zero usage regardless of what the canned JSON says — the
+    // contract is "dry-run costs nothing".
+    const source = canned[stage];
+    return {
+      ...source,
+      usage: { input_tokens: 0, output_tokens: 0, usd_cost: 0 },
+    };
+  };
+
+  // Permissive transition shim: always OK, no real STATE.md mutation.
+  // The dry-run's purpose is to exercise the run() dispatch + artifact
+  // shape, not to re-test gate logic (that's covered by
+  // tests/pipeline-runner.test.ts and tests/mcp-gdd-state.test.ts).
+  const transitionStageOverride = async () => ({ ok: true as const });
+
+  return {
+    runOverride,
+    transitionStageOverride,
+  };
+}
+
+/** Load and validate one canned-<stage>.json file. Throws ValidationError on miss. */
+function loadCannedSession(fixtureDir: string, stage: Stage): SessionResult {
+  const cannedPath = resolvePath(fixtureDir, 'expected-outputs', `canned-${stage}.json`);
+  let raw: string;
+  try {
+    raw = readFileSync(cannedPath, 'utf8');
+  } catch (err) {
+    throw new ValidationError(
+      `--dry-run: cannot read canned session for stage "${stage}" at "${cannedPath}": ${errMessage(err)}`,
+      'DRY_RUN_CANNED_MISSING',
+      { stage, path: cannedPath },
+    );
+  }
+  let parsed: unknown;
+  try {
+    parsed = JSON.parse(raw);
+  } catch (err) {
+    throw new ValidationError(
+      `--dry-run: canned session for stage "${stage}" is not valid JSON: ${errMessage(err)}`,
+      'DRY_RUN_CANNED_INVALID',
+      { stage, path: cannedPath },
+    );
+  }
+  if (parsed === null || typeof parsed !== 'object') {
+    throw new ValidationError(
+      `--dry-run: canned session for stage "${stage}" must be a JSON object`,
+      'DRY_RUN_CANNED_INVALID',
+      { stage, path: cannedPath },
+    );
+  }
+  return parsed as SessionResult;
+}
+
+/**
+ * Write the per-stage dry-run artifacts under `<cwd>/.design/`. Creates
+ * parent directories as needed and is idempotent — re-running overwrites.
+ */
+function writeDryRunArtifacts(cwd: string, stage: Stage): void {
+  const artifacts = DRY_RUN_ARTIFACTS[stage];
+  for (const { path: relPath, body } of artifacts) {
+    const abs = joinPath(cwd, relPath);
+    const dir = dirnamePath(abs);
+    if (!existsSync(dir)) {
+      mkdirSync(dir, { recursive: true });
+    }
+    writeFileSync(abs, body, 'utf8');
+  }
 }
