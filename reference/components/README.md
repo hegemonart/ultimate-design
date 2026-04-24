@@ -41,16 +41,16 @@ Typography · Keyboard/a11y · Motion · Do/Don't · Anti-patterns · Citations 
 
 ---
 
-## Wave 3 — Feedback *(Phase 17)*
+## Wave 3 — Feedback
 
 | Component | Spec | Purpose |
 |-----------|------|---------|
-| Toast / Snackbar | — | Ephemeral status notification |
-| Alert / Banner | — | Persistent inline status message |
-| Progress | — | Linear and circular completion indicator |
-| Skeleton | — | Loading placeholder matching content shape |
-| Badge | — | Numeric or status indicator overlaid on another element |
-| Chip / Tag | — | Compact, dismissible label |
+| Toast / Snackbar | [toast.md](toast.md) | Ephemeral status notification; auto-dismisses 4–8s |
+| Alert / Banner | [alert.md](alert.md) | Persistent inline status message; four severity variants |
+| Progress | [progress.md](progress.md) | Linear and circular completion indicator; determinate + indeterminate |
+| Skeleton | [skeleton.md](skeleton.md) | Loading placeholder matching content shape |
+| Badge | [badge.md](badge.md) | Numeric or status indicator overlaid on another element |
+| Chip / Tag | [chip.md](chip.md) | Compact toggleable/removable label; filter, input, suggestion, display |
 
 ---
 
@@ -84,7 +84,7 @@ Typography · Keyboard/a11y · Motion · Do/Don't · Anti-patterns · Citations 
 |------|-------|--------|
 | Wave 1 — Inputs | 8 | v1.16.0 |
 | Wave 2 — Containers | 7 | v1.16.0 |
-| Wave 3 — Feedback | 6 | Phase 17 |
+| Wave 3 — Feedback | 6 | v1.17.0 |
 | Wave 4 — Navigation | 5 | Phase 17 |
 | Wave 5 — Data & Advanced | 5 | Phase 17 |
 | **Total** | **31** | — |
