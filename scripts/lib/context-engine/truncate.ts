@@ -65,10 +65,11 @@ export function truncateMarkdown(raw: string, thresholdBytes: number): TruncateR
     preambleEndInBody = firstHeadingInBody;
     if (firstHeadingInBody > 0) {
       const preambleSlice = body.slice(0, firstHeadingInBody);
-      // Strip a single trailing blank line so the preamble's blank gap to the
-      // first heading is owned by the body-walk logic below, not double-
-      // emitted here.
-      const trimmed = stripTrailingBlank(preambleSlice);
+      // Strip leading + trailing blanks so spacing is owned by the output
+      // assembler, not double-emitted here. Leading blanks come from the
+      // `\n` that follows frontmatter's closing `---`; trailing blanks
+      // come from the gap before the first heading.
+      const trimmed = stripTrailingBlank(stripLeadingBlank(preambleSlice));
       const preambleRaw = trimmed.join('\n');
       if (trimmed.length === 0) {
         preambleLines = [];
@@ -154,6 +155,12 @@ function stripTrailingBlank(arr: string[]): string[] {
   return arr.slice(0, end);
 }
 
+function stripLeadingBlank(arr: string[]): string[] {
+  let start = 0;
+  while (start < arr.length && arr[start] === '') start++;
+  return arr.slice(start);
+}
+
 /**
  * Core walker over the post-preamble body. Produces `kept` — the output
  * lines (headings, first paragraphs, markers) — and `droppedLines` — the
@@ -175,11 +182,16 @@ function walkHeadingsAndParagraphs(body: string[]): { kept: string[]; droppedLin
   let droppedLines = 0;
   let pendingDropCount = 0;
   // Modes:
-  //   'start'  — before the first heading (normally empty after preamble).
-  //   'para'   — collecting first paragraph lines under the current heading.
-  //   'gap'    — after the paragraph's terminating blank; dropping until
-  //              the next heading.
-  type Mode = 'start' | 'para' | 'gap';
+  //   'start'        — before the first heading (normally empty after preamble).
+  //   'await-para'   — after a heading, skipping leading blanks until the
+  //                    first non-blank line (which starts the first paragraph).
+  //                    Blank lines in this mode are neither kept nor counted
+  //                    as drops — they are standard heading/paragraph gaps.
+  //   'para'         — collecting first-paragraph lines under the current
+  //                    heading. Terminates on blank or next heading.
+  //   'gap'          — after the paragraph's terminating blank; dropping
+  //                    until the next heading.
+  type Mode = 'start' | 'await-para' | 'para' | 'gap';
   let mode: Mode = 'start';
 
   const flushDropsBeforeKeeper = (): void => {
@@ -207,6 +219,24 @@ function walkHeadingsAndParagraphs(body: string[]): { kept: string[]; droppedLin
       if (kept.length > 0 && kept[kept.length - 1] !== '') {
         kept.push('');
       }
+      kept.push(line);
+      // Enter await-para: standard markdown wraps heading/paragraph with a
+      // blank line; we must skip that blank before collecting the first
+      // paragraph, otherwise the paragraph is dropped entirely.
+      mode = 'await-para';
+      continue;
+    }
+
+    if (mode === 'await-para') {
+      if (line === '') {
+        // Leading blank between heading and its first paragraph. Skip it —
+        // do not count as a drop (it is structural whitespace).
+        continue;
+      }
+      // First non-blank line after the heading: emit our blank separator
+      // (so the heading is followed by exactly one blank) and start the
+      // paragraph run.
+      kept.push('');
       kept.push(line);
       mode = 'para';
       continue;
