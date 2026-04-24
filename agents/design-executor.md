@@ -178,7 +178,7 @@ before committing final values.
 
 ### Type: layout
 
-Read `reference/layout.md` (if present) and relevant DESIGN-CONTEXT.md decisions before starting. If `reference/css-grid-layout.md` is present, also read it — apply modern Grid patterns (subgrid, container queries with `@container`, fluid `clamp()` typography, logical properties, safe-area insets, anchor positioning). If `reference/image-optimization.md` is present, apply it to any image-related layout decisions (format choice, srcset/sizes, lazy-loading, CDN transforms, image budget enforcement).
+Read `reference/layout.md` (if present) and relevant DESIGN-CONTEXT.md decisions before starting. If `reference/css-grid-layout.md` is present, also read it — apply modern Grid patterns (subgrid, container queries with `@container`, fluid `clamp()` typography, logical properties, safe-area insets, anchor positioning). If `reference/image-optimization.md` is present, apply it to any image-related layout decisions (format choice, srcset/sizes, lazy-loading, CDN transforms, image budget enforcement). If the layout task involves charts, dashboards, or data display, also read `reference/data-visualization.md` for chart-choice and dashboard-pattern guidance.
 
 1. **Inventory layout structure**: identify all grid, flex, and positioning patterns in scope files.
 2. **Check spacing consistency**: grep for magic spacing values (px or rem) not from a spacing scale. Map to nearest scale step.

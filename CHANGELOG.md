@@ -4,6 +4,33 @@ All notable changes to get-design-done are documented here. Versions follow [sem
 
 ---
 
+## [1.19.0] — 2026-04-24
+
+### Added — Platform, Inclusive Design & UX Research References (knowledge-layer complete)
+
+This release closes the final reference gaps identified in the 2026-04-18 knowledge audit. The plugin now ships 18 reference files covering every major design-knowledge domain.
+
+#### 7 new reference files
+
+- **`reference/platforms.md`** — iOS/Android/web/visionOS/watchOS conventions: nav patterns, safe areas, gesture vocabularies, native typography, haptic feedback. Wired into `design-context-builder` + `design-phase-researcher`.
+- **`reference/rtl-cjk-cultural.md`** — RTL logical CSS properties, CJK typography (line-height 1.5–1.8, font-fallback stacks), Arabic/Hebrew, Devanagari/Tamil/Thai, cultural color meanings table, `Intl.*` formatting. Wired into `design-context-builder` + `design-auditor`.
+- **`reference/onboarding-progressive-disclosure.md`** — First-run pattern matrix, feature discovery, Aha-moment mapping, activation vs. habituation metrics, anti-patterns. Wired into `design-executor` + `design-auditor`.
+- **`reference/user-research.md`** — Research method matrix, card sort/tree test/A/B benchmarks, synthesis techniques, research ethics. Wired into `design-phase-researcher`.
+- **`reference/information-architecture.md`** — Nav pattern catalog (hub-and-spoke/nested/faceted/flat/mega-menu), tree-test benchmarks, wayfinding ARIA conventions. Wired into `design-context-builder` + `design-pattern-mapper`.
+- **`reference/form-patterns.md`** — Label position (Wroblewski research), on-blur validation default, full `autocomplete` taxonomy, `inputmode`/`enterkeyhint`, password UX (paste-allowed), CAPTCHA ethics. Wired into `design-auditor` (forms pillar) + `design-executor` (new `type:forms`).
+- **`reference/data-visualization.md`** — Chart-choice matrix, 25 chart types (decision-tree prose, UUPM `charts.csv` MIT), Okabe-Ito/viridis/cividis palettes, axis conventions, dashboard patterns. Wired into `design-auditor` + `design-executor`.
+
+#### Agent wiring
+- `design-context-builder` — Area 2 locale detection; Area 6 platform note; `canonical_refs` extended with 3 conditional references.
+- `design-auditor` — Required reading extended: form-patterns, onboarding, data-visualization, rtl-cjk-cultural, information-architecture.
+- `design-executor` — New `type:forms` task type (7-step checklist); `type:layout` reads data-viz for dashboards; `type:copy` reads onboarding for first-run flows.
+- `design-phase-researcher` — reads user-research.md + platforms.md.
+- `design-pattern-mapper` — reads information-architecture.md for nav classification.
+
+All 7 files registered in `reference/registry.json`. Regression baseline at `test-fixture/baselines/phase-19/`.
+
+---
+
 ## [1.18.0] — 2026-04-24
 
 ### Added — Advanced Craft References + Motion Vocabulary

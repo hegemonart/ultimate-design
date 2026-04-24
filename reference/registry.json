@@ -4,131 +4,6 @@
   "generated_at": "2026-04-24T00:00:00.000Z",
   "entries": [
     {
-      "name": "shared-preamble",
-      "path": "reference/shared-preamble.md",
-      "type": "preamble",
-      "tier": "L0",
-      "description": "L0 aggregator \u2014 imports meta-rules first and exposes Framework Identity + Ordering Convention + Pre-Warming"
-    },
-    {
-      "name": "meta-rules",
-      "path": "reference/meta-rules.md",
-      "type": "meta-rules",
-      "tier": "L0",
-      "description": "Framework-invariant rules: Required Reading Discipline, Writes Protocol, Deviation Handling, Completion Markers, Context-Exhaustion & Budget awareness"
-    },
-    {
-      "name": "cycle-handoff-preamble",
-      "path": "reference/cycle-handoff-preamble.md",
-      "type": "preamble",
-      "description": "Framing prose for archived cycle material \u2014 read as reference, not as current request"
-    },
-    {
-      "name": "retrieval-contract",
-      "path": "reference/retrieval-contract.md",
-      "type": "preamble",
-      "description": "3-layer search \u2192 metadata \u2192 full-doc protocol with per-row token-cost labels"
-    },
-    {
-      "name": "heuristics",
-      "path": "reference/heuristics.md",
-      "type": "heuristic",
-      "tier": "L2",
-      "description": "NNG heuristics + GDD-specific rubrics used by auditor / verifier"
-    },
-    {
-      "name": "anti-patterns",
-      "path": "reference/anti-patterns.md",
-      "type": "heuristic",
-      "tier": "L2",
-      "description": "Catalog of design anti-patterns surfaced during audit"
-    },
-    {
-      "name": "checklists",
-      "path": "reference/checklists.md",
-      "type": "heuristic",
-      "tier": "L2",
-      "description": "Per-category gate checklists"
-    },
-    {
-      "name": "accessibility",
-      "path": "reference/accessibility.md",
-      "type": "heuristic",
-      "description": "WCAG + focus + keyboard-nav heuristics referenced by a11y-mapper"
-    },
-    {
-      "name": "debugger-philosophy",
-      "path": "reference/debugger-philosophy.md",
-      "type": "heuristic",
-      "description": "Philosophy guide for systematic-debugging agents"
-    },
-    {
-      "name": "parallelism-rules",
-      "path": "reference/parallelism-rules.md",
-      "type": "heuristic",
-      "description": "Rules for serial/parallel agent dispatch and Touches conflict detection"
-    },
-    {
-      "name": "priority-matrix",
-      "path": "reference/priority-matrix.md",
-      "type": "heuristic",
-      "description": "Severity \u00d7 Effort priority-score formula used by gap prioritizers"
-    },
-    {
-      "name": "project-skills-guide",
-      "path": "reference/project-skills-guide.md",
-      "type": "heuristic",
-      "description": "Guide for authoring project-skill artifacts (sketch/spike wrap-ups)"
-    },
-    {
-      "name": "audit-scoring",
-      "path": "reference/audit-scoring.md",
-      "type": "output-contract",
-      "description": "6-pillar + 7-category audit score rubric and output schema"
-    },
-    {
-      "name": "review-format",
-      "path": "reference/review-format.md",
-      "type": "output-contract",
-      "description": "Format of code-review output documents"
-    },
-    {
-      "name": "authority-feeds",
-      "path": "reference/authority-feeds.md",
-      "type": "authority-feed",
-      "description": "Whitelist of design-authority feed sources for the watcher"
-    },
-    {
-      "name": "motion",
-      "path": "reference/motion.md",
-      "type": "motion",
-      "description": "Motion vocabulary seed (extended in Phase 18)"
-    },
-    {
-      "name": "typography",
-      "path": "reference/typography.md",
-      "type": "heuristic",
-      "description": "Typography-system heuristics used by visual-hierarchy-mapper"
-    },
-    {
-      "name": "ai-native-tool-interface",
-      "path": "reference/ai-native-tool-interface.md",
-      "type": "surfaces",
-      "description": "AI-native tool interface contract used across connections"
-    },
-    {
-      "name": "intel-schema",
-      "path": "reference/intel-schema.md",
-      "type": "schema",
-      "description": "Schema documentation for .design/intel/ files"
-    },
-    {
-      "name": "config-schema",
-      "path": "reference/config-schema.md",
-      "type": "schema",
-      "description": "Schema documentation for .design/config.json"
-    },
-    {
       "name": "DEPRECATIONS",
       "path": "reference/DEPRECATIONS.md",
       "type": "schema",
@@ -139,6 +14,390 @@
       "path": "reference/STATE-TEMPLATE.md",
       "type": "schema",
       "description": "Template for .design/STATE.md scaffolded by /gdd:scan"
+    },
+    {
+      "name": "accessibility",
+      "path": "reference/accessibility.md",
+      "type": "heuristic",
+      "description": "WCAG + focus + keyboard-nav heuristics referenced by a11y-mapper"
+    },
+    {
+      "name": "ai-native-tool-interface",
+      "path": "reference/ai-native-tool-interface.md",
+      "type": "surfaces",
+      "description": "AI-native tool interface contract used across connections"
+    },
+    {
+      "name": "anti-patterns",
+      "path": "reference/anti-patterns.md",
+      "type": "heuristic",
+      "tier": "L2",
+      "description": "Catalog of design anti-patterns surfaced during audit"
+    },
+    {
+      "name": "audit-scoring",
+      "path": "reference/audit-scoring.md",
+      "type": "output-contract",
+      "description": "6-pillar + 7-category audit score rubric and output schema"
+    },
+    {
+      "name": "authority-feeds",
+      "path": "reference/authority-feeds.md",
+      "type": "authority-feed",
+      "description": "Whitelist of design-authority feed sources for the watcher"
+    },
+    {
+      "name": "brand-voice",
+      "path": "reference/brand-voice.md",
+      "type": "heuristic",
+      "description": "Voice axes, archetypes, tone-by-context, industry-context palettes"
+    },
+    {
+      "name": "checklists",
+      "path": "reference/checklists.md",
+      "type": "heuristic",
+      "tier": "L2",
+      "description": "Per-category gate checklists"
+    },
+    {
+      "name": "component-accordion",
+      "path": "reference/components/accordion.md",
+      "type": "component-spec",
+      "description": "Accordion component spec — h2–h6 header, aria-expanded on trigger, CSS grid height animation"
+    },
+    {
+      "name": "component-alert",
+      "path": "reference/components/alert.md",
+      "type": "component-spec",
+      "description": "Alert spec — info/success/warning/error variants, role=alert vs role=status, icon reinforces variant"
+    },
+    {
+      "name": "component-badge",
+      "path": "reference/components/badge.md",
+      "type": "component-spec",
+      "description": "Badge spec — count/dot/icon variants, 99+ overflow, aria-label on parent element"
+    },
+    {
+      "name": "component-breadcrumbs",
+      "path": "reference/components/breadcrumbs.md",
+      "type": "component-spec",
+      "description": "Breadcrumbs spec — aria-current=page on last item, aria-hidden separators, ol not ul"
+    },
+    {
+      "name": "component-button",
+      "path": "reference/components/button.md",
+      "type": "component-spec",
+      "description": "Button component spec — primary/secondary/ghost/destructive/icon-only; WAI-ARIA Enter/Space contract"
+    },
+    {
+      "name": "component-card",
+      "path": "reference/components/card.md",
+      "type": "component-spec",
+      "description": "Card component spec — stretched-link pattern, article semantics, nested interactive anti-pattern"
+    },
+    {
+      "name": "component-checkbox",
+      "path": "reference/components/checkbox.md",
+      "type": "component-spec",
+      "description": "Checkbox component spec — fieldset+legend, indeterminate state, aria-checked=mixed"
+    },
+    {
+      "name": "component-chip",
+      "path": "reference/components/chip.md",
+      "type": "component-spec",
+      "description": "Chip spec — filter/input/suggestion/display variants, aria-pressed on toggle, independent remove aria-label"
+    },
+    {
+      "name": "component-command-palette",
+      "path": "reference/components/command-palette.md",
+      "type": "component-spec",
+      "description": "Command-palette spec — role=dialog + aria-modal, focus trap, role=combobox + aria-controls, Cmd/Ctrl+K"
+    },
+    {
+      "name": "component-date-picker",
+      "path": "reference/components/date-picker.md",
+      "type": "component-spec",
+      "description": "Date-picker spec — input + range, calendar role=dialog, day gridcell+button, native mobile fallback"
+    },
+    {
+      "name": "component-drawer",
+      "path": "reference/components/drawer.md",
+      "type": "component-spec",
+      "description": "Drawer component spec — focus trap, swipe-to-close, nav vs content role distinction"
+    },
+    {
+      "name": "component-file-upload",
+      "path": "reference/components/file-upload.md",
+      "type": "component-spec",
+      "description": "File-upload spec — drop-zone + picker, input[type=file] never display:none, remove aria-label"
+    },
+    {
+      "name": "component-input",
+      "path": "reference/components/input.md",
+      "type": "component-spec",
+      "description": "Input component spec — placeholder-as-label anti-pattern, aria-describedby error linking"
+    },
+    {
+      "name": "component-label",
+      "path": "reference/components/label.md",
+      "type": "component-spec",
+      "description": "Label component spec — 4 association methods, .sr-only pattern, legend for groups"
+    },
+    {
+      "name": "component-link",
+      "path": "reference/components/link.md",
+      "type": "component-spec",
+      "description": "Link component spec — a[href] vs button boundary, WCAG 1.4.1 underline, rel=noopener"
+    },
+    {
+      "name": "component-list",
+      "path": "reference/components/list.md",
+      "type": "component-spec",
+      "description": "List spec — display (ul/li) vs interactive (role=listbox + role=option), virtualise >100 items"
+    },
+    {
+      "name": "component-menu",
+      "path": "reference/components/menu.md",
+      "type": "component-spec",
+      "description": "Menu spec — role=menu + role=menuitem, arrow-key nav, click-only open, sub-menu ArrowRight"
+    },
+    {
+      "name": "component-modal-dialog",
+      "path": "reference/components/modal-dialog.md",
+      "type": "component-spec",
+      "description": "Modal dialog spec — focus trap, Escape contract, aria-modal, aria-labelledby, scroll-lock"
+    },
+    {
+      "name": "component-navbar",
+      "path": "reference/components/navbar.md",
+      "type": "component-spec",
+      "description": "Navbar spec — role=banner + role=navigation, skip link, aria-current=page, hamburger aria-expanded"
+    },
+    {
+      "name": "component-pagination",
+      "path": "reference/components/pagination.md",
+      "type": "component-spec",
+      "description": "Pagination spec — aria-label=Pagination, aria-current=page, per-page select with visible label"
+    },
+    {
+      "name": "component-popover",
+      "path": "reference/components/popover.md",
+      "type": "component-spec",
+      "description": "Popover spec — Floating UI middlewares, non-modal, aria-expanded+aria-controls"
+    },
+    {
+      "name": "component-progress",
+      "path": "reference/components/progress.md",
+      "type": "component-spec",
+      "description": "Progress spec — determinate (aria-valuenow) vs indeterminate (aria-valuetext), linear + circular"
+    },
+    {
+      "name": "component-radio",
+      "path": "reference/components/radio.md",
+      "type": "component-spec",
+      "description": "Radio component spec — arrow-key auto-advance, Tab-as-group-unit, single-radio anti-pattern"
+    },
+    {
+      "name": "component-rich-text-editor",
+      "path": "reference/components/rich-text-editor.md",
+      "type": "component-spec",
+      "description": "Rich-text editor spec — contenteditable + role=textbox, toolbar role=toolbar, aria-pressed on toggles"
+    },
+    {
+      "name": "component-select-combobox",
+      "path": "reference/components/select-combobox.md",
+      "type": "component-spec",
+      "description": "Select/combobox spec — WAI-ARIA listbox + combobox contracts, aria-activedescendant"
+    },
+    {
+      "name": "component-sidebar",
+      "path": "reference/components/sidebar.md",
+      "type": "component-spec",
+      "description": "Sidebar spec — aria-label=Secondary, icon+label vs icon-only collapsed, settings-nav + dashboard-nav variants"
+    },
+    {
+      "name": "component-skeleton",
+      "path": "reference/components/skeleton.md",
+      "type": "component-spec",
+      "description": "Skeleton spec — content-mirror layout, shimmer animation, aria-hidden on elements, aria-busy on container"
+    },
+    {
+      "name": "component-slider",
+      "path": "reference/components/slider.md",
+      "type": "component-spec",
+      "description": "Slider spec — role=slider + aria-valuenow/min/max/valuetext, 44px thumb touch target, Page Up/Down ±10%"
+    },
+    {
+      "name": "component-stepper",
+      "path": "reference/components/stepper.md",
+      "type": "component-spec",
+      "description": "Stepper spec — role=list (not role=tablist), aria-current=step, wizard/onboarding/checkout flow context"
+    },
+    {
+      "name": "component-switch",
+      "path": "reference/components/switch.md",
+      "type": "component-spec",
+      "description": "Switch component spec — role=switch, spring thumb, pill track, immediate-action rule"
+    },
+    {
+      "name": "component-table",
+      "path": "reference/components/table.md",
+      "type": "component-spec",
+      "description": "Table spec — scope=col on th, aria-sort, aria-selected on rows, role=grid vs role=table, virtualise >200"
+    },
+    {
+      "name": "component-tabs",
+      "path": "reference/components/tabs.md",
+      "type": "component-spec",
+      "description": "Tabs component spec — roving tabindex, arrow-key nav, automatic vs manual activation"
+    },
+    {
+      "name": "component-toast",
+      "path": "reference/components/toast.md",
+      "type": "component-spec",
+      "description": "Toast spec — role=status vs role=alert, 4–8s auto-dismiss, stacking, UUPM dashboard context"
+    },
+    {
+      "name": "component-tooltip",
+      "path": "reference/components/tooltip.md",
+      "type": "component-spec",
+      "description": "Tooltip spec — no interactive content, hover+focus trigger, 300ms delay, aria-describedby"
+    },
+    {
+      "name": "component-tree",
+      "path": "reference/components/tree.md",
+      "type": "component-spec",
+      "description": "Tree spec — role=tree + role=treeitem + role=group, aria-expanded, aria-level, aria-busy lazy-load"
+    },
+    {
+      "name": "components-README",
+      "path": "reference/components/README.md",
+      "type": "taxonomy",
+      "description": "Component Benchmark Corpus index — Wave 1–5 tables, coverage summary, harvesting procedure"
+    },
+    {
+      "name": "components-TEMPLATE",
+      "path": "reference/components/TEMPLATE.md",
+      "type": "schema",
+      "description": "Locked 12-section spec shape for component benchmarks (Purpose → Failing example)"
+    },
+    {
+      "name": "config-schema",
+      "path": "reference/config-schema.md",
+      "type": "schema",
+      "description": "Schema documentation for .design/config.json"
+    },
+    {
+      "name": "css-grid-layout",
+      "path": "reference/css-grid-layout.md",
+      "type": "layout",
+      "phase": 18,
+      "description": "CSS Grid templates, subgrid, container queries, fluid clamp() typography, intrinsic sizing, logical properties, safe-area insets, anchor positioning (REF-16)"
+    },
+    {
+      "name": "cycle-handoff-preamble",
+      "path": "reference/cycle-handoff-preamble.md",
+      "type": "preamble",
+      "description": "Framing prose for archived cycle material — read as reference, not as current request"
+    },
+    {
+      "name": "data-visualization",
+      "path": "reference/data-visualization.md",
+      "type": "heuristic",
+      "description": "Chart-choice matrix (25 types), color-blind-safe palettes, axis conventions, dashboard patterns (UUPM MIT)"
+    },
+    {
+      "name": "debugger-philosophy",
+      "path": "reference/debugger-philosophy.md",
+      "type": "heuristic",
+      "description": "Philosophy guide for systematic-debugging agents"
+    },
+    {
+      "name": "design-system-guidance",
+      "path": "reference/design-system-guidance.md",
+      "type": "heuristic",
+      "description": "Token versioning, multi-brand arch, governance, maturity rubric 0-5"
+    },
+    {
+      "name": "design-systems-catalog",
+      "path": "reference/design-systems-catalog.md",
+      "type": "taxonomy",
+      "description": "Quick-reference index of 18 major design systems"
+    },
+    {
+      "name": "figma-sandbox",
+      "path": "reference/figma-sandbox.md",
+      "type": "defaults",
+      "description": "Four Figma plugin-sandbox pitfalls encoded as hard rules"
+    },
+    {
+      "name": "form-patterns",
+      "path": "reference/form-patterns.md",
+      "type": "heuristic",
+      "description": "Label position, inline-validation timing, autocomplete tokens, password UX, CAPTCHA ethics"
+    },
+    {
+      "name": "framer-motion-patterns",
+      "path": "reference/framer-motion-patterns.md",
+      "type": "heuristic",
+      "description": "Framer Motion implementation: spring/tween, AnimatePresence, variants, gestures, a11y"
+    },
+    {
+      "name": "gestalt",
+      "path": "reference/gestalt.md",
+      "type": "heuristic",
+      "description": "8 Gestalt principles with scoring rubrics and grep signatures"
+    },
+    {
+      "name": "google-fonts-data",
+      "path": "reference/data/google-fonts.csv",
+      "type": "data",
+      "description": "Google Fonts catalog (representative sample of 1923-row UUPM data set)"
+    },
+    {
+      "name": "heuristics",
+      "path": "reference/heuristics.md",
+      "type": "heuristic",
+      "tier": "L2",
+      "description": "NNG heuristics + GDD-specific rubrics used by auditor / verifier"
+    },
+    {
+      "name": "iconography",
+      "path": "reference/iconography.md",
+      "type": "heuristic",
+      "description": "Icon sizing, metaphors, library catalog, touch targets, animation"
+    },
+    {
+      "name": "image-optimization",
+      "path": "reference/image-optimization.md",
+      "type": "performance",
+      "phase": 18,
+      "description": "WebP/AVIF/JPEG-XL matrix, srcset+sizes math, art direction, LQIP/BlurHash, lazy-loading, fetchpriority, CDN transforms, image budget enforcement (REF-15)"
+    },
+    {
+      "name": "information-architecture",
+      "path": "reference/information-architecture.md",
+      "type": "heuristic",
+      "description": "Nav pattern catalog, menu-depth rules, card sort/tree test benchmarks, wayfinding, faceted nav"
+    },
+    {
+      "name": "intel-schema",
+      "path": "reference/intel-schema.md",
+      "type": "schema",
+      "description": "Schema documentation for .design/intel/ files"
+    },
+    {
+      "name": "mcp-budget.default",
+      "path": "reference/mcp-budget.default.json",
+      "type": "defaults",
+      "description": "Default MCP per-task budget (calls + consecutive-timeout thresholds)"
+    },
+    {
+      "name": "meta-rules",
+      "path": "reference/meta-rules.md",
+      "type": "meta-rules",
+      "tier": "L0",
+      "description": "Framework-invariant rules: Required Reading Discipline, Writes Protocol, Deviation Handling, Completion Markers, Context-Exhaustion & Budget awareness"
     },
     {
       "name": "model-prices",
@@ -153,133 +412,10 @@
       "description": "Per-agent default tier map and rationale"
     },
     {
-      "name": "figma-sandbox",
-      "path": "reference/figma-sandbox.md",
-      "type": "defaults",
-      "description": "Four Figma plugin-sandbox pitfalls encoded as hard rules"
-    },
-    {
-      "name": "mcp-budget.default",
-      "path": "reference/mcp-budget.default.json",
-      "type": "defaults",
-      "description": "Default MCP per-task budget (calls + consecutive-timeout thresholds)"
-    },
-    {
-      "name": "protected-paths.default",
-      "path": "reference/protected-paths.default.json",
-      "type": "defaults",
-      "description": "Default glob list the plugin refuses to Edit/Write/mutate-via-Bash without override"
-    },
-    {
-      "name": "start-interview",
-      "path": "reference/start-interview.md",
-      "type": "preamble",
-      "description": "Locked 5-question interview consumed by /gdd:start (Phase 14.7) \u2014 pain, target-area, budget, framework/DS confirmation, Figma/canvas workflow"
-    },
-    {
-      "name": "framer-motion-patterns",
-      "path": "reference/framer-motion-patterns.md",
-      "type": "heuristic",
-      "description": "Framer Motion implementation: spring/tween, AnimatePresence, variants, gestures, a11y"
-    },
-    {
-      "name": "iconography",
-      "path": "reference/iconography.md",
-      "type": "heuristic",
-      "description": "Icon sizing, metaphors, library catalog, touch targets, animation"
-    },
-    {
-      "name": "performance",
-      "path": "reference/performance.md",
-      "type": "heuristic",
-      "description": "Core Web Vitals budgets, JS/font/image budgets, React runtime perf"
-    },
-    {
-      "name": "design-systems-catalog",
-      "path": "reference/design-systems-catalog.md",
-      "type": "taxonomy",
-      "description": "Quick-reference index of 18 major design systems"
-    },
-    {
-      "name": "brand-voice",
-      "path": "reference/brand-voice.md",
-      "type": "heuristic",
-      "description": "Voice axes, archetypes, tone-by-context, industry-context palettes"
-    },
-    {
-      "name": "visual-hierarchy-layout",
-      "path": "reference/visual-hierarchy-layout.md",
-      "type": "heuristic",
-      "description": "Z-order, whitespace, grids, F/Z patterns, 24 landing archetypes"
-    },
-    {
-      "name": "gestalt",
-      "path": "reference/gestalt.md",
-      "type": "heuristic",
-      "description": "8 Gestalt principles with scoring rubrics and grep signatures"
-    },
-    {
-      "name": "design-system-guidance",
-      "path": "reference/design-system-guidance.md",
-      "type": "heuristic",
-      "description": "Token versioning, multi-brand arch, governance, maturity rubric 0-5"
-    },
-    {
-      "name": "palette-catalog",
-      "path": "reference/palette-catalog.md",
-      "type": "palette",
-      "description": "40+ industry-vertical color palettes (WCAG verified, UUPM MIT)"
-    },
-    {
-      "name": "style-vocabulary",
-      "path": "reference/style-vocabulary.md",
-      "type": "style-vocabulary",
-      "description": "67 UI aesthetics with keywords, effects, best-for, era (UUPM MIT)"
-    },
-    {
-      "name": "palettes-data",
-      "path": "reference/data/palettes.csv",
-      "type": "data",
-      "description": "CSV data sibling for palette-catalog.md"
-    },
-    {
-      "name": "styles-data",
-      "path": "reference/data/styles.csv",
-      "type": "data",
-      "description": "CSV data sibling for style-vocabulary.md"
-    },
-    {
-      "name": "surfaces",
-      "path": "reference/surfaces.md",
-      "type": "surfaces",
-      "description": "Concentric radius, optical alignment, 3-layer shadow, image outlines, hit areas"
-    },
-    {
-      "name": "google-fonts-data",
-      "path": "reference/data/google-fonts.csv",
-      "type": "data",
-      "description": "Google Fonts catalog (representative sample of 1923-row UUPM data set)"
-    },
-    {
-      "name": "variable-fonts-loading",
-      "path": "reference/variable-fonts-loading.md",
-      "type": "typography",
-      "phase": 18,
-      "description": "Variable font axes, font-display trade-offs, WOFF2 subsetting, FOIT/FOUT, fallback metric overrides, GRAD axis for dark mode, system font stacks (REF-14)"
-    },
-    {
-      "name": "image-optimization",
-      "path": "reference/image-optimization.md",
-      "type": "performance",
-      "phase": 18,
-      "description": "WebP/AVIF/JPEG-XL matrix, srcset+sizes math, art direction, LQIP/BlurHash, lazy-loading, fetchpriority, CDN transforms, image budget enforcement (REF-15)"
-    },
-    {
-      "name": "css-grid-layout",
-      "path": "reference/css-grid-layout.md",
-      "type": "layout",
-      "phase": 18,
-      "description": "CSS Grid templates, subgrid, container queries, fluid clamp() typography, intrinsic sizing, logical properties, safe-area insets, anchor positioning (REF-16)"
+      "name": "motion",
+      "path": "reference/motion.md",
+      "type": "motion",
+      "description": "Motion vocabulary seed (extended in Phase 18)"
     },
     {
       "name": "motion-advanced",
@@ -303,6 +439,13 @@
       "description": "Input→output range mapping + 4 extrapolation modes (extend|identity|clamp|wrap); taxonomy of progress/scroll/gesture/time-linked animations (MOT-02)"
     },
     {
+      "name": "motion-map-contract",
+      "path": "reference/output-contracts/motion-map.schema.json",
+      "type": "output-contract",
+      "phase": 18,
+      "description": "JSON schema for motion-mapper structured output block — easing, transition_family, duration_class, trigger per animation binding (MOT-04)"
+    },
+    {
       "name": "motion-spring",
       "path": "reference/motion-spring.md",
       "type": "motion",
@@ -317,233 +460,132 @@
       "description": "8 controlled transition families from hyperframes Apache-2.0: 3d, blur, cover, destruction, dissolve, distortion, grid, light — each with definition, canonical examples, when-to-use (MOT-03)"
     },
     {
-      "name": "motion-map-contract",
-      "path": "reference/output-contracts/motion-map.schema.json",
+      "name": "onboarding-progressive-disclosure",
+      "path": "reference/onboarding-progressive-disclosure.md",
+      "type": "heuristic",
+      "description": "First-run patterns, feature discovery, Aha-moment mapping, onboarding anti-patterns"
+    },
+    {
+      "name": "palette-catalog",
+      "path": "reference/palette-catalog.md",
+      "type": "palette",
+      "description": "40+ industry-vertical color palettes (WCAG verified, UUPM MIT)"
+    },
+    {
+      "name": "palettes-data",
+      "path": "reference/data/palettes.csv",
+      "type": "data",
+      "description": "CSV data sibling for palette-catalog.md"
+    },
+    {
+      "name": "parallelism-rules",
+      "path": "reference/parallelism-rules.md",
+      "type": "heuristic",
+      "description": "Rules for serial/parallel agent dispatch and Touches conflict detection"
+    },
+    {
+      "name": "performance",
+      "path": "reference/performance.md",
+      "type": "heuristic",
+      "description": "Core Web Vitals budgets, JS/font/image budgets, React runtime perf"
+    },
+    {
+      "name": "platforms",
+      "path": "reference/platforms.md",
+      "type": "heuristic",
+      "description": "iOS/Android/web/visionOS/watchOS conventions: nav patterns, safe areas, gestures, native typography, haptics"
+    },
+    {
+      "name": "priority-matrix",
+      "path": "reference/priority-matrix.md",
+      "type": "heuristic",
+      "description": "Severity × Effort priority-score formula used by gap prioritizers"
+    },
+    {
+      "name": "project-skills-guide",
+      "path": "reference/project-skills-guide.md",
+      "type": "heuristic",
+      "description": "Guide for authoring project-skill artifacts (sketch/spike wrap-ups)"
+    },
+    {
+      "name": "protected-paths.default",
+      "path": "reference/protected-paths.default.json",
+      "type": "defaults",
+      "description": "Default glob list the plugin refuses to Edit/Write/mutate-via-Bash without override"
+    },
+    {
+      "name": "retrieval-contract",
+      "path": "reference/retrieval-contract.md",
+      "type": "preamble",
+      "description": "3-layer search → metadata → full-doc protocol with per-row token-cost labels"
+    },
+    {
+      "name": "review-format",
+      "path": "reference/review-format.md",
       "type": "output-contract",
+      "description": "Format of code-review output documents"
+    },
+    {
+      "name": "rtl-cjk-cultural",
+      "path": "reference/rtl-cjk-cultural.md",
+      "type": "heuristic",
+      "description": "RTL mirroring, CJK typography, Arabic/Hebrew/Devanagari, cultural color meanings, inclusive imagery"
+    },
+    {
+      "name": "shared-preamble",
+      "path": "reference/shared-preamble.md",
+      "type": "preamble",
+      "tier": "L0",
+      "description": "L0 aggregator — imports meta-rules first and exposes Framework Identity + Ordering Convention + Pre-Warming"
+    },
+    {
+      "name": "start-interview",
+      "path": "reference/start-interview.md",
+      "type": "preamble",
+      "description": "Locked 5-question interview consumed by /gdd:start (Phase 14.7) — pain, target-area, budget, framework/DS confirmation, Figma/canvas workflow"
+    },
+    {
+      "name": "style-vocabulary",
+      "path": "reference/style-vocabulary.md",
+      "type": "style-vocabulary",
+      "description": "67 UI aesthetics with keywords, effects, best-for, era (UUPM MIT)"
+    },
+    {
+      "name": "styles-data",
+      "path": "reference/data/styles.csv",
+      "type": "data",
+      "description": "CSV data sibling for style-vocabulary.md"
+    },
+    {
+      "name": "surfaces",
+      "path": "reference/surfaces.md",
+      "type": "surfaces",
+      "description": "Concentric radius, optical alignment, 3-layer shadow, image outlines, hit areas"
+    },
+    {
+      "name": "typography",
+      "path": "reference/typography.md",
+      "type": "heuristic",
+      "description": "Typography-system heuristics used by visual-hierarchy-mapper"
+    },
+    {
+      "name": "user-research",
+      "path": "reference/user-research.md",
+      "type": "heuristic",
+      "description": "Research method matrix, A/B testing, synthesis techniques, research ethics"
+    },
+    {
+      "name": "variable-fonts-loading",
+      "path": "reference/variable-fonts-loading.md",
+      "type": "typography",
       "phase": 18,
-      "description": "JSON schema for motion-mapper structured output block — easing, transition_family, duration_class, trigger per animation binding (MOT-04)"
+      "description": "Variable font axes, font-display trade-offs, WOFF2 subsetting, FOIT/FOUT, fallback metric overrides, GRAD axis for dark mode, system font stacks (REF-14)"
     },
     {
-      "name": "components-README",
-      "path": "reference/components/README.md",
-      "type": "taxonomy",
-      "description": "Component Benchmark Corpus index — Wave 1–5 tables, coverage summary, harvesting procedure"
-    },
-    {
-      "name": "components-TEMPLATE",
-      "path": "reference/components/TEMPLATE.md",
-      "type": "schema",
-      "description": "Locked 12-section spec shape for component benchmarks (Purpose → Failing example)"
-    },
-    {
-      "name": "component-accordion",
-      "path": "reference/components/accordion.md",
-      "type": "component-spec",
-      "description": "Accordion component spec — h2–h6 header, aria-expanded on trigger, CSS grid height animation"
-    },
-    {
-      "name": "component-button",
-      "path": "reference/components/button.md",
-      "type": "component-spec",
-      "description": "Button component spec — primary/secondary/ghost/destructive/icon-only; WAI-ARIA Enter/Space contract"
-    },
-    {
-      "name": "component-card",
-      "path": "reference/components/card.md",
-      "type": "component-spec",
-      "description": "Card component spec — stretched-link pattern, article semantics, nested interactive anti-pattern"
-    },
-    {
-      "name": "component-checkbox",
-      "path": "reference/components/checkbox.md",
-      "type": "component-spec",
-      "description": "Checkbox component spec — fieldset+legend, indeterminate state, aria-checked=mixed"
-    },
-    {
-      "name": "component-drawer",
-      "path": "reference/components/drawer.md",
-      "type": "component-spec",
-      "description": "Drawer component spec — focus trap, swipe-to-close, nav vs content role distinction"
-    },
-    {
-      "name": "component-input",
-      "path": "reference/components/input.md",
-      "type": "component-spec",
-      "description": "Input component spec — placeholder-as-label anti-pattern, aria-describedby error linking"
-    },
-    {
-      "name": "component-label",
-      "path": "reference/components/label.md",
-      "type": "component-spec",
-      "description": "Label component spec — 4 association methods, .sr-only pattern, legend for groups"
-    },
-    {
-      "name": "component-link",
-      "path": "reference/components/link.md",
-      "type": "component-spec",
-      "description": "Link component spec — a[href] vs button boundary, WCAG 1.4.1 underline, rel=noopener"
-    },
-    {
-      "name": "component-modal-dialog",
-      "path": "reference/components/modal-dialog.md",
-      "type": "component-spec",
-      "description": "Modal dialog spec — focus trap, Escape contract, aria-modal, aria-labelledby, scroll-lock"
-    },
-    {
-      "name": "component-popover",
-      "path": "reference/components/popover.md",
-      "type": "component-spec",
-      "description": "Popover spec — Floating UI middlewares, non-modal, aria-expanded+aria-controls"
-    },
-    {
-      "name": "component-radio",
-      "path": "reference/components/radio.md",
-      "type": "component-spec",
-      "description": "Radio component spec — arrow-key auto-advance, Tab-as-group-unit, single-radio anti-pattern"
-    },
-    {
-      "name": "component-select-combobox",
-      "path": "reference/components/select-combobox.md",
-      "type": "component-spec",
-      "description": "Select/combobox spec — WAI-ARIA listbox + combobox contracts, aria-activedescendant"
-    },
-    {
-      "name": "component-switch",
-      "path": "reference/components/switch.md",
-      "type": "component-spec",
-      "description": "Switch component spec — role=switch, spring thumb, pill track, immediate-action rule"
-    },
-    {
-      "name": "component-tabs",
-      "path": "reference/components/tabs.md",
-      "type": "component-spec",
-      "description": "Tabs component spec — roving tabindex, arrow-key nav, automatic vs manual activation"
-    },
-    {
-      "name": "component-tooltip",
-      "path": "reference/components/tooltip.md",
-      "type": "component-spec",
-      "description": "Tooltip spec — no interactive content, hover+focus trigger, 300ms delay, aria-describedby"
-    },
-    {
-      "name": "component-toast",
-      "path": "reference/components/toast.md",
-      "type": "component-spec",
-      "description": "Toast spec — role=status vs role=alert, 4–8s auto-dismiss, stacking, UUPM dashboard context"
-    },
-    {
-      "name": "component-alert",
-      "path": "reference/components/alert.md",
-      "type": "component-spec",
-      "description": "Alert spec — info/success/warning/error variants, role=alert vs role=status, icon reinforces variant"
-    },
-    {
-      "name": "component-progress",
-      "path": "reference/components/progress.md",
-      "type": "component-spec",
-      "description": "Progress spec — determinate (aria-valuenow) vs indeterminate (aria-valuetext), linear + circular"
-    },
-    {
-      "name": "component-skeleton",
-      "path": "reference/components/skeleton.md",
-      "type": "component-spec",
-      "description": "Skeleton spec — content-mirror layout, shimmer animation, aria-hidden on elements, aria-busy on container"
-    },
-    {
-      "name": "component-badge",
-      "path": "reference/components/badge.md",
-      "type": "component-spec",
-      "description": "Badge spec — count/dot/icon variants, 99+ overflow, aria-label on parent element"
-    },
-    {
-      "name": "component-chip",
-      "path": "reference/components/chip.md",
-      "type": "component-spec",
-      "description": "Chip spec — filter/input/suggestion/display variants, aria-pressed on toggle, independent remove aria-label"
-    },
-    {
-      "name": "component-menu",
-      "path": "reference/components/menu.md",
-      "type": "component-spec",
-      "description": "Menu spec — role=menu + role=menuitem, arrow-key nav, click-only open, sub-menu ArrowRight"
-    },
-    {
-      "name": "component-navbar",
-      "path": "reference/components/navbar.md",
-      "type": "component-spec",
-      "description": "Navbar spec — role=banner + role=navigation, skip link, aria-current=page, hamburger aria-expanded"
-    },
-    {
-      "name": "component-sidebar",
-      "path": "reference/components/sidebar.md",
-      "type": "component-spec",
-      "description": "Sidebar spec — aria-label=Secondary, icon+label vs icon-only collapsed, settings-nav + dashboard-nav variants"
-    },
-    {
-      "name": "component-breadcrumbs",
-      "path": "reference/components/breadcrumbs.md",
-      "type": "component-spec",
-      "description": "Breadcrumbs spec — aria-current=page on last item, aria-hidden separators, ol not ul"
-    },
-    {
-      "name": "component-pagination",
-      "path": "reference/components/pagination.md",
-      "type": "component-spec",
-      "description": "Pagination spec — aria-label=Pagination, aria-current=page, per-page select with visible label"
-    },
-    {
-      "name": "component-table",
-      "path": "reference/components/table.md",
-      "type": "component-spec",
-      "description": "Table spec — scope=col on th, aria-sort, aria-selected on rows, role=grid vs role=table, virtualise >200"
-    },
-    {
-      "name": "component-list",
-      "path": "reference/components/list.md",
-      "type": "component-spec",
-      "description": "List spec — display (ul/li) vs interactive (role=listbox + role=option), virtualise >100 items"
-    },
-    {
-      "name": "component-tree",
-      "path": "reference/components/tree.md",
-      "type": "component-spec",
-      "description": "Tree spec — role=tree + role=treeitem + role=group, aria-expanded, aria-level, aria-busy lazy-load"
-    },
-    {
-      "name": "component-command-palette",
-      "path": "reference/components/command-palette.md",
-      "type": "component-spec",
-      "description": "Command-palette spec — role=dialog + aria-modal, focus trap, role=combobox + aria-controls, Cmd/Ctrl+K"
-    },
-    {
-      "name": "component-date-picker",
-      "path": "reference/components/date-picker.md",
-      "type": "component-spec",
-      "description": "Date-picker spec — input + range, calendar role=dialog, day gridcell+button, native mobile fallback"
-    },
-    {
-      "name": "component-slider",
-      "path": "reference/components/slider.md",
-      "type": "component-spec",
-      "description": "Slider spec — role=slider + aria-valuenow/min/max/valuetext, 44px thumb touch target, Page Up/Down ±10%"
-    },
-    {
-      "name": "component-file-upload",
-      "path": "reference/components/file-upload.md",
-      "type": "component-spec",
-      "description": "File-upload spec — drop-zone + picker, input[type=file] never display:none, remove aria-label"
-    },
-    {
-      "name": "component-rich-text-editor",
-      "path": "reference/components/rich-text-editor.md",
-      "type": "component-spec",
-      "description": "Rich-text editor spec — contenteditable + role=textbox, toolbar role=toolbar, aria-pressed on toggles"
-    },
-    {
-      "name": "component-stepper",
-      "path": "reference/components/stepper.md",
-      "type": "component-spec",
-      "description": "Stepper spec — role=list (not role=tablist), aria-current=step, wizard/onboarding/checkout flow context"
+      "name": "visual-hierarchy-layout",
+      "path": "reference/visual-hierarchy-layout.md",
+      "type": "heuristic",
+      "description": "Z-order, whitespace, grids, F/Z patterns, 24 landing archetypes"
     }
   ]
 }

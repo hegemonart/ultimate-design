@@ -57,6 +57,11 @@ Minimum expected files:
 - `reference/image-optimization.md` (if present) — format matrix, srcset/sizes, LQIP/BlurHash, CDN transforms, image budgets; use when auditing Pillar 5 (Layout & Spacing) for image-heavy UIs
 - `reference/css-grid-layout.md` (if present) — subgrid, container queries, fluid clamp() typography, logical properties; use when auditing Pillar 5 (Layout & Spacing)
 - `reference/motion-advanced.md` (if present) — advanced motion patterns; score gesture/drag mechanics, clip-path animations, blur crossfades as "advanced craft" signal (positive, not a penalty) in Pillar 7 (Micro-Polish)
+- `reference/form-patterns.md` — label position, validation timing, autofill tokens, password UX (use for forms-pillar checks)
+- `reference/onboarding-progressive-disclosure.md` — first-run patterns, feature discovery, anti-patterns (use when onboarding flows are in scope)
+- `reference/data-visualization.md` — chart-choice matrix, color-blind palettes, axis conventions (use for chart-heavy projects)
+- `reference/rtl-cjk-cultural.md` — RTL mirroring, CJK typography, cultural color meanings (use when i18n or multi-locale is in scope)
+- `reference/information-architecture.md` — nav pattern catalog, menu-depth rules, wayfinding (use when nav structure is in scope)
 
 ---
 

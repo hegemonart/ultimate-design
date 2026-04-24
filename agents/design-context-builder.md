@@ -317,6 +317,8 @@ Examples:
 
 If inferred from README, state the inference and ask for correction.
 
+Also capture: locale/language targets. If the product serves RTL locales (Arabic, Hebrew) or CJK audiences (Chinese, Japanese, Korean), note this in the context file and read `reference/rtl-cjk-cultural.md` before writing layout and typography decisions.
+
 ### Area 3 — Goals (Observable Outcomes)
 
 > What does success look like? Name 1–3 observable, measurable outcomes.
@@ -398,7 +400,7 @@ Note: Refero tool name may differ — always verify via ToolSearch. Two or more 
 - Framework / CSS approach (already inferred — confirm)
 - Existing design tokens that cannot change
 - Accessibility level (WCAG AA minimum by default — AAA if specified)
-- Device targets (desktop-primary, mobile-first, or responsive equal priority)
+- Device targets (desktop-primary, mobile-first, or responsive equal priority) — if mobile or native-app target, read `reference/platforms.md` for safe-area, gesture, and nav-pattern constraints
 - Browser support requirements
 - Performance constraints (animation budget, bundle size)
 - Deadline
@@ -578,6 +580,9 @@ C-04: [other constraints]
 - ${CLAUDE_PLUGIN_ROOT}/reference/heuristics.md
 - ${CLAUDE_PLUGIN_ROOT}/reference/iconography.md
 - ${CLAUDE_PLUGIN_ROOT}/reference/performance.md
+- ${CLAUDE_PLUGIN_ROOT}/reference/platforms.md (read when project targets mobile or cross-platform — iOS, Android, visionOS, watchOS)
+- ${CLAUDE_PLUGIN_ROOT}/reference/rtl-cjk-cultural.md (read when project serves non-Latin locales or has explicit i18n requirement)
+- ${CLAUDE_PLUGIN_ROOT}/reference/information-architecture.md (read when nav complexity or IA decisions are in scope)
 </canonical_refs>
 
 <baseline_audit>
