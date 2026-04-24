@@ -52,6 +52,11 @@ Minimum expected files:
 - `reference/performance.md` — Core Web Vitals budgets, JS/font/image budgets, React runtime performance
 - `reference/style-vocabulary.md` — UI aesthetic catalog; use when scoring Pillar 3 (Color) style-coherence sub-check and Pillar 2 (Visual Hierarchy) signature-effects verification
 - `reference/design-systems-catalog.md` — 18-system index for identifying pattern precedents and system alignment
+- `reference/form-patterns.md` — label position, validation timing, autofill tokens, password UX (use for forms-pillar checks)
+- `reference/onboarding-progressive-disclosure.md` — first-run patterns, feature discovery, anti-patterns (use when onboarding flows are in scope)
+- `reference/data-visualization.md` — chart-choice matrix, color-blind palettes, axis conventions (use for chart-heavy projects)
+- `reference/rtl-cjk-cultural.md` — RTL mirroring, CJK typography, cultural color meanings (use when i18n or multi-locale is in scope)
+- `reference/information-architecture.md` — nav pattern catalog, menu-depth rules, wayfinding (use when nav structure is in scope)
 
 ---
 

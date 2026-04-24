@@ -87,7 +87,7 @@ Research loading and rendering performance norms for the project type:
 Target ~2 minutes of research time:
 
 - Use `WebSearch` for: industry design conventions, published pattern libraries, WCAG guidance, framework-specific design docs
-- Use `Read` for: in-repo reference files (`reference/heuristics.md`, `reference/accessibility.md`, `reference/anti-patterns.md`) when they exist
+- Use `Read` for: in-repo reference files (`reference/heuristics.md`, `reference/accessibility.md`, `reference/anti-patterns.md`, `reference/user-research.md`, `reference/platforms.md`) when they exist — `user-research.md` informs which evaluation methods fit the project type; `platforms.md` informs platform-appropriate patterns when the project targets mobile, native, or cross-platform
 - Use `Glob`/`Grep` for: identifying the actual tech stack from project files when DESIGN-CONTEXT.md is ambiguous
 
 Prioritize in-repo reference files over web search — they are already project-calibrated.

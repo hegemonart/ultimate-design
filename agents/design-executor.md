@@ -177,7 +177,7 @@ before committing final values.
 
 ### Type: layout
 
-Read `reference/layout.md` (if present) and relevant DESIGN-CONTEXT.md decisions before starting.
+Read `reference/layout.md` (if present) and relevant DESIGN-CONTEXT.md decisions before starting. If the layout task involves charts, dashboards, or data display, also read `reference/data-visualization.md` for chart-choice and dashboard-pattern guidance.
 
 1. **Inventory layout structure**: identify all grid, flex, and positioning patterns in scope files.
 2. **Check spacing consistency**: grep for magic spacing values (px or rem) not from a spacing scale. Map to nearest scale step.
@@ -237,10 +237,25 @@ Also: verify exit animations are 60–70% of enter duration.
 
 ---
 
+### Type: forms
+
+Read `reference/form-patterns.md` before starting. This is the authoritative guide for all form design tasks.
+
+1. **Audit label position**: check for placeholder-only labels (WCAG fail) — convert to top-aligned or floating labels.
+2. **Audit validation timing**: on-blur is the default; on-change only for character counters and password strength meters.
+3. **Audit autocomplete tokens**: ensure `autocomplete` attributes match the full taxonomy in `reference/form-patterns.md` Section 6.
+4. **Audit inputmode hints**: check `inputmode` and `enterkeyhint` for mobile keyboard optimization.
+5. **Audit password fields**: show/hide toggle required; paste must be allowed; `autocomplete="new-password"` on creation, `autocomplete="current-password"` on login.
+6. **Multi-step forms**: verify step count is shown upfront; back navigation preserves state.
+7. **Apply fixes** and document each change with the pattern reference it addresses.
+
+---
+
 ### Type: copy
 
 Read `reference/anti-patterns.md` copy section before starting.
 Read `reference/brand-voice.md` — voice axes, archetype library, and tone-by-context table provide the authoritative copy standards for this task type.
+If the scope includes onboarding flows or empty states, also read `reference/onboarding-progressive-disclosure.md` for first-run copy conventions.
 
 1. **Audit all user-visible text**: scan files in scope for button labels, error messages, empty states, tooltips, placeholder text.
 2. **Apply UX copy standards**:

@@ -1,0 +1,83 @@
+{
+  "phase": "19",
+  "version": "1.19.0",
+  "locked_at": "2026-04-24T00:00:00.000Z",
+  "description": "Phase 19 — Platform, Inclusive Design & UX Research References. Knowledge-layer complete.",
+  "reference_files": [
+    {
+      "path": "reference/platforms.md",
+      "required_sections": [
+        "Navigation Patterns",
+        "Safe Areas",
+        "Gesture Vocabularies",
+        "Native Typography",
+        "Haptic Feedback",
+        "Brand Consistency"
+      ]
+    },
+    {
+      "path": "reference/rtl-cjk-cultural.md",
+      "required_sections": [
+        "RTL Layout",
+        "CJK Typography",
+        "Arabic and Hebrew",
+        "Cultural Color",
+        "Inclusive Imagery"
+      ]
+    },
+    {
+      "path": "reference/onboarding-progressive-disclosure.md",
+      "required_sections": [
+        "First-Run Pattern",
+        "Feature Discovery",
+        "Aha-Moment",
+        "Anti-Patterns"
+      ]
+    },
+    {
+      "path": "reference/user-research.md",
+      "required_sections": [
+        "Method Matrix",
+        "Sample-Size",
+        "A/B Testing",
+        "Research Ethics"
+      ]
+    },
+    {
+      "path": "reference/information-architecture.md",
+      "required_sections": [
+        "Navigation Pattern",
+        "Menu Depth",
+        "Tree Testing",
+        "Wayfinding"
+      ]
+    },
+    {
+      "path": "reference/form-patterns.md",
+      "required_sections": [
+        "Label Position",
+        "Inline Validation",
+        "Autofill",
+        "Password UX",
+        "CAPTCHA"
+      ]
+    },
+    {
+      "path": "reference/data-visualization.md",
+      "required_sections": [
+        "Chart-Choice Matrix",
+        "Chart Catalog",
+        "Color-Blind-Safe",
+        "Dashboard Patterns"
+      ]
+    }
+  ],
+  "agent_wiring": [
+    { "agent": "design-context-builder", "additions": ["platforms.md (Area 6)", "rtl-cjk-cultural.md (Area 2)", "information-architecture.md (canonical_refs)"] },
+    { "agent": "design-auditor", "additions": ["form-patterns", "onboarding-progressive-disclosure", "data-visualization", "rtl-cjk-cultural", "information-architecture"] },
+    { "agent": "design-executor", "additions": ["type:forms (new)", "type:layout reads data-viz", "type:copy reads onboarding"] },
+    { "agent": "design-phase-researcher", "additions": ["user-research.md", "platforms.md"] },
+    { "agent": "design-pattern-mapper", "additions": ["information-architecture.md"] }
+  ],
+  "registry_entries": 7
+}

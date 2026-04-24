@@ -259,6 +259,48 @@
       "path": "reference/data/google-fonts.csv",
       "type": "data",
       "description": "Google Fonts catalog (representative sample of 1923-row UUPM data set)"
+    },
+    {
+      "name": "platforms",
+      "path": "reference/platforms.md",
+      "type": "heuristic",
+      "description": "iOS/Android/web/visionOS/watchOS conventions: nav patterns, safe areas, gestures, native typography, haptics"
+    },
+    {
+      "name": "rtl-cjk-cultural",
+      "path": "reference/rtl-cjk-cultural.md",
+      "type": "heuristic",
+      "description": "RTL mirroring, CJK typography, Arabic/Hebrew/Devanagari, cultural color meanings, inclusive imagery"
+    },
+    {
+      "name": "onboarding-progressive-disclosure",
+      "path": "reference/onboarding-progressive-disclosure.md",
+      "type": "heuristic",
+      "description": "First-run patterns, feature discovery, Aha-moment mapping, onboarding anti-patterns"
+    },
+    {
+      "name": "user-research",
+      "path": "reference/user-research.md",
+      "type": "heuristic",
+      "description": "Research method matrix, A/B testing, synthesis techniques, research ethics"
+    },
+    {
+      "name": "information-architecture",
+      "path": "reference/information-architecture.md",
+      "type": "heuristic",
+      "description": "Nav pattern catalog, menu-depth rules, card sort/tree test benchmarks, wayfinding, faceted nav"
+    },
+    {
+      "name": "form-patterns",
+      "path": "reference/form-patterns.md",
+      "type": "heuristic",
+      "description": "Label position, inline-validation timing, autocomplete tokens, password UX, CAPTCHA ethics"
+    },
+    {
+      "name": "data-visualization",
+      "path": "reference/data-visualization.md",
+      "type": "heuristic",
+      "description": "Chart-choice matrix (25 types), color-blind-safe palettes, axis conventions, dashboard patterns (UUPM MIT)"
     }
   ]
 }

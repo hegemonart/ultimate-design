@@ -1,6 +1,6 @@
 {
   "name": "@hegemonart/get-design-done",
-  "version": "1.15.0",
+  "version": "1.19.0",
   "description": "A Claude Code plugin for systematic design improvement",
   "author": "Hegemon",
   "homepage": "https://github.com/hegemonart/get-design-done",
@@ -66,7 +66,13 @@
     "palette-catalog",
     "style-vocabulary",
     "industry-palettes",
-    "ui-style-vocabulary"
+    "ui-style-vocabulary",
+    "i18n",
+    "user-research",
+    "information-architecture",
+    "form-patterns",
+    "data-viz",
+    "platforms"
   ],
   "skills": [
     "SKILL.md"

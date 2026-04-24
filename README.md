@@ -76,6 +76,13 @@ You don't need to be a designer. The pipeline carries the design expertise so yo
 
 Built-in quality gates catch real problems: Handoff Faithfulness scoring on Claude Design bundles, contrast audits across the full palette × surface matrix, anti-pattern detection from the NNG catalog, dark-mode architecture verification, and motion-system consistency checks.
 
+### v1.19.0 Highlights — Full Knowledge Coverage (18 reference files)
+
+- **Knowledge-layer complete** — The plugin now ships **18 reference files** covering every major design-knowledge domain identified in the 2026-04-18 coverage audit. Agents have authoritative answers on platform conventions, internationalization, research methodology, information architecture, form design, and data visualization — in addition to the foundational knowledge from v1.15.0.
+- **7 new Phase 19 references** — `platforms.md` (iOS/Android/web/visionOS/watchOS), `rtl-cjk-cultural.md` (RTL + CJK + cultural color), `onboarding-progressive-disclosure.md`, `user-research.md` (method matrix, A/B, ethics), `information-architecture.md` (nav patterns, tree-test benchmarks), `form-patterns.md` (Wroblewski label research, autocomplete taxonomy, CAPTCHA ethics), `data-visualization.md` (25 chart types, Okabe-Ito palette, dashboard patterns — UUPM MIT).
+- **New `type:forms` executor task type** — `design-executor` now has a dedicated 7-step checklist for form audits: label position, validation timing, autocomplete tokens, inputmode hints, password UX, multi-step state, and CAPTCHA compliance.
+- **Platform + locale detection in context-builder** — `design-context-builder` now explicitly prompts for locale/RTL/CJK requirements (Area 2) and device targets with platform references (Area 6), ensuring downstream agents receive the full platform context.
+
 ### v1.15.0 Highlights — Design Knowledge Expansion
 
 - **10 new foundational references** — `iconography.md`, `performance.md`, `brand-voice.md`, `visual-hierarchy-layout.md`, `gestalt.md`, `design-system-guidance.md`, `design-systems-catalog.md`, `framer-motion-patterns.md`, `palette-catalog.md`, `style-vocabulary.md`. Agents now have authoritative answers on icon sizing, Web Vitals budgets, brand voice axes, Gestalt principles, DS governance, and 40+ industry-vertical color palettes.

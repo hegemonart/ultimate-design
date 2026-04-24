@@ -37,6 +37,7 @@ The orchestrating stage supplies a `<required_reading>` block in the prompt pass
 - `.design/DESIGN-CONTEXT.md` — goals, decisions, must-haves, baseline audit, domain, scopes
 - `reference/audit-scoring.md` — maps task types to scoring categories
 - `reference/brand-voice.md` — voice axis defaults and industry context (use when classifying copy-system patterns and inferring brand register from existing UI text)
+- `reference/information-architecture.md` — nav pattern catalog (use to classify existing navigation implementation: hub-and-spoke, nested, faceted, flat, mega-menu)
 
 **Invariant:** Read every file in the `<required_reading>` block before taking any other action.
 
