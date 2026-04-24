@@ -3,6 +3,7 @@ name: design
 description: "Stage 4 of 5 — reads DESIGN-PLAN.md, spawns design-executor per task with wave coordination and parallel/sequential routing. Thin orchestrator."
 argument-hint: "[--auto] [--parallel]"
 user-invocable: true
+tools: Read, Write, Bash, Grep, Glob, Task, AskUserQuestion, mcp__gdd_state__get, mcp__gdd_state__transition_stage, mcp__gdd_state__update_progress, mcp__gdd_state__set_status, mcp__gdd_state__add_blocker, mcp__gdd_state__resolve_blocker, mcp__gdd_state__checkpoint
 ---
 
 # Get Design Done — Design
@@ -11,13 +12,12 @@ user-invocable: true
 
 ---
 
-## State Integration
+## Stage entry
 
-1. Read `.design/STATE.md`.
-   - **If missing:** create minimal skeleton from `reference/STATE-TEMPLATE.md` with `stage: design`, `status: in_progress`; log warning: "STATE.md not found — creating from template. Prior stage outputs may be incomplete."
-   - **If present and `stage == design` and `status == in_progress`:** RESUME — use `task_progress` numerator as source of truth; skip tasks that already have a corresponding `.design/tasks/task-NN.md` file.
-   - **Otherwise:** normal transition — set `stage: design`, `status: in_progress`.
-2. Probe `<connections>`, update `last_checkpoint`, write STATE.md.
+1. Call `mcp__gdd_state__transition_stage` with `to: "design"`.
+   - Gate failure surfaces `error.context.blockers` to the user; do not advance.
+   - If the transition succeeds and the prior stage was already `design` with `status: in_progress`, this is a RESUME — use `task_progress` numerator as source of truth and skip tasks that already have a corresponding `.design/tasks/task-NN.md` file.
+2. Call `mcp__gdd_state__get` → snapshot `state`; read `state.position.wave` to decide execution plan.
 
 Abort only if `.design/DESIGN-PLAN.md` is missing:
 > "No plan found. Run `/get-design-done:plan` first."
@@ -82,8 +82,21 @@ For each wave:
 1. Read `.design/config.json` `parallelism` (or defaults from `reference/config-schema.md`).
 2. Collect candidates in the wave; check `Touches:`, `writes:`, `parallel-safe`, and `typical-duration-seconds` fields.
 3. Apply rules in order from `reference/parallelism-rules.md` (hard → soft). Overlapping Touches split into sequential sub-waves.
-4. Write `<parallelism_decision>` to STATE.md per wave (stage: design, wave: N).
+4. Record the parallelism decision for this wave via `mcp__gdd_state__update_progress` with `task_progress: "<completed>/<total>"` and `status: "design_wave_<N>_parallelism: <parallel|serial>, reason=<short-reason>"` — the status string is the canonical carrier (mirrors the plan-stage convention from Plan 20-09; a dedicated tool may be added in a follow-on plan).
 5. If `parallel`: spawn all candidates via concurrent `Task()` calls in one response. If `serial`: spawn sequentially.
+
+### Executor prompt template (applies to every spawned design-executor)
+
+Every spawned executor receives the following STATE.md contract in its prompt:
+
+> **STATE.md mutation protocol** — When you complete a task in your assigned batch, update STATE.md ONLY via the `gdd-state` MCP tools. Specifically:
+> - Report task progress: `mcp__gdd_state__update_progress` with your new `task_progress` fraction.
+> - Add blockers: `mcp__gdd_state__add_blocker` with `{ stage: "design", date: <today>, text: "..." }`.
+> - Resolve your own blockers on fix: `mcp__gdd_state__resolve_blocker` with the blocker id.
+>
+> Do NOT `Read` + `Write` `.design/STATE.md` directly — the MCP tools enforce the lockfile and emit mutation events. Direct writes corrupt parallel state.
+
+Inline this protocol block verbatim inside every `Task("design-executor", """ ... """)` prompt in both the parallel-batch and sequential-tail spawns below. Concurrent executors (Phase 10.1 parallel mode) each emit `update_progress` calls; the lockfile (Plan 20-01) and event stream (Plan 20-06) serialize them safely.
 
 ## Step 2 — Wave-by-Wave Execution
 
@@ -151,7 +164,10 @@ Merging worktrees...
 
 Merge each worktree branch back into the working directory. Each agent touched non-overlapping files (guaranteed by the conflict check on `Touches:` fields). If an unexpected merge conflict appears, flag it and ask the user to resolve before continuing.
 
-Update STATE.md `task_progress` after merge.
+After merge, roll up the batch's progress:
+
+- Call `mcp__gdd_state__update_progress` with `task_progress: "<completed>/<total>"` and `status: "design_wave_<N>_parallel_batch_complete"`.
+- Call `mcp__gdd_state__checkpoint` — records the wave boundary in `<timestamps>` and bumps `last_checkpoint`.
 
 ### Sequential tail (Parallel: false tasks, or all tasks if `parallel_mode=false`)
 
@@ -195,7 +211,9 @@ Emit `## EXECUTION COMPLETE` when done.
 """, subagent_type="design-executor")
 ```
 
-Update STATE.md `task_progress` after each task completes.
+After each task completes, call `mcp__gdd_state__update_progress` with the new `task_progress: "<completed>/<total>"` and `status: "design_wave_<N>_task_<NN>_complete"`.
+
+After the final sequential task of the wave, call `mcp__gdd_state__checkpoint` — records the wave boundary in `<timestamps>` and bumps `last_checkpoint`.
 
 ---
 
@@ -220,17 +238,17 @@ Skip checkpoint if `auto_mode=true`.
 
 After each wave, check task-NN.md files for `status: deviation`. If any found:
 
-- Present affected task IDs and their blocker descriptions (from `.design/STATE.md <blockers>`)
+- Call `mcp__gdd_state__get` → read `state.blockers`; present affected task IDs and their blocker descriptions from the returned snapshot.
 - Offer: (a) stop stage, (b) continue remaining tasks
 - In `auto_mode`: continue automatically, log all deviations
+- When a blocker is addressed (fix committed by a follow-up task), call `mcp__gdd_state__resolve_blocker` with the blocker id to clear it from the live state.
 
 ---
 
 ## State Update (exit)
 
-1. Set `<position> status: completed`, `stage: design`.
-2. Set `<timestamps> design_completed_at: [now ISO 8601]`.
-3. Write STATE.md.
+1. Call `mcp__gdd_state__set_status` with `status: "design_complete"` — marks the stage completed without transitioning; verify calls `transition_stage` on its entry, keeping the transition atomic with the owning stage.
+2. Call `mcp__gdd_state__checkpoint` — stamps `last_checkpoint` and appends a `design_completed_at` entry to `<timestamps>`.
 
 ---
 
