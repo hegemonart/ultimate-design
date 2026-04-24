@@ -572,6 +572,8 @@ C-04: [other constraints]
 - ${CLAUDE_PLUGIN_ROOT}/reference/audit-scoring.md
 - ${CLAUDE_PLUGIN_ROOT}/reference/motion.md
 - ${CLAUDE_PLUGIN_ROOT}/reference/heuristics.md
+- ${CLAUDE_PLUGIN_ROOT}/reference/iconography.md
+- ${CLAUDE_PLUGIN_ROOT}/reference/performance.md
 </canonical_refs>
 
 <baseline_audit>

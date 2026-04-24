@@ -186,6 +186,7 @@ _Dominant styling approach: [CSS Modules | Tailwind | styled-components | inline
 | `spacing-system` | Padding, margin, gap, spacing scale |
 | `typography-system` | Font size, weight, family, line-height |
 | `component-styling` | How components apply styles (CSS Modules, Tailwind, etc.) |
+| `iconography-system` | Icon library in use, stroke weight, sizing conventions, touch targets |
 
 **DO NOT use:** controller, service, middleware, CRUD, data flow, request-response, event-driven. Those are code-architecture terms and have no meaning in design pattern analysis.
 

@@ -8,7 +8,7 @@
       "path": "reference/shared-preamble.md",
       "type": "preamble",
       "tier": "L0",
-      "description": "L0 aggregator — imports meta-rules first and exposes Framework Identity + Ordering Convention + Pre-Warming"
+      "description": "L0 aggregator \u2014 imports meta-rules first and exposes Framework Identity + Ordering Convention + Pre-Warming"
     },
     {
       "name": "meta-rules",
@@ -21,13 +21,13 @@
       "name": "cycle-handoff-preamble",
       "path": "reference/cycle-handoff-preamble.md",
       "type": "preamble",
-      "description": "Framing prose for archived cycle material — read as reference, not as current request"
+      "description": "Framing prose for archived cycle material \u2014 read as reference, not as current request"
     },
     {
       "name": "retrieval-contract",
       "path": "reference/retrieval-contract.md",
       "type": "preamble",
-      "description": "3-layer search → metadata → full-doc protocol with per-row token-cost labels"
+      "description": "3-layer search \u2192 metadata \u2192 full-doc protocol with per-row token-cost labels"
     },
     {
       "name": "heuristics",
@@ -72,7 +72,7 @@
       "name": "priority-matrix",
       "path": "reference/priority-matrix.md",
       "type": "heuristic",
-      "description": "Severity × Effort priority-score formula used by gap prioritizers"
+      "description": "Severity \u00d7 Effort priority-score formula used by gap prioritizers"
     },
     {
       "name": "project-skills-guide",
@@ -174,13 +174,31 @@
       "name": "start-interview",
       "path": "reference/start-interview.md",
       "type": "preamble",
-      "description": "Locked 5-question interview consumed by /gdd:start (Phase 14.7) — pain, target-area, budget, framework/DS confirmation, Figma/canvas workflow"
+      "description": "Locked 5-question interview consumed by /gdd:start (Phase 14.7) \u2014 pain, target-area, budget, framework/DS confirmation, Figma/canvas workflow"
     },
     {
       "name": "framer-motion-patterns",
       "path": "reference/framer-motion-patterns.md",
       "type": "heuristic",
       "description": "Framer Motion implementation: spring/tween, AnimatePresence, variants, gestures, a11y"
+    },
+    {
+      "name": "iconography",
+      "path": "reference/iconography.md",
+      "type": "heuristic",
+      "description": "Icon sizing, metaphors, library catalog, touch targets, animation"
+    },
+    {
+      "name": "performance",
+      "path": "reference/performance.md",
+      "type": "heuristic",
+      "description": "Core Web Vitals budgets, JS/font/image budgets, React runtime perf"
+    },
+    {
+      "name": "design-systems-catalog",
+      "path": "reference/design-systems-catalog.md",
+      "type": "taxonomy",
+      "description": "Quick-reference index of 18 major design systems"
     }
   ]
 }
