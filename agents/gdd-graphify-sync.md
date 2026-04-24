@@ -108,4 +108,3 @@ At run-end, append one JSONL line to `.design/intel/insights.jsonl`:
 ```
 
 Schema: `reference/schemas/insight-line.schema.json`. Use an empty `artifacts_written` array for read-only agents.
-
