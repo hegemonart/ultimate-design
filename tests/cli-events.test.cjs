@@ -11,9 +11,14 @@ const { spawnSync } = require('node:child_process');
 const CLI = join(__dirname, '..', 'scripts', 'cli', 'gdd-events.mjs');
 
 function runCli(args, opts = {}) {
+  // Node 22 needs --experimental-strip-types explicitly; Node 23+
+  // ships type stripping on by default and the flag interacts badly
+  // with the launcher on Windows + Node 24 (STATUS_STACK_BUFFER_OVERRUN).
+  const major = Number(process.versions.node.split('.')[0]);
+  const flags = major < 23 ? ['--experimental-strip-types'] : [];
   return spawnSync(
     process.execPath,
-    ['--experimental-strip-types', CLI, ...args],
+    [...flags, CLI, ...args],
     { encoding: 'utf8', timeout: 5000, ...opts },
   );
 }
