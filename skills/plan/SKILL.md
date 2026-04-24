@@ -3,20 +3,18 @@ name: plan
 description: "Stage 3 of 5 — reads DESIGN-CONTEXT.md, spawns design-phase-researcher (optional) + design-planner + design-plan-checker, writes DESIGN-PLAN.md. Thin orchestrator."
 argument-hint: "[--auto] [--parallel]"
 user-invocable: true
+tools: Read, Write, Bash, Glob, Task, AskUserQuestion, ToolSearch, mcp__gdd_state__get, mcp__gdd_state__transition_stage, mcp__gdd_state__add_decision, mcp__gdd_state__add_must_have, mcp__gdd_state__update_progress, mcp__gdd_state__set_status, mcp__gdd_state__add_blocker, mcp__gdd_state__checkpoint
 ---
 
 # Get Design Done — Plan
 
 **Stage 3 of 5** in the get-design-done pipeline. Thin orchestrator. All planning intelligence lives in agents/design-planner.md.
 
-## State Integration
+## Stage entry
 
-1. Read `.design/STATE.md`.
-   - If missing: create minimal skeleton from `reference/STATE-TEMPLATE.md` with stage=plan, status=in_progress, task_progress=0/3, and log warning "STATE.md not found — created fresh. If this is a resumed session, run /get-design-done:scan first."
-   - If present and frontmatter stage==plan and `<position>` status==in_progress: RESUME — skip already-complete agent invocations (use task_progress numerator as source of truth).
-   - Otherwise: normal transition — set frontmatter stage=plan, `<position>` stage=plan, status=in_progress, task_progress=0/3.
-2. Update `<connections>` by probing MCP availability (figma, refero).
-3. Update last_checkpoint. Write STATE.md.
+1. `mcp__gdd_state__transition_stage` with `to: "plan"`.
+   - Gate failure surfaces `error.context.blockers` to the user; do not advance.
+2. `mcp__gdd_state__get` → snapshot `state`. Use this snapshot for `<position>`, `<connections>`, `<must_haves>`, `<blockers>`, `<decisions>` in the current stage; do not re-read STATE.md directly.
 
 Abort with a clear error only if the user is trying to plan without DESIGN-CONTEXT.md — that is the true prerequisite, not STATE.md.
 
@@ -31,7 +29,11 @@ Parse $ARGUMENTS:
 - Read `.design/config.json` `parallelism` (or defaults from `reference/config-schema.md`).
 - Apply rules from `reference/parallelism-rules.md`.
 - Plan's pipeline is inherently sequential (researcher → pattern-mapper → planner → checker). Expected verdict: **serial** (rule 1).
-- Write `<parallelism_decision>` to STATE.md with the verdict and reason before spawning agents.
+
+<!-- Parallelism decision is currently carried as the status string of an update_progress call. A dedicated tool may be added in a follow-on plan; until then, the status string is the canonical carrier. -->
+
+After the parallelism decision is made:
+- Call `mcp__gdd_state__update_progress` with `task_progress: "<current>/<total>"` and `status: "plan_parallelism_decided: batch_size=<N>, reason=<short-reason>"`.
 
 ## Probe Chromatic connection
 
@@ -48,7 +50,8 @@ Step C2 — Token check:
   → false → chromatic: unavailable
 
 Also check: if storybook: not_configured → chromatic effectively unavailable (emit note, do not run).
-Write chromatic status to .design/STATE.md <connections>.
+
+Write chromatic status to STATE.md `<connections>` via `mcp__gdd_state__probe_connections` — pass the single-entry probe result (`[{ name: "chromatic", status: "<verdict>" }]`). Do not edit `<connections>` directly.
 
 ## Chromatic Change-Risk Scoping (when chromatic: available)
 
@@ -82,7 +85,7 @@ Emit `## RESEARCH COMPLETE` when done.
 """)
 ```
 
-Wait for `## RESEARCH COMPLETE`. Update STATE.md task_progress 1/3.
+Wait for `## RESEARCH COMPLETE`. Call `mcp__gdd_state__update_progress` with `task_progress: "1/3"` and a short `status` summary.
 
 ## Step 1.5 — Pattern Mapping (mandatory, brownfield protection)
 
@@ -104,7 +107,7 @@ Emit `## MAPPING COMPLETE` when done.
 """)
 ```
 
-Wait for `## MAPPING COMPLETE`. Update STATE.md task_progress 1/3.
+Wait for `## MAPPING COMPLETE`. Call `mcp__gdd_state__update_progress` with `task_progress: "1/3"` and a short `status` summary.
 
 ## Step 1.6 — Assumptions Analysis (optional, same flag as research)
 
@@ -145,6 +148,18 @@ Wait for `## SYNTHESIS COMPLETE`. Write to `.design/DESIGN-PREPLAN-BRIEF.md` (ov
 
 **Parallel synthesizer note (future):** if a future plan variant spawns N parallel phase-researchers (e.g., one per project-type family), wire synthesize the same way as `skills/map/` Step 3.5.
 
+## Research-synthesis persistence (decisions + must-haves)
+
+When the synthesizer (design-phase-researcher / design-pattern-mapper / design-assumptions-analyzer) produces D-XX decisions and M-XX must-haves, persist each one through MCP instead of editing STATE.md directly.
+
+For each D-XX decision the synthesizer produces:
+- Call `mcp__gdd_state__add_decision` with `{ id: "D-XX", text: "...", status: "locked"|"tentative" }`.
+
+For each M-XX must-have the synthesizer produces:
+- Call `mcp__gdd_state__add_must_have` with `{ id: "M-XX", text: "...", status: "pending" }`.
+
+Issue these sequentially. Each call is event-emitting and lockfile-safe. Parallel issuance would serialize on the STATE.md lockfile with no throughput gain.
+
 ## Step 2 — Plan
 
 ```
@@ -178,7 +193,7 @@ Emit `## PLANNING COMPLETE` when done.
 """)
 ```
 
-Wait for `## PLANNING COMPLETE`. Update STATE.md task_progress 2/3.
+Wait for `## PLANNING COMPLETE`. Call `mcp__gdd_state__update_progress` with `task_progress: "2/3"` and a short `status` summary.
 
 ## Step 3 — Check
 
@@ -204,17 +219,18 @@ Emit `## PLAN CHECK COMPLETE` when done.
 """)
 ```
 
-Wait for `## PLAN CHECK COMPLETE`. Update STATE.md task_progress 3/3.
+Wait for `## PLAN CHECK COMPLETE`. Call `mcp__gdd_state__update_progress` with `task_progress: "3/3"` and a short `status` summary.
 
 If `## PLAN CHECK RESULT: ISSUES FOUND` and any BLOCKER issues:
 - Present issues to user and offer: (a) revise plan now — re-spawn design-planner with issue list, (b) accept and proceed, (c) abort.
 - If auto_mode: auto-accept WARNING issues, abort on BLOCKER issues.
 
-## State Update (exit)
+## Stage exit
 
-1. Set `<position>` status=completed.
-2. Set `<timestamps>` plan_completed_at=now.
-3. Update last_checkpoint. Write STATE.md.
+1. Call `mcp__gdd_state__set_status` with `status: "plan_complete"`.
+2. Call `mcp__gdd_state__checkpoint` to stamp `last_checkpoint` and finalize the plan stage.
+
+The next stage (design) calls `mcp__gdd_state__transition_stage` on entry — this skill does NOT issue the transition itself, preserving the stage-owned-transition discipline established by brief→explore and explore→plan.
 
 ## After Completion
 
