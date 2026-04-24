@@ -1,37 +1,58 @@
 ---
 name: gdd-resume
-description: "Restore session context from .design/HANDOFF.md and route to where work left off."
-argument-hint: ""
-tools: Read, Write, Bash, Glob
+description: "Restore session context from a numbered checkpoint. Lists available checkpoints when no argument given."
+argument-hint: "[<N>]"
+tools: Read, Write, Bash, Glob, AskUserQuestion
 ---
+
+@reference/retrieval-contract.md
+@reference/cycle-handoff-preamble.md
 
 # /gdd:resume
 
-Inverse of `/gdd:pause`. Reads the handoff file, prints a clear "you were here" summary, and routes to the next command.
+Inverse of `/gdd:pause`. Reads a checkpoint file, prints a clear "you were here" summary, and routes to the next command.
 
 ## Steps
 
-1. Try to read `.design/HANDOFF.md`. If missing, read `.design/STATE.md` and infer position from the `stage:` and `cycle:` fields.
-2. Print a summary in this exact shape:
+1. **Parse argument**:
+   - If argument is a number N → restore checkpoint N.
+   - If no argument → list available checkpoints and ask which to restore (see step 2).
+
+2. **List mode** (no argument):
+   ```bash
+   ls .design/checkpoints/ 2>/dev/null | sort -n
    ```
-   Last paused: <timestamp>
+   If empty, fall back to reading `.design/HANDOFF.md` (legacy single-slot format).
+   If checkpoints exist, present the list and ask (AskUserQuestion):
+   "Which checkpoint would you like to restore? (enter number, or press Enter for the latest)"
+   Use the answer (or latest if Enter pressed) as N.
+
+3. **Read checkpoint**: load `.design/checkpoints/NN-*.md`. If not found, try `.design/HANDOFF.md` as legacy fallback.
+
+4. **Print summary** in this exact shape:
+   ```
+   Checkpoint NN restored.
+   Saved: <timestamp>
    You were: <in-progress description>
    Next step: <next>
    Active sketch: <path or none>
    Open todos: <N>
    ```
-3. **Staleness check** — compare mtime of `.design/` artifacts vs `src/` (via Glob + Bash `stat` when available). If `src/` has commits/changes newer than the last pipeline artifact, warn: "Source has changed since last pipeline run — consider re-running explore or verify."
-4. **Route recommendation** based on stage:
-   - `brief` → "Run `@get-design-done brief`"
-   - `explore` → "Run `@get-design-done explore`"
-   - `plan` → "Run `@get-design-done plan`"
-   - `design` → "Run `@get-design-done design` to continue"
-   - `verify` → "Run `@get-design-done verify`"
-5. Do not auto-execute the next command — just recommend.
+
+5. **Staleness check**: compare mtime of `.design/` artifacts vs `src/` via Bash `stat` when available. If `src/` has commits newer than the checkpoint timestamp, warn:
+   "Source has changed since checkpoint NN — consider re-running explore or verify."
+
+6. **Route recommendation** based on checkpoint `Stage:` field:
+   - `brief` → "Run `/gdd:brief`"
+   - `explore` → "Run `/gdd:explore`"
+   - `plan` → "Run `/gdd:plan`"
+   - `design` → "Run `/gdd:design` to continue"
+   - `verify` → "Run `/gdd:verify`"
 
 ## Do Not
 
-- Do not delete HANDOFF.md (leave it; next `/gdd:pause` overwrites it).
+- Do not delete checkpoint files.
 - Do not modify STATE.md.
+- Do not auto-execute the next command — just recommend.
 
 ## RESUME COMPLETE

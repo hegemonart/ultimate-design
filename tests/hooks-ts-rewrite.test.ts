@@ -170,7 +170,7 @@ test('hooks-ts-rewrite: legacy .js hooks are deleted', () => {
   );
 });
 
-test('hooks-ts-rewrite: hooks.json references only .ts paths for JS-runtime hooks', () => {
+test('hooks-ts-rewrite: Plan 20-13 owned hooks use .ts + --experimental-strip-types', () => {
   const raw = readFileSync(HOOKS_JSON, 'utf8');
   const data = JSON.parse(raw) as { hooks: Record<string, unknown[]> };
 
@@ -189,23 +189,34 @@ test('hooks-ts-rewrite: hooks.json references only .ts paths for JS-runtime hook
     }
   }
 
-  assert.ok(commands.length >= 3, 'expected at least 3 JS-runtime hook commands');
-  // Every node-invoked command must point at a .ts file; no .js.
-  for (const cmd of commands) {
-    const isNodeInvocation = /\bnode\b/.test(cmd);
-    if (!isNodeInvocation) continue; // bash/sh hooks are fine
+  // Plan 20-13 owns exactly these three hooks. Hooks added by other
+  // phases (e.g. gdd-bash-guard.js, gdd-protected-paths.js) are owned
+  // by those phases' migration timelines and may still be .js here.
+  const owned = [
+    'budget-enforcer',
+    'context-exhaustion',
+    'gdd-read-injection-scanner',
+  ];
+  for (const base of owned) {
+    const matches = commands.filter((c) => c.includes(`/hooks/${base}.`));
     assert.ok(
-      /hooks\/[a-z0-9-]+\.ts/.test(cmd),
-      `node-invoked hook command must reference a .ts file: ${cmd}`,
+      matches.length >= 1,
+      `hooks.json must register /hooks/${base}.ts via node --experimental-strip-types`,
     );
-    assert.ok(
-      !/hooks\/[a-z0-9-]+\.js/.test(cmd),
-      `node-invoked hook command must not reference a .js file: ${cmd}`,
-    );
-    assert.ok(
-      /--experimental-strip-types/.test(cmd),
-      `node-invoked hook command must include --experimental-strip-types: ${cmd}`,
-    );
+    for (const cmd of matches) {
+      assert.ok(
+        cmd.includes(`/hooks/${base}.ts`),
+        `Plan 20-13 owned hook ${base} must reference .ts, got: ${cmd}`,
+      );
+      assert.ok(
+        !cmd.includes(`/hooks/${base}.js`),
+        `Plan 20-13 owned hook ${base} must not reference .js, got: ${cmd}`,
+      );
+      assert.ok(
+        /--experimental-strip-types/.test(cmd),
+        `Plan 20-13 owned hook ${base} must use --experimental-strip-types: ${cmd}`,
+      );
+    }
   }
 });
 

@@ -229,14 +229,27 @@ test('phase-20 baseline: hook-list.txt matches hooks/ directory', () => {
   );
 });
 
-test('phase-20 baseline: no legacy *.js hooks remain (Plan 20-13 migrated everything to .ts)', () => {
+test('phase-20 baseline: Plan 20-13 migrated its owned hooks to .ts', () => {
+  // Plan 20-13 rewrote the 3 hooks owned by Phase 20 (budget-enforcer,
+  // context-exhaustion, gdd-read-injection-scanner). .js hooks added by
+  // later/parallel phases (bash-guard, decision-injector, mcp-circuit-breaker,
+  // protected-paths) are allowed — they are owned by those phases' re-lock.
+  const owned = [
+    'budget-enforcer',
+    'context-exhaustion',
+    'gdd-read-injection-scanner',
+  ];
   const entries = fs.readdirSync(path.join(REPO_ROOT, 'hooks'));
-  const jsHooks = entries.filter((f) => f.endsWith('.js'));
-  assert.deepEqual(
-    jsHooks,
-    [],
-    `Plan 20-13 migrated all hooks to TypeScript. Found legacy .js hook(s): ${jsHooks.join(', ')}`,
-  );
+  for (const base of owned) {
+    assert.ok(
+      entries.includes(`${base}.ts`),
+      `Plan 20-13 migration: hooks/${base}.ts must exist`,
+    );
+    assert.ok(
+      !entries.includes(`${base}.js`),
+      `Plan 20-13 migration: hooks/${base}.js must be removed (use .ts)`,
+    );
+  }
 });
 
 // ---------------------------------------------------------------------------

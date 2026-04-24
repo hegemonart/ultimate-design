@@ -1,5 +1,7 @@
 README.md
 a11y-mapper.md
+component-benchmark-harvester.md
+component-benchmark-synthesizer.md
 component-taxonomy-mapper.md
 design-advisor.md
 design-assumptions-analyzer.md
@@ -24,6 +26,7 @@ design-plan-checker.md
 design-planner.md
 design-reflector.md
 design-research-synthesizer.md
+design-start-writer.md
 design-update-checker.md
 design-verifier-gate.md
 design-verifier.md
