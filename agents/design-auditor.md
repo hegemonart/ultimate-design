@@ -50,6 +50,7 @@ Minimum expected files:
 - `reference/visual-hierarchy-layout.md` — Z-order, whitespace, grids, and reading-order patterns (use when auditing Pillar 2: Visual Hierarchy)
 - `reference/iconography.md` — icon sizing, metaphors, library catalog, touch targets, animation guidelines
 - `reference/performance.md` — Core Web Vitals budgets, JS/font/image budgets, React runtime performance
+- `reference/style-vocabulary.md` — UI aesthetic catalog; use when scoring Pillar 3 (Color) style-coherence sub-check and Pillar 2 (Visual Hierarchy) signature-effects verification
 - `reference/design-systems-catalog.md` — 18-system index for identifying pattern precedents and system alignment
 
 ---
@@ -129,6 +130,8 @@ grep -rEn "btn-primary" src/ --include="*.tsx" --include="*.jsx" 2>/dev/null | h
 ### Pillar 3: Color
 
 **What this measures:** Palette harmony, semantic role consistency (red = danger only), avoidance of AI-default palettes, dark mode quality if applicable.
+
+**Style-vocabulary cross-check:** Before scoring, read the `D-0N` style decision from `.design/DESIGN-CONTEXT.md` (e.g., "Glassmorphism", "Neubrutalism", "Data Dense"). Look up that style name verbatim in `reference/style-vocabulary.md` — the Light/Dark column tells you whether dark mode is required, the Signature Effects column tells you what color techniques are canonical for the style, and the Avoid For column tells you whether this style is structurally mismatched to the product type. A palette that is internally consistent but inconsistent with the declared style (e.g., hard flat fills implemented for a Glassmorphism direction) is a style coherence defect and should reduce the score by 1 point. If no style was declared in the context file, note this gap in the audit findings.
 
 **Audit method:**
 
