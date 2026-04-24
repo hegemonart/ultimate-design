@@ -528,7 +528,6 @@ If `reference/components/` does not exist or contains no specs, skip this sectio
 
 ---
 
-
 ## Record
 
 At run-end, append one JSONL line to `.design/intel/insights.jsonl`:

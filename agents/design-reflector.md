@@ -172,7 +172,6 @@ Aggregate per agent across cycles:
 - Proposals are additive — propose additions, not deletions of existing content, unless the evidence is clear (e.g., wrong frontmatter value).
 - Maximum 20 proposals per reflection file. If more are warranted, batch the lowest-priority ones into a single summary note at the end.
 
-
 ## Record
 
 At run-end, append one JSONL line to `.design/intel/insights.jsonl`:

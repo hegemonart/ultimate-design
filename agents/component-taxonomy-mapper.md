@@ -85,7 +85,6 @@ dominant_styling: [CSS Modules | Tailwind | styled-components | mixed]
 
 Do not modify anything outside `.design/map/`. No git. No agent spawning.
 
-
 ## Record
 
 At run-end, append one JSONL line to `.design/intel/insights.jsonl`:

@@ -257,7 +257,6 @@ You MUST NOT:
 
 ---
 
-
 ## Record
 
 At run-end, append one JSONL line to `.design/intel/insights.jsonl`:

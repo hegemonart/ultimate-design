@@ -511,7 +511,6 @@ This agent MUST NOT:
 @.design/intel/tokens.json (if present)
 @.design/intel/decisions.json (if present)
 
-
 ## Record
 
 At run-end, append one JSONL line to `.design/intel/insights.jsonl`:

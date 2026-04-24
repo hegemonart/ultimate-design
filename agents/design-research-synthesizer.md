@@ -163,7 +163,6 @@ Read .design/STATE.md
 
 Single file: `.design/DESIGN-CONTEXT.md`.
 
-
 ## Record
 
 At run-end, append one JSONL line to `.design/intel/insights.jsonl`:

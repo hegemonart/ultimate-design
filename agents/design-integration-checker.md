@@ -323,7 +323,6 @@ Document any ambiguous cases in the per-decision "Notes" field.
 
 ---
 
-
 ## Record
 
 At run-end, append one JSONL line to `.design/intel/insights.jsonl`:

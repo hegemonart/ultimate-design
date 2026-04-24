@@ -87,7 +87,6 @@ You MAY:
 
 Per 10.1-CONTEXT decision **D-21** (Lazy Checker Spawning): "Cheap Haiku gate agents at `agents/*-gate.md` decide whether to spawn full checker. If false, skip full checker, log as `lazy_skipped: true` in telemetry." This gate is the context-checker-specific instance of that pattern — the full `design-context-checker` runs a 6-dimension rubric against `.design/DESIGN-CONTEXT.md`. If the builder made no changes to that file in this phase (a no-op re-run of discover, for example), the prior verdict still holds and the spawn is wasted cost.
 
-
 ## Record
 
 At run-end, append one JSONL line to `.design/intel/insights.jsonl`:

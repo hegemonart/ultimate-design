@@ -82,7 +82,6 @@ For each learning with `Proposed reference update: yes`:
 @.design/intel/patterns.json (if present)
 @.design/learnings/LEARNINGS.md (if present)
 
-
 ## Record
 
 At run-end, append one JSONL line to `.design/intel/insights.jsonl`:

@@ -144,7 +144,6 @@ Total: N findings. (0 = clean)
 
 You MUST NOT modify anything outside `.design/map/`. Do not run git commands or spawn agents.
 
-
 ## Record
 
 At run-end, append one JSONL line to `.design/intel/insights.jsonl`:

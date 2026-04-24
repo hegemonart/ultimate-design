@@ -177,7 +177,6 @@ The stage reads the inline summary to determine how many gaps were fixed before 
 
 ---
 
-
 ## Record
 
 At run-end, append one JSONL line to `.design/intel/insights.jsonl`:

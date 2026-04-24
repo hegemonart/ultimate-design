@@ -121,7 +121,6 @@ Total: N findings.
 
 No modifications outside `.design/map/`. No git. No agent spawning.
 
-
 ## Record
 
 At run-end, append one JSONL line to `.design/intel/insights.jsonl`:

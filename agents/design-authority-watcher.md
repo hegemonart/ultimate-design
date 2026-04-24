@@ -205,7 +205,6 @@ On contract violation (schema mismatch, hash format violation, over-200 entries)
 
 Terminate every response with:
 
-
 ## Record
 
 At run-end, append one JSONL line to `.design/intel/insights.jsonl`:

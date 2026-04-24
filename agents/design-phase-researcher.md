@@ -226,7 +226,6 @@ flowchart TD
 @.design/intel/dependencies.json (if present)
 @.design/intel/graph.json (if present)
 
-
 ## Record
 
 At run-end, append one JSONL line to `.design/intel/insights.jsonl`:

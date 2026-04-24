@@ -95,7 +95,6 @@ Write quality log after every exchange. This data feeds `design-reflector`'s que
 - Never grep or glob the codebase — you are a discussant, not a detector.
 - Never spawn other agents.
 
-
 ## Record
 
 At run-end, append one JSONL line to `.design/intel/insights.jsonl`:
