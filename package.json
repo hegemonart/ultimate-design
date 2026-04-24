@@ -20,6 +20,7 @@
     "scripts/",
     "connections/",
     "reference/",
+    "bin/",
     "SKILL.md",
     "README.md",
     "CHANGELOG.md",
@@ -27,7 +28,8 @@
   ],
   "bin": {
     "get-design-done": "./scripts/install.cjs",
-    "gdd-state-mcp": "./scripts/mcp-servers/gdd-state/server.ts"
+    "gdd-state-mcp": "./scripts/mcp-servers/gdd-state/server.ts",
+    "gdd-sdk": "./bin/gdd-sdk"
   },
   "publishConfig": {
     "access": "public",
@@ -46,7 +48,8 @@
     "test:size-budget": "node --test tests/agent-size-budget.test.cjs",
     "release:extract-changelog": "node scripts/extract-changelog-section.cjs",
     "verify:version-sync": "node scripts/verify-version-sync.cjs",
-    "typecheck:session-runner": "tsc --noEmit"
+    "typecheck:session-runner": "tsc --noEmit",
+    "gdd-sdk": "node --experimental-strip-types scripts/lib/cli/index.ts"
   },
   "devDependencies": {
     "@types/node": "^22.0.0",
