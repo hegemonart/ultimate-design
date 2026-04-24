@@ -132,10 +132,12 @@ test('22-04: opaque extra fields preserved in record', () => {
 });
 
 test('22-04: chainPathFor handles relative + absolute', () => {
-  const abs = chainPathFor({ path: '/abs/path.jsonl' });
-  assert.equal(abs, '/abs/path.jsonl');
-  const rel = chainPathFor({ baseDir: '/proj', path: 'sub/x.jsonl' });
-  assert.equal(rel, '/proj/sub/x.jsonl');
+  const path = require('node:path');
+  const absInput = process.platform === 'win32' ? 'C:\\abs\\path.jsonl' : '/abs/path.jsonl';
+  const baseDir = process.platform === 'win32' ? 'C:\\proj' : '/proj';
+  assert.equal(chainPathFor({ path: absInput }), absInput);
+  const rel = chainPathFor({ baseDir, path: 'sub/x.jsonl' });
+  assert.equal(rel, path.resolve(baseDir, 'sub/x.jsonl'));
 });
 
 test('22-04: walkParents safe against self-cycle (defensive)', () => {

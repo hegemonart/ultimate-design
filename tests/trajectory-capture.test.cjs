@@ -26,8 +26,11 @@ test('22-03: hashOf differs for different inputs', () => {
 });
 
 test('22-03: trajectoryPath sanitizes cycle name', () => {
-  const p = trajectoryPath({ baseDir: '/tmp', cycle: 'feature/branch-x' });
-  assert.match(p, /\/feature_branch-x\.jsonl$/);
+  const baseDir = process.platform === 'win32' ? 'C:\\tmp' : '/tmp';
+  const p = trajectoryPath({ baseDir, cycle: 'feature/branch-x' });
+  // The forward-slash in cycle is replaced with underscore. Final
+  // separator is platform-specific (\\ on Windows, / on POSIX).
+  assert.match(p, /[\\/]feature_branch-x\.jsonl$/);
 });
 
 test('22-03: recordCall writes one JSONL line with all fields', () => {
