@@ -363,6 +363,33 @@ This audit is **code-only**. No Playwright-MCP and no dev server screenshot capt
 
 ---
 
+## Motion Anti-Pattern Check
+
+When the codebase uses Framer Motion (detectable by `import.*framer-motion` in source files), perform this additional check after the 6-pillar audit and include findings in **Pillar 6: Experience Design** under a `### Motion (Framer Motion)` subsection.
+
+Read `reference/framer-motion-patterns.md` for the full rationale behind these rules. The two hard violations to surface:
+
+**Anti-pattern 1 — Non-transform animations:** Animating `width`, `height`, `margin`, `padding`, `left`, or `top` triggers layout recalculation on every frame and causes dropped frames. Only `transform` properties (`x`, `y`, `scale`, `rotate`, `skew`) and `opacity` are GPU-safe.
+
+```bash
+# Detect non-transform animation targets in Framer Motion usage
+grep -rEn "animate=\{.*\b(width|height|margin|padding|left|top|right|bottom)\b" src/ --include="*.tsx" --include="*.jsx" 2>/dev/null | head -10
+```
+
+**Anti-pattern 2 — Missing reduced-motion guard:** Framer Motion animations must respect `prefers-reduced-motion`. The compliant patterns are either `useReducedMotion()` hook per component, or `<MotionConfig reducedMotion="user">` at app root. Absence of either is an accessibility violation.
+
+```bash
+# Check for MotionConfig with reducedMotion at app root
+grep -rEn "reducedMotion|useReducedMotion" src/ --include="*.tsx" --include="*.jsx" 2>/dev/null | head -10
+
+# Confirm framer-motion is in use
+grep -rEl "from ['\"]framer-motion['\"]" src/ --include="*.tsx" --include="*.jsx" 2>/dev/null | wc -l
+```
+
+If framer-motion is in use and neither `reducedMotion="user"` in `MotionConfig` nor `useReducedMotion` calls are found, flag this as a high-priority accessibility gap in the Priority Fix List.
+
+---
+
 ## Constraints
 
 **MUST NOT:**

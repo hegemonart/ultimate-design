@@ -220,7 +220,9 @@ Work through the accessibility checklist:
 
 ### Type: motion
 
-Read `reference/motion.md` before starting.
+Read `reference/motion.md` and `reference/framer-motion-patterns.md` before starting.
+
+`reference/framer-motion-patterns.md` contains Framer Motion-specific implementation patterns that complement the framework-agnostic rules in `reference/motion.md`. When the codebase uses Framer Motion (detectable by `framer-motion` imports), apply the patterns from that file: spring/tween configuration, `AnimatePresence` with `initial={false}`, layout animations, variants with `staggerChildren`, gesture props (`whileHover`, `whileTap` at scale 0.96), `useReducedMotion` or `MotionConfig reducedMotion="user"` for a11y, and the hard constraint that `bounce: 0` for all micro-interactions.
 
 Apply the 5-question framework to every animation/transition in scope:
 
