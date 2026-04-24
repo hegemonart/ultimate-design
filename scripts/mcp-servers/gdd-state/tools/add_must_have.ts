@@ -1,9 +1,13 @@
 // scripts/mcp-servers/gdd-state/tools/add_must_have.ts
 //
 // Tool: gdd_state__add_must_have
-// Purpose: Append one entry to <must_haves>. Auto-allocates M-N id by
-// scanning existing must_haves when the caller doesn't supply one.
-// Emits state.mutation on success.
+// Purpose: Insert-or-update one entry in <must_haves>. Auto-allocates
+// M-N id by scanning existing must_haves when the caller doesn't
+// supply one. When the caller supplies an `id` that already exists,
+// the entry is updated in-place (same position in the block) — this
+// is the canonical "flip a must-have status" idiom used by the verify
+// skill (see skills/verify/SKILL.md "Flipping a must-have status").
+// Emits state.mutation on success with `action: "insert" | "update"`.
 
 import { mutate } from '../../../lib/gdd-state/index.ts';
 import type { MustHave } from '../../../lib/gdd-state/types.ts';
@@ -65,7 +69,8 @@ export async function handle(input: unknown): Promise<ToolResponse> {
     }
 
     const path = resolveStatePath();
-    let appended: MustHave | null = null;
+    let written: MustHave | null = null;
+    let action: 'insert' | 'update' = 'insert';
     let countAfter = 0;
     const after = await mutate(path, (s) => {
       const mh: MustHave = {
@@ -73,16 +78,35 @@ export async function handle(input: unknown): Promise<ToolResponse> {
         text: typed.text,
         status: typed.status ?? 'pending',
       };
-      s.must_haves.push(mh);
-      appended = mh;
+      // Update-in-place when the caller supplied an id that already
+      // exists — preserves the entry's position in the <must_haves>
+      // block. This is the canonical idiom the verify skill relies on
+      // to flip `pending` → `pass`/`fail` without a dedicated
+      // update_must_have_status tool.
+      const existingIdx =
+        typed.id !== undefined
+          ? s.must_haves.findIndex((existing) => existing.id === mh.id)
+          : -1;
+      if (existingIdx >= 0) {
+        s.must_haves[existingIdx] = mh;
+        action = 'update';
+      } else {
+        s.must_haves.push(mh);
+        action = 'insert';
+      }
+      written = mh;
       countAfter = s.must_haves.length;
       return s;
     });
-    if (appended === null) {
-      throwValidation('INTERNAL', 'must_have was not appended (unreachable)');
+    if (written === null) {
+      throwValidation('INTERNAL', 'must_have was not written (unreachable)');
     }
-    emitStateMutation(name, { appended, count: countAfter }, after);
-    return okResponse({ must_have: appended, count: countAfter });
+    emitStateMutation(
+      name,
+      { must_have: written, action, count: countAfter },
+      after,
+    );
+    return okResponse({ must_have: written, action, count: countAfter });
   } catch (err) {
     return errorResponse(err);
   }
