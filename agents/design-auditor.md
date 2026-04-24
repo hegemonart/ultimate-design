@@ -6,7 +6,8 @@ color: green
 model: inherit
 default-tier: sonnet
 tier-rationale: "Emits structured findings from code inspection; Sonnet balances depth with cost"
-size_budget: XL
+size_budget: XXL
+size_budget_rationale: "Phase 17 added Component Conformance addendum (+54 lines for spec-grep detection + conformance scoring algorithm)"
 parallel-safe: always
 typical-duration-seconds: 45
 reads-only: false

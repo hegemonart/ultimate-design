@@ -6,6 +6,7 @@ color: green
 model: inherit
 default-tier: sonnet
 tier-rationale: "Catalogs design patterns present in codebase; open-ended classification"
+size_budget: XL
 parallel-safe: always
 typical-duration-seconds: 45
 reads-only: false

@@ -5,7 +5,8 @@ tools: Read, Write, Edit, Bash, Grep, Glob
 color: yellow
 default-tier: sonnet
 tier-rationale: "Follows an Opus-authored plan; executes rather than plans"
-size_budget: XL
+size_budget: XXL
+size_budget_rationale: "Phase 17 added Benchmark Spec Pre-Flight section for type:components (+17 lines)"
 parallel-safe: conditional-on-touches
 typical-duration-seconds: 60
 reads-only: false
