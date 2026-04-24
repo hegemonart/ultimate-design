@@ -39,9 +39,10 @@
  */
 
 import { existsSync, mkdirSync, readFileSync, appendFileSync } from 'node:fs';
-import { join, dirname } from 'node:path';
+import { join, dirname, isAbsolute, resolve } from 'node:path';
 import { spawn } from 'node:child_process';
 import { createInterface } from 'node:readline';
+import { createRequire } from 'node:module';
 
 import { appendEvent } from '../scripts/lib/event-stream/index.ts';
 import type { HookFiredEvent } from '../scripts/lib/event-stream/index.ts';
@@ -50,6 +51,27 @@ import type { HookFiredEvent } from '../scripts/lib/event-stream/index.ts';
 // the structural merge with defaults — the schema permits every field
 // to be optional so defaults-merged objects are always valid.
 import type { BudgetSchema } from '../reference/schemas/generated.js';
+
+// Plan 20-14 resilience primitives. These are `.cjs` modules so that
+// `.cjs`-only call sites (future CLIs) can consume them without
+// --experimental-strip-types. From this file — which runs as an ES
+// module under strip-types — we reach them via `createRequire`
+// anchored on an absolute filesystem path derived from `process.argv[1]`
+// (identical pattern to `hooks/gdd-read-injection-scanner.ts`'s
+// loadPatterns). We deliberately avoid `import.meta.url` so this
+// module stays compatible with the `Node16` tsconfig module setting
+// without forcing `"type":"module"` in package.json (which would
+// break the Tier-2 .cjs tests per Plan 20-00).
+function resolveHookPath(): string {
+  const a1 = process.argv[1];
+  if (typeof a1 === 'string' && a1.length > 0) {
+    return isAbsolute(a1) ? a1 : resolve(a1);
+  }
+  return resolve('hooks/budget-enforcer.ts');
+}
+const nodeRequire = createRequire(resolveHookPath());
+const rateGuard = nodeRequire('../scripts/lib/rate-guard.cjs') as typeof import('../scripts/lib/rate-guard.cjs');
+const iterationBudget = nodeRequire('../scripts/lib/iteration-budget.cjs') as typeof import('../scripts/lib/iteration-budget.cjs');
 
 // ── Types ───────────────────────────────────────────────────────────────────
 
@@ -123,10 +145,16 @@ interface TelemetryRowPartial {
   _cyclePhase?: { cycle: string; phase: string };
 }
 
-/** The hook's terminal decision — also the event payload `decision` field. */
+/**
+ * The hook's terminal decision — also the event payload `decision` field.
+ * `'rate-limited'` was added in Plan 20-14 to signal that rate-guard
+ * saw an upstream provider hit its limit and the hook short-circuited
+ * before the budget cap check.
+ */
 export type HookDecision =
   | 'lazy'
   | 'cache'
+  | 'rate-limited'
   | 'block'
   | 'downgrade'
   | 'warn'
@@ -489,6 +517,17 @@ export async function main(): Promise<void> {
   if (inputHash !== null) {
     const cached = cacheLookup(agent, inputHash);
     if (cached !== null) {
+      // Plan 20-14: refund one iteration-budget unit — cached answers did
+      // no real work and shouldn't count against the fix-loop ceiling.
+      // The refund call is fire-and-forget; failures are swallowed so
+      // telemetry/iteration-budget errors never block the hook. We also
+      // silence the auto-init path (refund on a fresh state file is a
+      // no-op at full budget, which is what we want).
+      try {
+        void iterationBudget.refund(1).catch(() => { /* fail open */ });
+      } catch {
+        // fail open
+      }
       writeTelemetry({
         agent,
         tier: 'cache',
@@ -508,6 +547,43 @@ export async function main(): Promise<void> {
       process.stdout.write(JSON.stringify(response));
       return;
     }
+  }
+
+  // Plan 20-14: rate-guard short-circuit. Inserted AFTER the cache
+  // check (cached answers bypass every network call so rate-limits are
+  // irrelevant for them) and BEFORE the budget cap so a rate-limited
+  // provider surfaces a clean "wait N seconds" message instead of a
+  // "cap reached" one. rate-guard state is per-provider — we key on
+  // 'anthropic' because every Agent spawn in this project goes through
+  // the Anthropic API; future multi-provider routing would branch here
+  // on toolInput._provider.
+  const rateState = rateGuard.remaining('anthropic');
+  if (rateState !== null && rateState.remaining <= 0) {
+    const waitSeconds = Math.max(
+      0,
+      Math.ceil((Date.parse(rateState.resetAt) - Date.now()) / 1000),
+    );
+    writeTelemetry({
+      agent,
+      tier:
+        toolInput._tier_override ??
+        toolInput._default_tier ??
+        'sonnet',
+      tokens_in: Number(toolInput._tokens_in_est ?? 0),
+      tokens_out: Number(toolInput._tokens_out_est ?? 0),
+      cache_hit: false,
+      est_cost_usd: Number(toolInput._est_cost_usd ?? 0),
+      block_reason: 'rate_limited',
+      _cyclePhase: cyclePhase,
+    });
+    emitHookFired('rate-limited', cycle);
+    const response: ToolOutput = {
+      continue: false,
+      suppressOutput: false,
+      message: `gdd-budget-enforcer: rate-limited on anthropic, retry in ${waitSeconds}s (resetAt=${rateState.resetAt})`,
+    };
+    process.stdout.write(JSON.stringify(response));
+    return;
   }
 
   const estCost = Number(toolInput._est_cost_usd ?? 0);
