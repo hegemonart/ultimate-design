@@ -28,7 +28,9 @@ test('hook-validation: all hook command files exist', () => {
           // Extract file path from command string
           // Pattern: bash "${CLAUDE_PLUGIN_ROOT}/scripts/bootstrap.sh"
           // Match paths that may be preceded by env vars like ${CLAUDE_PLUGIN_ROOT}
-          const fileMatch = h.command.match(/\$\{[A-Z_]+\}([^'"\s]+\.(?:sh|js|cjs))|(?:^|[\s'"])([./][^'"\s]+\.(?:sh|js|cjs))/);
+          // Plan 20-13: .ts added for the TypeScript hook rewrites (budget-enforcer.ts,
+          // context-exhaustion.ts, gdd-read-injection-scanner.ts).
+          const fileMatch = h.command.match(/\$\{[A-Z_]+\}([^'"\s]+\.(?:sh|js|cjs|ts))|(?:^|[\s'"])([./][^'"\s]+\.(?:sh|js|cjs|ts))/);
           if (fileMatch) {
             // Group 1: path after env var like ${CLAUDE_PLUGIN_ROOT}/scripts/file.sh
             // Group 2: plain relative path
