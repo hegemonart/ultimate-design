@@ -2,18 +2,18 @@
 name: gdd-settings
 description: "Manage .design/config.json settings. Subcommands: profile, parallelism, cleanup, show."
 argument-hint: "<profile <name>|parallelism <key> <value>|cleanup|show>"
-tools: Read, Write, AskUserQuestion, Bash, mcp__gdd_state__get, mcp__gdd_state__frontmatter_update
+tools: Read, Write, AskUserQuestion, Bash
 ---
 
 # gdd-settings
 
-Manages `.design/config.json` — the per-project config for model profile and parallelism. See `reference/config-schema.md` for the full schema. This skill also supports patching non-stage STATE.md frontmatter keys (`cycle`, `wave`, custom keys) via `mcp__gdd_state__frontmatter_update`. See **STATE.md frontmatter** below.
+Manages `.design/config.json` — the per-project config for model profile and parallelism. See `reference/config-schema.md` for the full schema.
 
 ## Subcommands
 
 ### `show`
 
-Print the current `.design/config.json` contents, nicely formatted. If the file is missing, print the defaults with a note that no config exists yet. Also call `mcp__gdd_state__get` to print the current STATE.md frontmatter keys (cycle, wave, model_profile) alongside config.json for a unified view.
+Print the current `.design/config.json` contents, nicely formatted. If the file is missing, print the defaults with a note that no config exists yet.
 
 ### `profile <name>`
 
@@ -49,14 +49,6 @@ Always:
 1. Read current `.design/config.json` (use defaults below if missing).
 2. Merge the single field being changed — never overwrite unrelated fields.
 3. Write back as pretty JSON (2-space indent, trailing newline).
-
-## STATE.md frontmatter
-
-For any STATE.md frontmatter patch (cycle, wave, or project-custom keys), call `mcp__gdd_state__frontmatter_update({ patch: { <key>: <value> } })`. Do not `Edit` or `Write` STATE.md directly.
-
-**Stage-patch guard:** this skill cannot patch `stage`. If the user attempts to set `stage` here, reject with: "Use /gdd:brief, /gdd:explore, etc. for stage transitions. The settings skill is for non-stage frontmatter only." The MCP tool itself rejects `stage` patches with a VALIDATION error (surfaced by `mcp__gdd_state__frontmatter_update`), which this prose surfaces up-front so the user gets a clear message before the tool round-trip.
-
-This surface is STATE.md-only. `.design/config.json` mutations continue to use `Read` + `Write` directly (out of scope for the 11-tool MCP catalog).
 
 ## Default Config
 
