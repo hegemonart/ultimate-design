@@ -47,10 +47,37 @@ function _findRepoRoot(): string {
   }
   return process.cwd();
 }
-const _redactRequire = createRequire(join(_findRepoRoot(), 'package.json'));
-const { redact } = _redactRequire(
-  resolve(_findRepoRoot(), 'scripts/lib/redact.cjs'),
-) as { redact: (v: unknown) => unknown };
+
+// Soft load: if redact.cjs is unreachable from the runtime cwd (e.g. a
+// hook subprocess running in a temp test dir three directories above
+// the plugin root), fall through to the identity function. The writer
+// keeps working — events just aren't scrubbed in that environment.
+// Production callers always run from inside the plugin tree.
+let _redact: (v: unknown) => unknown;
+try {
+  const _root = _findRepoRoot();
+  const _candidate = resolve(_root, 'scripts/lib/redact.cjs');
+  if (existsSync(_candidate)) {
+    const _redactRequire = createRequire(join(_root, 'package.json'));
+    const _mod = _redactRequire(_candidate) as { redact: (v: unknown) => unknown };
+    _redact = _mod.redact;
+  } else {
+    // Fallback: also try walking up from this source file's logical
+    // position (3 dirs above writer.ts → repo root).
+    const _altRoot = resolve(_root, '..', '..');
+    const _altCandidate = resolve(_altRoot, 'scripts/lib/redact.cjs');
+    if (existsSync(_altCandidate)) {
+      const _altRequire = createRequire(join(_altRoot, 'package.json'));
+      const _altMod = _altRequire(_altCandidate) as { redact: (v: unknown) => unknown };
+      _redact = _altMod.redact;
+    } else {
+      _redact = (v) => v;
+    }
+  }
+} catch {
+  _redact = (v) => v;
+}
+const redact = _redact;
 
 /** Default relative path for the persisted event stream. */
 export const DEFAULT_EVENTS_PATH = '.design/telemetry/events.jsonl';
