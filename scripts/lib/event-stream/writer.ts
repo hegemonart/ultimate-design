@@ -23,8 +23,17 @@
 
 import { appendFileSync, mkdirSync } from 'node:fs';
 import { dirname, resolve, isAbsolute, join } from 'node:path';
+import { createRequire } from 'node:module';
 
 import type { BaseEvent } from './types.ts';
+
+// Phase 22 Plan 22-02: write-time secret scrubbing. `redact()` deep-walks
+// the event and replaces secret-shaped strings with `[REDACTED:<type>]`
+// placeholders before serialization. Loaded via createRequire because
+// `redact.cjs` is a CommonJS module and `--experimental-strip-types` does
+// not interop ESM↔CJS for type-stripped sources.
+const require = createRequire(import.meta.url);
+const { redact } = require('../redact.cjs') as { redact: (v: unknown) => unknown };
 
 /** Default relative path for the persisted event stream. */
 export const DEFAULT_EVENTS_PATH = '.design/telemetry/events.jsonl';
@@ -113,22 +122,26 @@ export class EventWriter {
    * {@link append}.
    */
   serialize(ev: BaseEvent): string {
-    const raw = JSON.stringify(ev) + '\n';
+    // Phase 22 Plan 22-02: scrub secrets from the entire event (envelope +
+    // payload) before serialization. Redaction is non-mutating and runs
+    // exactly once per event, here at the write boundary.
+    const scrubbed = redact(ev) as BaseEvent;
+    const raw = JSON.stringify(scrubbed) + '\n';
     if (Buffer.byteLength(raw, 'utf8') <= this.maxLineBytes) {
       return raw;
     }
 
     // Truncate: keep envelope fields, drop payload content.
     const truncated: BaseEvent = {
-      type: ev.type,
-      timestamp: ev.timestamp,
-      sessionId: ev.sessionId,
+      type: scrubbed.type,
+      timestamp: scrubbed.timestamp,
+      sessionId: scrubbed.sessionId,
       payload: { _truncated_placeholder: true },
       _truncated: true,
     };
-    if (ev.stage !== undefined) truncated.stage = ev.stage;
-    if (ev.cycle !== undefined) truncated.cycle = ev.cycle;
-    if (ev._meta !== undefined) truncated._meta = ev._meta;
+    if (scrubbed.stage !== undefined) truncated.stage = scrubbed.stage;
+    if (scrubbed.cycle !== undefined) truncated.cycle = scrubbed.cycle;
+    if (scrubbed._meta !== undefined) truncated._meta = scrubbed._meta;
     return JSON.stringify(truncated) + '\n';
   }
 
