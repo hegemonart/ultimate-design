@@ -27,7 +27,6 @@
 
 const fs = require('node:fs');
 const path = require('node:path');
-const crypto = require('node:crypto');
 
 const DEFAULT_POSTERIOR_PATH = '.design/telemetry/posterior.json';
 const SCHEMA_VERSION = '1.0.0';
@@ -183,15 +182,18 @@ function sampleBeta(alpha, beta) {
   return x / (x + y);
 }
 
+// Math.random() is intentional here. Bandit sampling needs uniform
+// noise, not cryptographic randomness — using crypto + arithmetic is
+// what CodeQL js/biased-cryptographic-random flags. Math.random is
+// uniform-enough for Thompson sampling; security is not a concern.
 function randn() {
-  // Box-Muller via crypto.randomBytes for a slightly less hot loop.
-  const u1 = (crypto.randomBytes(4).readUInt32BE() + 1) / 0x1_0000_0001;
-  const u2 = (crypto.randomBytes(4).readUInt32BE() + 1) / 0x1_0000_0001;
+  const u1 = Math.random() || 1e-12; // avoid log(0)
+  const u2 = Math.random();
   return Math.sqrt(-2 * Math.log(u1)) * Math.cos(2 * Math.PI * u2);
 }
 
 function rand01() {
-  return crypto.randomBytes(4).readUInt32BE() / 0x1_0000_0000;
+  return Math.random();
 }
 
 function sampleGamma(k) {
