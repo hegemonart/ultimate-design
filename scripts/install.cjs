@@ -2,153 +2,201 @@
 'use strict';
 
 // npx @hegemonart/get-design-done
-// One-command installer for the get-design-done Claude Code plugin.
+// Multi-runtime installer for the get-design-done plugin.
 //
-// Registers the github.com/hegemonart/get-design-done marketplace and enables
-// the plugin in ~/.claude/settings.json (or $CLAUDE_CONFIG_DIR/settings.json).
-// Claude Code fetches the plugin payload from the marketplace on next launch.
+// Runtime selection:
+//   • zero-flag in TTY      → @clack/prompts interactive multi-select
+//   • zero-flag in non-TTY  → defaults to --claude --global (back-compat)
+//   • any explicit flag     → scripted, no prompts
 //
-// Usage:
-//   npx @hegemonart/get-design-done           # install
-//   npx @hegemonart/get-design-done --dry-run # show what would change
-//   npx @hegemonart/get-design-done --help
+// Per-runtime flags: --claude, --opencode, --gemini, --kilo, --codex,
+//   --copilot, --cursor, --windsurf, --antigravity, --augment, --trae,
+//   --qwen, --codebuddy, --cline. --all selects every runtime.
+//
+// Modifiers: --global (default) | --local; --uninstall; --dry-run;
+//   --config-dir <path>; --help / -h.
 
-const fs = require('fs');
-const path = require('path');
-const os = require('os');
+const path = require('node:path');
 
-const REPO = 'hegemonart/get-design-done';
-const MARKETPLACE_NAME = 'get-design-done';
-const PLUGIN_NAME = 'get-design-done';
-const ENABLED_KEY = `${PLUGIN_NAME}@${MARKETPLACE_NAME}`;
+const { listRuntimes, listRuntimeIds } = require('./lib/install/runtimes.cjs');
+const { installRuntime, uninstallRuntime } = require('./lib/install/installer.cjs');
 
-const args = new Set(process.argv.slice(2));
-
-if (args.has('--help') || args.has('-h')) {
-  process.stdout.write(
-    [
-      'npx @hegemonart/get-design-done — install the plugin',
-      '',
-      'Registers the github.com/hegemonart/get-design-done marketplace and',
-      'enables the get-design-done plugin in your Claude Code settings.',
-      '',
-      'Flags:',
-      '  --dry-run    Print the diff without writing',
-      '  --help, -h   Show this message',
-      '',
-      'Environment:',
-      '  CLAUDE_CONFIG_DIR   Override the Claude config directory',
-      '                      (default: ~/.claude)',
-      '',
-      'After install, restart Claude Code to load the plugin.',
-      '',
-    ].join('\n'),
-  );
-  process.exit(0);
-}
-
-const DRY_RUN = args.has('--dry-run');
-
-function resolveConfigDir() {
-  if (process.env.CLAUDE_CONFIG_DIR && process.env.CLAUDE_CONFIG_DIR.trim()) {
-    return process.env.CLAUDE_CONFIG_DIR.trim();
+function parseArgs(argv) {
+  const args = argv.slice(2);
+  const flags = new Set();
+  let configDir = null;
+  for (let i = 0; i < args.length; i++) {
+    const a = args[i];
+    if (a === '--config-dir') {
+      configDir = args[++i] || null;
+      continue;
+    }
+    if (a.startsWith('--config-dir=')) {
+      configDir = a.slice('--config-dir='.length);
+      continue;
+    }
+    flags.add(a);
   }
-  return path.join(os.homedir(), '.claude');
+  return { flags, configDir };
 }
 
-function loadSettings(settingsPath) {
-  if (!fs.existsSync(settingsPath)) return {};
-  try {
-    const raw = fs.readFileSync(settingsPath, 'utf8');
-    if (!raw.trim()) return {};
-    return JSON.parse(raw);
-  } catch (err) {
-    process.stderr.write(
-      `get-design-done installer: cannot parse ${settingsPath} as JSON\n` +
-        `  ${err.message}\n` +
-        `  Fix the file manually or delete it, then re-run.\n`,
-    );
-    process.exit(1);
+function helpText() {
+  const ids = listRuntimes()
+    .map((r) => `  --${r.id.padEnd(12)} ${r.displayName}`)
+    .join('\n');
+  return [
+    'npx @hegemonart/get-design-done — install the plugin into one or more runtimes',
+    '',
+    'Zero-flag in a TTY launches the interactive multi-select.',
+    'Zero-flag in a non-TTY (CI, pipes) defaults to --claude --global.',
+    '',
+    'Per-runtime flags:',
+    ids,
+    '  --all           Select every runtime',
+    '',
+    'Modifiers:',
+    '  --global        Install at $HOME / $USERPROFILE level (default)',
+    '  --local         Install in current working directory',
+    '  --uninstall     Remove the plugin from selected runtimes',
+    '  --dry-run       Print the diff without writing',
+    '  --config-dir D  Override the config directory',
+    '  --help, -h      Show this message',
+    '',
+    'Environment overrides (per-runtime):',
+    '  CLAUDE_CONFIG_DIR, OPENCODE_CONFIG_DIR, GEMINI_CONFIG_DIR,',
+    '  CODEX_HOME, CURSOR_CONFIG_DIR, … (one per runtime)',
+    '',
+  ].join('\n');
+}
+
+function runtimesFromFlags(flags) {
+  if (flags.has('--all')) return listRuntimeIds();
+  const picked = [];
+  for (const id of listRuntimeIds()) {
+    if (flags.has(`--${id}`)) picked.push(id);
   }
+  return picked;
 }
 
-function mergeSettings(existing) {
-  const next = { ...existing };
-
-  const marketplaces = { ...(next.extraKnownMarketplaces || {}) };
-  const marketplaceEntry = {
-    source: { source: 'github', repo: REPO },
-  };
-  const marketplaceChanged =
-    JSON.stringify(marketplaces[MARKETPLACE_NAME]) !==
-    JSON.stringify(marketplaceEntry);
-  marketplaces[MARKETPLACE_NAME] = marketplaceEntry;
-  next.extraKnownMarketplaces = marketplaces;
-
-  const enabled = { ...(next.enabledPlugins || {}) };
-  const enabledChanged = enabled[ENABLED_KEY] !== true;
-  enabled[ENABLED_KEY] = true;
-  next.enabledPlugins = enabled;
-
-  return { next, changed: marketplaceChanged || enabledChanged };
+async function pickRuntimesInteractively(opts) {
+  const { runInteractiveInstall, runInteractiveUninstall } = require('./lib/install/interactive.cjs');
+  if (opts.uninstall) {
+    return runInteractiveUninstall(opts);
+  }
+  return runInteractiveInstall();
 }
 
-function atomicWrite(target, contents) {
-  const tmp = `${target}.tmp-${process.pid}`;
-  fs.writeFileSync(tmp, contents, { encoding: 'utf8', mode: 0o600 });
-  fs.renameSync(tmp, target);
+function resolveLocalConfigDir(runtime) {
+  return path.resolve(process.cwd(), runtime.configDirFallback);
 }
 
-function main() {
-  const configDir = resolveConfigDir();
-  const settingsPath = path.join(configDir, 'settings.json');
+function shouldUseInteractive(flags) {
+  // Any of these flags means "scripted mode":
+  //   per-runtime, --all, --uninstall (with explicit list), --help
+  if (flags.has('--all')) return false;
+  for (const id of listRuntimeIds()) {
+    if (flags.has(`--${id}`)) return false;
+  }
+  // Bare --uninstall (no runtime list) is itself a trigger for interactive
+  // select-which-to-remove flow, so it returns true.
+  return Boolean(process.stdout.isTTY) && Boolean(process.stdin.isTTY);
+}
 
-  if (!fs.existsSync(configDir)) {
-    if (DRY_RUN) {
-      process.stdout.write(
-        `[dry-run] would create ${configDir}\n`,
-      );
+function summariseResults(results) {
+  const lines = [];
+  for (const r of results) {
+    const tag = r.dryRun ? '[dry-run] ' : '';
+    const status = r.action;
+    lines.push(`${tag}• ${r.runtime.padEnd(12)} ${status.padEnd(16)} ${r.path}`);
+    if (r.reason) lines.push(`    ${r.reason}`);
+  }
+  return lines.join('\n');
+}
+
+async function main() {
+  const { flags, configDir } = parseArgs(process.argv);
+
+  if (flags.has('--help') || flags.has('-h')) {
+    process.stdout.write(helpText());
+    process.exit(0);
+  }
+
+  const dryRun = flags.has('--dry-run');
+  const uninstall = flags.has('--uninstall');
+  const local = flags.has('--local');
+  const explicitRuntimes = runtimesFromFlags(flags);
+
+  let runtimes = explicitRuntimes;
+  let location = local ? 'local' : 'global';
+
+  if (runtimes.length === 0) {
+    if (shouldUseInteractive(flags)) {
+      const opts = { uninstall };
+      const picked = await pickRuntimesInteractively(opts);
+      if (picked == null) {
+        process.exit(0);
+      }
+      runtimes = picked.runtimes;
+      if (picked.location) location = picked.location;
     } else {
-      fs.mkdirSync(configDir, { recursive: true });
+      // Non-TTY zero-flag fallback: back-compat with v1.23.5 behaviour.
+      runtimes = ['claude'];
+      location = local ? 'local' : 'global';
     }
   }
 
-  const existing = loadSettings(settingsPath);
-  const { next, changed } = mergeSettings(existing);
-  const formatted = `${JSON.stringify(next, null, 2)}\n`;
+  const results = [];
+  const { getRuntime } = require('./lib/install/runtimes.cjs');
+  for (const id of runtimes) {
+    const runtime = getRuntime(id);
+    const opts = { dryRun };
+    if (configDir) {
+      opts.configDir = configDir;
+    } else if (location === 'local') {
+      opts.configDir = resolveLocalConfigDir(runtime);
+    }
+    const result = uninstall
+      ? uninstallRuntime(id, opts)
+      : installRuntime(id, opts);
+    results.push(result);
+  }
 
-  if (!changed) {
+  const verb = uninstall ? 'uninstall' : 'install';
+  const allUnchanged = results.length > 0 && results.every((r) => r.action === 'unchanged');
+  if (allUnchanged && !dryRun) {
     process.stdout.write(
-      `get-design-done is already registered in ${settingsPath}\n` +
-        `Nothing to do. Restart Claude Code if you haven't yet.\n`,
+      [
+        `get-design-done is already registered (${runtimes.length} runtime(s) unchanged):`,
+        summariseResults(results),
+        '',
+        'Nothing to do. Restart the affected runtime(s) if you have not yet.',
+        '',
+      ].join('\n'),
     );
     return;
   }
-
-  if (DRY_RUN) {
-    process.stdout.write(
-      `[dry-run] would update ${settingsPath}\n` +
-        `  extraKnownMarketplaces["${MARKETPLACE_NAME}"] = { source: { source: "github", repo: "${REPO}" } }\n` +
-        `  enabledPlugins["${ENABLED_KEY}"] = true\n`,
-    );
-    return;
-  }
-
-  atomicWrite(settingsPath, formatted);
-
   process.stdout.write(
     [
-      `✓ get-design-done registered in ${settingsPath}`,
-      `  marketplace: github:${REPO}`,
-      `  plugin:      ${ENABLED_KEY}`,
+      dryRun
+        ? `[dry-run] would ${verb} into ${runtimes.length} runtime(s):`
+        : `${verb} complete (${runtimes.length} runtime(s)):`,
+      summariseResults(results),
       '',
-      'Next steps:',
-      '  1. Restart Claude Code (or run /reload-plugins).',
-      '  2. Claude Code will fetch the plugin on first launch.',
-      '  3. Verify with: /plugin list',
+      uninstall
+        ? ''
+        : 'Restart the affected runtime(s) for the plugin to load.',
       '',
     ].join('\n'),
   );
 }
 
-main();
+main().catch((err) => {
+  if (err && err.code === 'EINSTALLER_BAD_JSON') {
+    process.stderr.write(`${err.message}\n`);
+  } else {
+    process.stderr.write(
+      `get-design-done installer error: ${err && err.stack ? err.stack : err}\n`,
+    );
+  }
+  process.exit(1);
+});
