@@ -55,8 +55,17 @@ function excerptOf(absolutePath, opts = {}) {
   raw = raw.replace(/^---\r?\n[\s\S]*?\r?\n---\r?\n/, '');
   // Drop fenced code blocks.
   raw = raw.replace(/```[\s\S]*?```/g, '');
-  // Drop HTML comments.
-  raw = raw.replace(/<!--[\s\S]*?-->/g, '');
+  // Drop HTML comments. Iterate until stable so that nested or
+  // adjacent `<!-- … -->` sequences cannot smuggle a residual `<!--`
+  // through a single regex pass (CodeQL js/incomplete-multi-character-
+  // sanitization). We're not building defense-in-depth against
+  // real markup attacks here — these excerpts are local doc files —
+  // but the loop costs nothing and silences the alert.
+  let prev;
+  do {
+    prev = raw;
+    raw = raw.replace(/<!--[\s\S]*?-->/g, '');
+  } while (raw !== prev);
   // Drop heading lines.
   raw = raw.replace(/^#{1,6}\s.*$/gm, '');
   // Take first non-empty paragraph.

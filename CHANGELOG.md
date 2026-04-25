@@ -25,16 +25,16 @@ Phase 23 GDD SDK Domain Primitives milestone — lands the highest-leverage code
 - **Image diff + visual baseline manager** — `scripts/lib/visual-baseline/diff.cjs` compares two PNG buffers. With `pngjs` installed (probeOptional), decodes both and counts pixels whose R/G/B/A channels differ beyond the tolerance (default 4). Without `pngjs`, falls back to bytewise SHA-256 equality. `scripts/lib/visual-baseline/index.cjs` exposes `compareToBaseline(key, pngBuffer)` and `applyBaseline(key, pngBuffer)`; reads/writes `.design/baselines/<key>.png`; rejects path-traversal keys. `pngjs@7` declared as optional dep. Defers Playwright/Preview MCP screenshot capture orchestration to a later phase. (Plan 23-07)
 
 - **Design-token reader (multi-source)** — `scripts/lib/design-tokens/index.cjs` facades over four pure-JS readers producing the uniform `{tokens, source, format, warnings}` shape:
-  * `css-vars.cjs` — extracts `--token: value;` from CSS/SCSS, last-write-wins, strips block comments, warns on `$scss-vars`
-  * `js-const.cjs` — spawn-node harness evaluates CJS/ESM exports, recognises `{tokens: …}` / default / direct bag, flattens nested with `.` separator
-  * `tailwind.cjs` — same harness, walks `theme` + `theme.extend` per scale (extend overrides base)
-  * `figma.cjs` — parses `{variableCollections}` shape OR already-flattened bag; emits `rgb(R, G, B)` for color values, per-mode tokens for multi-mode variables
+  - `css-vars.cjs` — extracts `--token: value;` from CSS/SCSS, last-write-wins, strips block comments, warns on `$scss-vars`
+  - `js-const.cjs` — spawn-node harness evaluates CJS/ESM exports, recognises `{tokens: …}` / default / direct bag, flattens nested with `.` separator
+  - `tailwind.cjs` — same harness, walks `theme` + `theme.extend` per scale (extend overrides base)
+  - `figma.cjs` — parses `{variableCollections}` shape OR already-flattened bag; emits `rgb(R, G, B)` for color values, per-mode tokens for multi-mode variables
   Auto-detection by extension + content sniff. (Plan 23-08)
 
 - **Domain primitives bundle** — three checkers sharing a single hit shape (`{rule_id, severity P0-P3, summary, evidence?, line?, file}`):
-  * `domain-primitives/nng.cjs` — runs grep-style heuristic rules loaded from `reference/heuristics.md` fenced yaml blocks; caller may inject `opts.rules` to bypass file-load
-  * `domain-primitives/anti-patterns.cjs` — same yaml extractor against `reference/anti-patterns.md`
-  * `domain-primitives/wcag.cjs` (no axe-core dep) — `contrastRatio()` (WCAG 1.4.3 luminance), `checkContrast({fg, bg, level: AA|AAA})`, `checkTapTarget({width, height, level})` (AA 24×24, AAA 44×44), `checkAriaLabels({content})` (interactive elements without text + aria-label)
+  - `domain-primitives/nng.cjs` — runs grep-style heuristic rules loaded from `reference/heuristics.md` fenced yaml blocks; caller may inject `opts.rules` to bypass file-load
+  - `domain-primitives/anti-patterns.cjs` — same yaml extractor against `reference/anti-patterns.md`
+  - `domain-primitives/wcag.cjs` (no axe-core dep) — `contrastRatio()` (WCAG 1.4.3 luminance), `checkContrast({fg, bg, level: AA|AAA})`, `checkTapTarget({width, height, level})` (AA 24×24, AAA 44×44), `checkAriaLabels({content})` (interactive elements without text + aria-label)
   Both NNG + anti-pattern files allow no parseable yaml today (treated as empty registry); robust to gradual rule population. (Plan 23-09)
 
 ### Changed
