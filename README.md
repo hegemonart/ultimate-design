@@ -104,7 +104,11 @@ Built-in quality gates catch real problems: Handoff Faithfulness scoring on Clau
 - **Component generators** — 21st.dev Magic MCP adds a prior-art gate before any greenfield build; Magic Patterns generates DS-aware components with a `preview_url` for visual verification. Both feed into a shared `design-component-generator` agent.
 - **Twelve tool connections** — Four new connections (paper.design, pencil.dev, 21st.dev, Magic Patterns) join the original eight. All are optional; the pipeline degrades gracefully to fallbacks when any connection is unavailable.
 
-## What's New in v1.21.0
+## What's New in v1.24.0
+
+**Multi-runtime installer** (headline upgrade) — `npx @hegemonart/get-design-done` with no flags now opens a polished interactive multi-select (`@clack/prompts`) for all 14 supported AI coding runtimes — Claude Code, OpenCode, Gemini CLI, Kilo Code, OpenAI Codex CLI, GitHub Copilot CLI, Cursor, Windsurf, Antigravity, Augment, Trae, Qwen Code, CodeBuddy, Cline. Pick any subset, choose Global or Local, confirm, done. Idempotent + foreign-AGENTS.md-safe. Scripted CI installs continue to work via the existing flag surface unchanged. See the [Getting Started](#getting-started) section below.
+
+### Previously in v1.21.0
 
 **Headless SDK** (headline upgrade) — the plugin now ships a `gdd-sdk` CLI that runs the full design pipeline without Claude Code. Five subcommands (`run`, `stage`, `query`, `audit`, `init`) work on any CI runner with Node 22+ and an `ANTHROPIC_API_KEY`. See the [Headless SDK](#headless-sdk) section below for examples.
 
@@ -134,14 +138,22 @@ Built-in quality gates catch real problems: Handoff Faithfulness scoring on Clau
 npx @hegemonart/get-design-done@latest
 ```
 
-That's it. The installer writes a `get-design-done` marketplace entry and enables the plugin in `~/.claude/settings.json` atomically. Restart Claude Code (or run `/reload-plugins`), and the pipeline is live.
+In a TTY this opens a polished interactive multi-select (`@clack/prompts`) — pick which AI runtimes to install into and whether to install Globally or Locally. Press `[a]` to select all 14 supported runtimes at once. In non-TTY contexts (CI, pipes), the same command falls back to `--claude --global` for full backwards compatibility with v1.23.5 and earlier.
+
+After install, restart the affected runtime(s) (or run `/reload-plugins` for Claude Code) and the pipeline is live.
+
+**Supported runtimes** *(v1.24.0+)*
+
+Claude Code, OpenCode, Gemini CLI, Kilo Code, OpenAI Codex CLI, GitHub Copilot CLI, Cursor, Windsurf, Antigravity, Augment, Trae, Qwen Code, CodeBuddy, Cline.
+
+Claude Code uses marketplace registration (`extraKnownMarketplaces` + `enabledPlugins` in `settings.json`); the other 13 runtimes follow the AGENTS.md / GEMINI.md convention — the installer drops a fingerprinted instructions file in the runtime's config dir (and refuses to overwrite an existing AGENTS.md it didn't author).
 
 **What the installer does**
 
-- Registers the `github:hegemonart/get-design-done` marketplace in `extraKnownMarketplaces`
-- Flips `enabledPlugins["get-design-done@get-design-done"]` to `true`
-- Preserves every other key in your settings — theme, permissions, other marketplaces — untouched
-- Idempotent: safe to re-run; no duplicate entries
+- For Claude Code: registers the `github:hegemonart/get-design-done` marketplace in `extraKnownMarketplaces` and flips `enabledPlugins["get-design-done@get-design-done"]` to `true`.
+- For AGENTS.md runtimes: drops a fingerprinted `AGENTS.md` (or `GEMINI.md`) in the runtime's config dir.
+- Preserves every other key in your settings — theme, permissions, other marketplaces — untouched.
+- Idempotent: safe to re-run; no duplicate entries; foreign AGENTS.md files are never overwritten.
 
 On first Claude Code launch after install, a `SessionStart` bootstrap hook provisions the companion reference library `~/.claude/libs/awesome-design-md` (idempotent — subsequent sessions run `git pull --ff-only`).
 
@@ -158,12 +170,29 @@ A one-line SessionStart nudge surfaces `/gdd:start` in fresh repos; run `/gdd:st
 ### Non-interactive install (CI, Docker, scripts)
 
 ```bash
-# Dry-run: print the diff, don't write
+# Dry-run: print the diff, don't write (Claude Code only by default)
 npx @hegemonart/get-design-done@latest --dry-run
 
 # Custom config dir (Docker, non-default Claude root)
 CLAUDE_CONFIG_DIR=/workspace/.claude npx @hegemonart/get-design-done@latest
+
+# Pick specific runtimes (any flag → scripted, no prompts)
+npx @hegemonart/get-design-done@latest --claude --opencode --gemini
+
+# Install into every supported runtime
+npx @hegemonart/get-design-done@latest --all
+
+# Local install (drops files into the current working directory)
+npx @hegemonart/get-design-done@latest --opencode --local
+
+# Uninstall — bare flag enters interactive multi-select of detected runtimes
+npx @hegemonart/get-design-done@latest --uninstall
+
+# Uninstall scripted (no prompt)
+npx @hegemonart/get-design-done@latest --uninstall --claude --gemini
 ```
+
+Per-runtime env-var overrides: `CLAUDE_CONFIG_DIR`, `OPENCODE_CONFIG_DIR`, `GEMINI_CONFIG_DIR`, `CODEX_HOME`, `CURSOR_CONFIG_DIR`, `KILO_CONFIG_DIR`, `COPILOT_CONFIG_DIR`, `WINDSURF_CONFIG_DIR`, `ANTIGRAVITY_CONFIG_DIR`, `AUGMENT_CONFIG_DIR`, `TRAE_CONFIG_DIR`, `QWEN_CONFIG_DIR`, `CODEBUDDY_CONFIG_DIR`, `CLINE_CONFIG_DIR`. Each falls back to `$HOME / $USERPROFILE` joined with the runtime's default subdirectory (e.g. `~/.claude`, `~/.gemini`, `~/.config/opencode`).
 
 ### Alternative: Claude Code CLI
 

@@ -4,6 +4,53 @@ All notable changes to get-design-done are documented here. Versions follow [sem
 
 ---
 
+## [1.24.0] — 2026-04-25
+
+Phase 24 Multi-Runtime Installer milestone — `npx @hegemonart/get-design-done` with no flags now launches a polished interactive install session (`@clack/prompts`) that walks the user through a multi-select of all 14 supported AI coding runtimes plus a Global/Local radio. Scripted / CI installs continue to work via the existing flag surface unchanged. Strict superset over v1.23.5: any non-zero invocation still works exactly as before.
+
+### Added
+
+- **Per-runtime install matrix** — `scripts/lib/install/runtimes.cjs` exports a 14-entry frozen list. Each entry: `{id, displayName, configDirEnv, configDirFallback, kind, files, marketplaceEntry?}`. Two install kinds are supported: `claude-marketplace` (registers an `extraKnownMarketplaces` entry + flips `enabledPlugins[<plugin>@<marketplace>]`, today only Claude Code) and `agents-md` (drops a runtime-specific instructions file in the runtime's config dir, used by the other 13). Adding a new runtime is one append to this file + one append to `test-fixture/baselines/phase-24/runtimes.txt`. (Plan 24-01)
+
+- **14 runtimes scoped** — Claude Code, OpenCode, Gemini CLI, Kilo Code, OpenAI Codex CLI, GitHub Copilot CLI, Cursor, Windsurf, Antigravity, Augment, Trae, Qwen Code, CodeBuddy, Cline. Gemini drops `GEMINI.md`; the other 12 `agents-md` runtimes drop `AGENTS.md`. (Plan 24-01)
+
+- **Config-dir lookup chain** — `scripts/lib/install/config-dir.cjs` exposes `resolveConfigDir(runtimeId, opts)` and `resolveAllConfigDirs(opts)`. Precedence: explicit `--config-dir` flag > per-runtime env var (`CLAUDE_CONFIG_DIR`, `OPENCODE_CONFIG_DIR`, `GEMINI_CONFIG_DIR`, `CODEX_HOME`, `CURSOR_CONFIG_DIR`, …) > POSIX/Windows fallback at `$HOME/$USERPROFILE` joined with the runtime's `configDirFallback`. Mirrors GSD `install.js`'s lookup pattern. (Plan 24-01)
+
+- **Settings merge / unmerge primitives** — `scripts/lib/install/merge.cjs` exports pure `mergeClaudeSettings(existing, marketplaceEntry) → {next, changed}` and `removeClaudeSettings(existing, marketplaceEntry) → {next, changed}`. Both are idempotent and preserve unrelated user keys. `buildAgentsFileContent(runtime)` produces the runtime-tagged AGENTS.md/GEMINI.md payload with a `<!-- get-design-done plugin instructions -->` fingerprint. `isPluginOwned(content)` is the inverse used by uninstall + foreign-file detection. (Plan 24-02)
+
+- **Per-runtime install/uninstall orchestrator** — `scripts/lib/install/installer.cjs` exports `installRuntime(runtimeId, opts)` and `uninstallRuntime(runtimeId, opts)`, both returning a structured `Result = {runtime, path, action: 'created'|'updated'|'unchanged'|'removed'|'skipped-foreign', dryRun, reason?}`. Atomic writes (`.tmp-<pid>` + rename) throughout. Foreign AGENTS.md/GEMINI.md files (no plugin fingerprint) are never clobbered — install reports `skipped-foreign` with a remediation hint. `detectInstalled(opts)` scans every runtime's config dir and returns the IDs that have a plugin-owned install. (Plan 24-02)
+
+- **`@clack/prompts` interactive session** — `scripts/lib/install/interactive.cjs` exports `runInteractiveInstall()` (3 steps: multi-select runtimes → Global/Local radio → confirmation) and `runInteractiveUninstall(opts)` (2 steps: multi-select detected-installed → confirmation). ESC at any step returns `null` so the entrypoint exits 0 with a "cancelled" message — no partial writes. `@clack/prompts ^0.7.0` added as a runtime dependency (~8KB). (Plan 24-03)
+
+- **Multi-runtime entrypoint** — `scripts/install.cjs` rewritten as a router. Decision tree: zero flags + TTY → interactive multi-select; zero flags + non-TTY (CI, pipes) → defaults to `--claude --global` for backwards compatibility with v1.23.5; any explicit per-runtime flag (or `--all`) → scripted, no prompts. `--uninstall` with no runtime list also enters interactive mode and only shows runtimes detected as installed. Per-runtime summary printed at the end with per-runtime path + action. (Plan 24-04)
+
+- **Existing flag surface preserved 1:1** — `--claude`, `--opencode`, `--gemini`, `--kilo`, `--codex`, `--copilot`, `--cursor`, `--windsurf`, `--antigravity`, `--augment`, `--trae`, `--qwen`, `--codebuddy`, `--cline`, `--all`, `--global`, `--local`, `--uninstall`, `--config-dir <path>`, `--dry-run`, `--help`, `-h`. Existing CI installs (`CLAUDE_CONFIG_DIR=/tmp npx @hegemonart/get-design-done`) continue to work with no source changes. (Plan 24-04)
+
+- **Idempotent + foreign-safe install** — re-running install over an already-installed runtime emits `unchanged` with the v1.23.5 "already registered" message preserved. AGENTS.md / GEMINI.md files NOT authored by this plugin are detected via missing fingerprint and never overwritten or deleted by uninstall. (Plan 24-02)
+
+### Changed
+
+- `tests/semver-compare.test.cjs` `OFF_CADENCE_VERSIONS` gains `1.24.0`.
+- `scripts/install.cjs` — full rewrite. The original v1.23.5 single-runtime marketplace registration logic is now extracted into `scripts/lib/install/merge.cjs` (`mergeClaudeSettings` / `removeClaudeSettings`) and reused by the new orchestrator.
+
+### Tests
+
+- `tests/install-runtimes.test.cjs` — 14-entry shape, kind/file mapping per runtime, baseline-file alignment, ID uniqueness, unknown-runtime throws (10 tests).
+- `tests/install-config-dir.test.cjs` — env override, explicit override, fallback resolution, empty env-var fallthrough, all-runtimes resolution (8).
+- `tests/install-merge.test.cjs` — merge/remove idempotency + key preservation, fingerprint helpers, full install→idempotent→uninstall round-trips for both kinds, foreign-file refusal + missing-target uninstall (15).
+- `tests/phase-24-baseline.test.cjs` — 3-manifest version alignment at 1.24.0, `@clack/prompts` registration, surface-export contract per module, runtimes.txt baseline match, install.cjs rewrite anchor (8).
+- All 7 existing `tests/install-script.test.cjs` end-to-end spawn tests pass against the rewritten entrypoint.
+
+Total: 41 new tests. All Phase 20/21/22/23/23.5 tests still green.
+
+### Deferred
+
+- Stdin-simulation integration tests for the interactive flow itself (requires a PTY shim; manual smoke-test on Windows CMD / PowerShell / Windows Terminal covers v1).
+- Auto-detection of installed runtimes during the install flow (multi-select with all 14 visible is sufficient for v1; uninstall flow already filters to detected-installed via `detectInstalled`).
+- Per-runtime MCP server registration writes — each runtime's MCP entry format differs and the install matrix records the format but does not generate the entries.
+
+---
+
 ## [1.23.5] — 2026-04-25
 
 Phase 23.5 No-Regret Adaptive Layer milestone — turns the passive Phase 22–23 observability + validation infrastructure into a closed self-tuning loop. Three tightly-scoped no-regret algorithms sharing one feature-flag ladder. Single-user viable via informed Beta-prior bootstrap (no shared telemetry required). Ships as a decimal patch on the v1.23 minor — does NOT shift Phase 24 → v1.24.0.

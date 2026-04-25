@@ -1,6 +1,6 @@
 {
   "name": "@hegemonart/get-design-done",
-  "version": "1.23.5",
+  "version": "1.24.0",
   "description": "A Claude Code plugin for systematic design improvement",
   "author": "Hegemon",
   "homepage": "https://github.com/hegemonart/get-design-done",
@@ -84,6 +84,7 @@
   "hooks": "hooks/hooks.json",
   "dependencies": {
     "@anthropic-ai/claude-agent-sdk": "^0.2.119",
+    "@clack/prompts": "^0.7.0",
     "@modelcontextprotocol/sdk": "^1.0.0"
   },
   "optionalDependencies": {
