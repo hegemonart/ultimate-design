@@ -87,16 +87,6 @@ Use it when you care that tokens match, contrast passes WCAG, motion feels cohes
 
 You do not need to be a designer to benefit from it. The pipeline carries the design discipline into the agent workflow: it extracts context, asks only for missing decisions, grounds the work in references, and catches the issues people usually find too late.
 
-## Sponsored By
-
-<div align="center">
-
-<a href="https://www.humbleteam.com/" aria-label="Humbleteam">
-  <img src="docs/assets/sponsors/humbleteam.svg" alt="Humbleteam" width="360">
-</a>
-
-</div>
-
 ### v1.24.0 Highlights — Multi-Runtime Installer
 
 - **`@clack/prompts` interactive multi-select** — `npx @hegemonart/get-design-done` with no flags now opens a polished checkbox UI for all 14 supported runtimes (Claude Code, OpenCode, Gemini CLI, Kilo, Codex, Copilot, Cursor, Windsurf, Antigravity, Augment, Trae, Qwen Code, CodeBuddy, Cline) plus a Global / Local radio. Pick any subset, confirm, done.
@@ -113,6 +103,18 @@ You do not need to be a designer to benefit from it. The pipeline carries the de
 - **v1.20.0** — SDK Foundation (resilience primitives, lockfile-safe `STATE.md`, `gdd-state` MCP server with 11 typed tools, TypeScript foundation).
 
 For full release notes see [CHANGELOG.md](CHANGELOG.md).
+
+---
+
+## Supported By
+
+<div align="center">
+
+<a href="https://www.humbleteam.com/" aria-label="Humbleteam">
+  <img src="docs/assets/sponsors/humbleteam.svg" alt="Humbleteam" width="220">
+</a>
+
+</div>
 
 ---
 

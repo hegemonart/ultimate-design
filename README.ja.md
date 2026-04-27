@@ -87,16 +87,6 @@ GDD は、AI コーディングエージェントで UI を出荷し、最初の
 
 デザイナーである必要はありません。パイプラインがデザインの規律をエージェントワークフローに持ち込みます。コンテキストを抽出し、足りない判断だけを尋ね、作業をリファレンスに接地し、通常は遅すぎる段階で見つかる問題を先に捕捉します。
 
-## スポンサー
-
-<div align="center">
-
-<a href="https://www.humbleteam.com/" aria-label="Humbleteam">
-  <img src="docs/assets/sponsors/humbleteam.svg" alt="Humbleteam" width="360">
-</a>
-
-</div>
-
 ### v1.24.0 ハイライト — マルチランタイム・インストーラー
 
 - **`@clack/prompts` 対話型マルチセレクト** — `npx @hegemonart/get-design-done` をフラグなしで実行すると、サポートされる 14 ランタイム(Claude Code、OpenCode、Gemini CLI、Kilo、Codex、Copilot、Cursor、Windsurf、Antigravity、Augment、Trae、Qwen Code、CodeBuddy、Cline)用の洗練されたチェックボックス UI と Global / Local ラジオボタンが表示されます。
@@ -113,6 +103,18 @@ GDD は、AI コーディングエージェントで UI を出荷し、最初の
 - **v1.20.0** — SDK 基盤(レジリエンスプリミティブ、ロックファイル安全な `STATE.md`、11 のタイプ付きツールを持つ `gdd-state` MCP サーバー、TypeScript 基盤)。
 
 完全なリリースノートは [CHANGELOG.md](CHANGELOG.md) を参照。
+
+---
+
+## Supported By
+
+<div align="center">
+
+<a href="https://www.humbleteam.com/" aria-label="Humbleteam">
+  <img src="docs/assets/sponsors/humbleteam.svg" alt="Humbleteam" width="220">
+</a>
+
+</div>
 
 ---
 
