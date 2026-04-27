@@ -107,7 +107,7 @@ Note di rilascio complete in [CHANGELOG.md](CHANGELOG.md).
 ---
 
 <p align="center">
-  <sub>Supported by</sub><br><br>
+  <strong>Supported by</strong><br><br>
   <a href="https://www.humbleteam.com/" aria-label="Humbleteam">
     <img src="docs/assets/sponsors/humbleteam.svg" alt="Humbleteam" width="180">
   </a>
