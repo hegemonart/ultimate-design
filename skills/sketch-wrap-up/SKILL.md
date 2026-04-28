@@ -62,11 +62,54 @@ Write `.design/sketches/<slug>/WINNER.md`:
 **Project skill written to**: ./.claude/skills/design-<area>-conventions.md
 ```
 
-## Step 7 — Update sketches SUMMARY.md
+## Step 7 — Append D-XX + `<prototyping>` outcome to STATE.md
+
+Two coupled writes to `.design/STATE.md`. Both must succeed together so the
+sketch resolution is discoverable from both `<decisions>` (read by all
+downstream stages) and `<prototyping>` (read by planner-specific context via
+the decision-injector).
+
+Compute `D-XX` as the highest existing `D-NN` in `<decisions>` plus 1
+(scan `<decisions>` for `D-\d+:` entries and take `max + 1`, zero-padded
+to two digits — e.g. existing `D-07` → new entry is `D-08`). Use the same
+`D-XX` value in both writes below.
+
+**Write 1 — append a numbered decision under `<decisions>`:**
+```
+D-XX: sketch/<slug> — winner: variant-N — <one-line rationale> (locked)
+  Source: .design/sketches/<slug>/WINNER.md
+```
+
+**Write 2 — append a `<sketch>` child element under `<prototyping>`:**
+```
+<sketch slug="<slug>" cycle="<cycle>" decision="D-XX" status="resolved"/>
+```
+
+`<cycle>` is the current cycle id from `.design/STATE.md` frontmatter
+(`cycle:` field; empty string is valid for Wave A single-cycle projects).
+
+If a `<prototyping>` block does not yet exist in STATE.md, materialize it
+between `<must_haves>` and `<connections>` per the STATE template, then
+append the `<sketch …/>` line as its first child. The block is omitted on
+fresh files and only appears once the first sketch / spike / skipped entry
+lands.
+
+If MCP `gdd_state` tools are available, prefer the typed mutators (these
+wrap `scripts/lib/gdd-state/mutator.ts` and emit byte-identical output to
+manual edits):
+```
+- mcp__gdd_state__add_decision({id: "D-XX", text: "sketch/<slug> — winner: variant-N — <rationale>", status: "locked"})
+- mcp__gdd_state__add_prototyping({type: "sketch", slug: "<slug>", cycle: "<cycle>", decision: "D-XX", status: "resolved"})
+```
+
+Without MCP, edit `.design/STATE.md` directly with `Read` + `Write`,
+inserting the two lines into the correct blocks.
+
+## Step 8 — Update sketches SUMMARY.md
 
 Append entry to `.design/sketches/SUMMARY.md` (create if missing):
 ```markdown
-- <slug> (YYYY-MM-DD) — winner: variant-N — area: <area> — <one-line rationale>
+- <slug> (YYYY-MM-DD) — winner: variant-N — area: <area> — D-XX — <one-line rationale>
 ```
 
 ## After writing
@@ -76,6 +119,8 @@ Append entry to `.design/sketches/SUMMARY.md` (create if missing):
 Slug: <slug>
 Winner: variant-N
 Area: <area>
+Decision recorded: D-XX
+Prototyping entry: <sketch slug="<slug>" cycle="<cycle>" decision="D-XX" status="resolved"/>
 Project skill: ./.claude/skills/design-<area>-conventions.md
 ━━━━━━━━━━━━━━━━━━━━━
 ```

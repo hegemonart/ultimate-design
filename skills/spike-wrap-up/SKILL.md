@@ -53,9 +53,47 @@ D-XX: spike/<slug> — <verdict> — <recommendation>
   Source: .design/spikes/<slug>/FINDINGS.md
 ```
 
-(Increment D-XX from the highest existing number.)
+(Increment D-XX from the highest existing number — scan `<decisions>` for
+`D-\d+:` entries and take `max + 1`, zero-padded to two digits.)
 
-## Step 6 — Update spikes SUMMARY.md
+If MCP `gdd_state` tools are available, prefer the typed mutator:
+```
+- mcp__gdd_state__add_decision({id: "D-XX", text: "spike/<slug> — <verdict> — <recommendation> — <one-line rationale>", status: "locked"})
+```
+
+## Step 6 — Append `<prototyping>` outcome to STATE.md
+
+Coupled with the Step 5 decision write — both must succeed together so the
+spike resolution is discoverable from both `<decisions>` (read by all
+downstream stages) and `<prototyping>` (read by planner-specific context via
+the decision-injector). Use the **same `D-XX`** as Step 5.
+
+Append a `<spike>` child element under `<prototyping>` in `.design/STATE.md`:
+```
+<spike slug="<slug>" cycle="<cycle>" decision="D-XX" verdict="yes|no|partial" status="resolved"/>
+```
+
+`<cycle>` is the current cycle id from `.design/STATE.md` frontmatter
+(`cycle:` field; empty string is valid for Wave A single-cycle projects).
+`verdict` is the answer from Step 3 (`yes` / `no` / `partial`).
+
+If a `<prototyping>` block does not yet exist in STATE.md, materialize it
+between `<must_haves>` and `<connections>` per the STATE template, then
+append the `<spike …/>` line as its first child. The block is omitted on
+fresh files and only appears once the first sketch / spike / skipped entry
+lands.
+
+If MCP `gdd_state` tools are available, prefer the typed mutator (it wraps
+`scripts/lib/gdd-state/mutator.ts` and emits byte-identical output to manual
+edits):
+```
+- mcp__gdd_state__add_prototyping({type: "spike", slug: "<slug>", cycle: "<cycle>", decision: "D-XX", verdict: "<verdict>", status: "resolved"})
+```
+
+Without MCP, edit `.design/STATE.md` directly with `Read` + `Write`,
+inserting the line into the `<prototyping>` block.
+
+## Step 7 — Update spikes SUMMARY.md
 
 Append entry to `.design/spikes/SUMMARY.md` (create if missing):
 ```markdown
@@ -69,6 +107,7 @@ Append entry to `.design/spikes/SUMMARY.md` (create if missing):
 Slug: <slug>
 Verdict: <verdict>
 Decision recorded: D-XX
+Prototyping entry: <spike slug="<slug>" cycle="<cycle>" decision="D-XX" verdict="<verdict>" status="resolved"/>
 FINDINGS.md written.
 ━━━━━━━━━━━━━━━━━━━━
 ```
