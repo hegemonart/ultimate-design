@@ -96,6 +96,18 @@ const OFF_CADENCE_VERSIONS = new Set([
   '1.24.0',
   '1.24.1',
   '1.24.2',
+  //   - 1.25.0 → Phase 25 Pipeline Hardening (gdd-pipeline-hardening
+  //     milestone). 9 plans (25-01 through 25-09): prototype gate
+  //     (agent + STATE <prototyping> block + sketch/spike-wrap-up
+  //     dual-writes + decision-injector outcomes); router S/M/L/XL
+  //     complexity_class additive to legacy fast/quick/full path;
+  //     quality-gate Stage 4.5 (skill + Haiku classifier agent +
+  //     STATE <quality_gate> block + 6 events.jsonl lifecycle events
+  //     + verify entry-gate refuses on fail); Stop-hook turn closeout
+  //     (gdd-turn-closeout.js + portable Skill mirror + hooks.json
+  //     wiring). Closeout shipped 5 new tests + Phase-25 baseline +
+  //     CHANGELOG.
+  '1.25.0',
 ]);
 
 test('semver-compare: consecutive versions in sequence are exact patch bumps', () => {

@@ -87,15 +87,18 @@ Use it when you care that tokens match, contrast passes WCAG, motion feels cohes
 
 You do not need to be a designer to benefit from it. The pipeline carries the design discipline into the agent workflow: it extracts context, asks only for missing decisions, grounds the work in references, and catches the issues people usually find too late.
 
-### v1.24.0 Highlights — Multi-Runtime Installer
+### v1.25.0 Highlights — Pipeline Hardening
 
-- **`@clack/prompts` interactive multi-select** — `npx @hegemonart/get-design-done` with no flags now opens a polished checkbox UI for all 14 supported runtimes (Claude Code, OpenCode, Gemini CLI, Kilo, Codex, Copilot, Cursor, Windsurf, Antigravity, Augment, Trae, Qwen Code, CodeBuddy, Cline) plus a Global / Local radio. Pick any subset, confirm, done.
-- **Idempotent + foreign-AGENTS.md-safe** — re-running the installer never duplicates entries, never overwrites runtime-specific instructions you've added, and a Confirmation step shows the diff before any file is written.
-- **Scripted CI surface preserved** — every existing flag (`--claude`, `--cursor`, `--all`, `--global`, `--local`, `--uninstall`, `--config-dir`) keeps working unchanged. Interactive mode activates only when no runtime flag is passed.
-- **Multi-select uninstall** — `--uninstall` without a runtime flag also enters interactive multi-select to pick which runtimes to remove from.
+Four pipeline gaps surfaced in the post-Phase-24 retrospective land as first-class pipeline citizens. All four are additive — no state-machine break, no breaking router contract.
+
+- **Prototype gate** — sketches and spikes become read/write members of the decision graph. New `prototype-gate` Haiku agent emits a recommend/skip verdict at two firing points (post-explore for sketches, post-plan for spikes); `sketch-wrap-up` and `spike-wrap-up` close the loop with a coupled D-XX + `<prototyping>` outcome write. The `decision-injector` surfaces top-N prior outcomes when downstream agents read planning files. STATE.md gains a `<prototyping>` block — round-trips byte-identically through the parser/serializer.
+- **S/M/L/XL complexity buckets** — router heuristic table refined from 3 to 4 tiers so telemetry distinguishes trivial from full-pipeline. JSON output now carries `complexity_class` (`S | M | L | XL`) next to the existing `path` (`fast | quick | full`) — strict superset, no breaking change for existing consumers. Canonical mapping: `/gdd:help`→S (short-circuit), `/gdd:scan`→M, standalone `/gdd:plan`→L, `/gdd:next` autonomous flow→XL. Budget enforcer reads class-specific caps from `.design/budget.json#class_caps_usd` when present.
+- **Quality gate (Stage 4.5)** — new lint/typecheck/test/visual-regression gate sits between `/gdd:design` and `/gdd:verify`. Detects commands automatically from `package.json#scripts` (or honors `.design/config.json#quality_gate.commands` when declared); excludes `test:e2e` for speed. Bounded fix loop (default `max_iters: 3`) reuses `design-fixer`. Timeout warns and proceeds (non-blocking on slow suites); failures mark STATE `<quality_gate>` block status=fail and verify entry refuses. Six lifecycle events emitted to `events.jsonl`.
+- **Turn closeout (Stop hook)** — new `gdd-turn-closeout.js` Stop hook fires when the assistant turn ends. Reads STATE.md + tails events.jsonl; if mid-pipeline and the last event is stale, appends a `turn_end` event and surfaces a stage-completion or paused-mid-task nudge. ≤10ms typical latency budget. Portable Skill mirror at `skills/turn-closeout/SKILL.md` covers the 13 non-Claude runtimes that lack a Stop hook surface.
 
 ### Previous releases
 
+- **v1.24.0** — Multi-Runtime Installer (`@clack/prompts` interactive multi-select for all 14 runtimes, idempotent + foreign-AGENTS.md-safe, scripted CI surface preserved 1:1).
 - **v1.23.5** — No-Regret Adaptive Layer (Thompson sampling bandit + AdaNormalHedge ensemble + MMR rerank; single-user via informed-prior bootstrap, no opt-in telemetry).
 - **v1.23.0** — SDK Domain Primitives (solidify-with-rollback gate, JSON output contracts, auto-crystallization of `Touches:` patterns).
 - **v1.22.0** — SDK Observability (~24 typed event types, per-tool-call trajectory, append-only event chain, secret scrubber).

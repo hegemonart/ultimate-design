@@ -4,6 +4,47 @@ All notable changes to get-design-done are documented here. Versions follow [sem
 
 ---
 
+## [1.25.0] — 2026-04-29
+
+Phase 25 Pipeline Hardening milestone — converts four pipeline gaps surfaced in the post-Phase-24 retrospective from side roads into first-class pipeline citizens: a prototype gate that makes sketches/spikes a read/write member of the decision graph, an S/M/L/XL complexity refinement to the router that distinguishes trivial from full-pipeline work, a Stage 4.5 quality gate that runs lint/typecheck/test between Design and Verify, and a Stop-hook turn closeout that closes the events.jsonl gap at turn-end. All four sub-features are additive — no state-machine break (5 stages stay 5 stages), no breaking router contract (`path: fast|quick|full` is preserved alongside the new `complexity_class`), and the existing budget-enforcer / verify-entry / decision-injector consumers gain the new fields without a code change to their existing call sites.
+
+### Added
+
+- **Prototype gate** — `agents/prototype-gate.md` (new Haiku-tier signal-scoring agent emitting `{recommend: 'sketch'|'spike'|'none', confidence, reasons}`) + STATE.md `<prototyping>` block schema with three child element types (`<sketch slug=… cycle=… decision=D-XX status=resolved/>`, `<spike slug=… cycle=… decision=D-XX verdict=yes|no|partial status=resolved/>`, `<skipped at=… cycle=… reason=…/>`) parsed/serialized through `scripts/lib/gdd-state/{types,parser,mutator}.ts`. Round-trips byte-identically; the block is omitted when null (no spurious empty-tag pairs). (Plan 25-01, commit `92e93bf`)
+
+- **Router S/M/L/XL complexity_class** — `skills/router/SKILL.md` heuristic table extended from 3 to 4 buckets (S = `/gdd:help`/`/gdd:stats`/single-Haiku skills; M = `/gdd:scan`/`/gdd:brief`/`/gdd:sketch`; L = `/gdd:explore`/`/gdd:discover`/standalone `/gdd:plan`/`/gdd:verify`; XL = `/gdd:next`/`/gdd:do`/autonomous flows). Router JSON output gains a `complexity_class` field next to the existing `path`; the canonical mapping is S→fast (short-circuited), M→fast, L→quick, XL→full. `hooks/budget-enforcer.ts` reads `complexity_class` when present and applies `.design/budget.json#class_caps_usd[<class>]` per-spawn cap; falls through to legacy cap behavior when the field is absent (strict superset). `reference/config-schema.md` documents the new optional `class_caps_usd: { S?, M?, L?, XL? }` field. (Plan 25-02, commit `a239171`)
+
+- **Quality gate (Stage 4.5)** — `skills/quality-gate/SKILL.md` (new) runs the project's own `lint`/`typecheck`/`test`/visual-regression scripts in parallel between `/gdd:design` and `/gdd:verify`. Three-tier detection chain (D-06): authoritative `.design/config.json#quality_gate.commands` > auto-detect from `package.json#scripts` > skip-with-notice. `agents/quality-gate-runner.md` (new Haiku-tier classifier) parses tool output and routes the fix-vs-block decision; `design-fixer` is reused for the bounded fix loop (D-08, default `max_iters: 3`). Timeout warns and proceeds (D-07 — non-blocking on slow suites); fail at `max_iters` marks STATE `<quality_gate>` block status="fail" and verify entry refuses (D-08). Six lifecycle events emitted to `events.jsonl` via the existing `appendEvent()` surface: `quality_gate_started`, `quality_gate_iteration`, `quality_gate_pass`, `quality_gate_fail`, `quality_gate_timeout`, `quality_gate_skipped` (D-09). STATE.md `<quality_gate>` block is a single-element schema (`<run started_at=… completed_at=… status=… iteration=N commands_run="lint,typecheck,test"/>`) — most-recent run only. (Plan 25-03, commit `037b25f`; Plan 25-07 wiring, commit `b64250c`)
+
+- **Turn closeout Stop hook** — `hooks/gdd-turn-closeout.js` (new) fires when the assistant turn ends. Reads STATE.md (1 file) + tails the last line of events.jsonl; if `position.status==in_progress` AND last event >60s ago, appends a `turn_end` event and surfaces a stage-completion or paused-mid-task nudge as `additionalContext`. ≤10ms typical latency budget per D-10; idempotent on the `(stage, task_progress)` tuple. `skills/turn-closeout/SKILL.md` (new) is the portable mirror for the 13 non-Claude runtimes that lack a Stop-hook surface — same logic, called from orchestrator skills (`/gdd:next`, `/gdd:design`, `/gdd:verify`) at exit per D-11. `hooks/hooks.json` Stop entry wires the JS hook into Claude Code's harness. (Plan 25-04, commit `675e879`; Plan 25-08 wiring, commit `f52a471`)
+
+- **sketch-wrap-up + spike-wrap-up dual writes** — `skills/sketch-wrap-up/SKILL.md` and `skills/spike-wrap-up/SKILL.md` now perform a coupled two-write on resolution: append the chosen-variant or verdict as a `D-XX` entry under `<decisions>` AND append a corresponding `<sketch …/>` or `<spike …/>` line under `<prototyping>`. The two entries reference each other via `decision="D-XX"` so the `decision-injector` retrieval path works through both `<decisions>` (read by all downstream stages) and `<prototyping>` (read by planner-specific context). (Plan 25-05, commit `953605e`)
+
+- **Decision injector surfaces prior prototyping outcomes** — `hooks/gdd-decision-injector.js` parses STATE.md `<prototyping>` entries (regex-based — the hook stays self-contained JS) and surfaces the top-N relevant entries when an agent reads any `.design/**.md` or `.planning/**.md` file ≥1500 bytes. Outcomes appear under a "### Prior prototyping outcomes" heading alongside the existing D-XX matches. Empty / missing block is a no-op. (Plan 25-06, commit `da1961c`)
+
+- **`scripts/lib/quality-gate-detect.cjs`** — Plan 25-09 promotes the doc-only auto-detection logic from `skills/quality-gate/SKILL.md` Step 1 (D-06) into a small testable JS module. Pure function, no I/O. Exports `detect({configCommands, scripts}) → {commands, tier, reason?}` plus the `ALLOWLIST` and `ALWAYS_EXCLUDED` arrays so downstream consumers and tests can pin to the canonical detection contract.
+
+### Tests
+
+- `tests/prototype-gate-state-block.test.cjs` (new, 6 tests) — `<prototyping>` block round-trips through parse → serialize byte-identically, parser populates `state.prototyping.{sketches,spikes,skipped}` correctly, and serializer omits the block when null (no spurious empty-tag pair).
+- `tests/router-complexity-class.test.cjs` (new, 10 tests) — JSON example contains `complexity_class` next to `path`; heuristic table contains S/M/L/XL bucket labels; canonical mapping rows present; `/gdd:help`→S, `/gdd:scan`→M, standalone `/gdd:plan`→L, `/gdd:next`→XL bucket assignments documented; S-class short-circuit semantics captured.
+- `tests/quality-gate-detection.test.cjs` (new, 12 tests) — Tier 1 (config override) / Tier 2 (auto-detect with `tsc` substitution + `test:e2e` exclusion) / Tier 3 (skip-with-notice) of the detection chain; SKILL.md timeout-and-failure semantics asserted at the content level.
+- `tests/turn-closeout-hook.test.cjs` (new, 8 tests) — spawns the Stop hook with 4 synthesized cwd states (no STATE.md, status=completed, fresh event, stale event with N/N) and asserts `{continue: true}` shape, `additionalContext` nudge, idempotence on the `(stage, task_progress)` tuple, and end-to-end latency.
+- `tests/phase-25-baseline.test.cjs` (new, 18 tests) — same shape as `phase-24-baseline.test.cjs`. Asserts all four sub-features land (prototype-gate agent + state block + wrap-up dual-writes + decision-injector wiring; router complexity_class + 4 buckets; quality-gate skill + agent + detection module + verify Step 2.5 + 6 lifecycle events; turn-closeout hook + portable mirror + hooks.json Stop wiring) plus all 4 manifests align at 1.25.0 + CHANGELOG `## [1.25.0]` block exists.
+- `tests/semver-compare.test.cjs` `OFF_CADENCE_VERSIONS` gains `1.25.0` with the milestone summary.
+
+### Decisions
+
+D-01 through D-13 — see `.planning/phases/25-pipeline-hardening/CONTEXT.md` for the full decision register. Highlights:
+- **D-01** — `<prototyping>` is a STATE.md block, not a stage. Keeps the 5-stage state machine intact (anti-renumber rule); sketches/spikes are checkpoints that fire mid-pipeline.
+- **D-04 / D-05** — `complexity_class` is additive to `path`. `path` enum stays `fast|quick|full` for back-compat; `complexity_class` enum is `S|M|L|XL` with canonical mapping S→fast (short-circuited), M→fast, L→quick, XL→full.
+- **D-06** — Quality-gate detection is a 3-tier chain: authoritative config > auto-detect from `package.json#scripts` > skip-with-notice. Never blocks if no commands resolve.
+- **D-07** — Quality-gate timeout warns and proceeds (does not block). Failures still block at the verify entry; slow runs surface a warning.
+- **D-10** — Stop-hook latency budget ≤10ms typical, idempotent on the `(stage, task_progress)` tuple, never blocks the user's next turn.
+- **D-12** — All 9 plans land together with one CHANGELOG block. 4 manifests bump in lockstep (`package.json` + `.claude-plugin/plugin.json` + `.claude-plugin/marketplace.json` × 2 slots + `tests/semver-compare.test.cjs` `OFF_CADENCE_VERSIONS`).
+
+---
+
 ## [1.24.2] — 2026-04-25
 
 Dependabot cleanup — patches the one real transitive vulnerability flagged on `main` and configures Dependabot to stop scanning inert framework-detection test fixtures. No behavior change for end users; security/quality patch on top of v1.24.1.
