@@ -8,7 +8,7 @@ This file is parsed by `scripts/lib/install/parse-runtime-models.cjs` and consum
 - `scripts/lib/install/installer.cjs` (26-03) — emits `models.json` per runtime config-dir at install time.
 - `hooks/budget-enforcer.ts` + `scripts/lib/budget-enforcer.cjs` (26-05) — concrete model name for cost lookup.
 
-**Strict schema** (D-03): each runtime block is a fenced ```json ... ``` block validated against `reference/schemas/runtime-models.schema.json`. Schema version is locked at `1` until a breaking change forces a version bump.
+**Strict schema** (D-03): each runtime block is a fenced `json` code block validated against `reference/schemas/runtime-models.schema.json`. Schema version is locked at `1` until a breaking change forces a version bump.
 
 **Provenance discipline** (D-01): every row carries a `source_url` (runtime-author docs), `retrieved_at` (ISO timestamp), and `last_validated_cycle` (current GDD cycle ID). Placeholder URLs are tagged `<TODO: confirm at <runtime-author-docs-url>>` and validated by Phase 13.2 authority-watcher on later cycles.
 

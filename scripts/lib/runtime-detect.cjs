@@ -58,7 +58,7 @@ const ENV_TO_RUNTIME = Object.freeze(
  *   when no recognized env-var is set in the current environment.
  *
  * @example
- *   process.env.CLAUDE_CONFIG_DIR = '/Users/me/.claude';
+ *   process.env.CLAUDE_CONFIG_DIR = process.env.HOME + '/.claude';
  *   detect(); // → 'claude'
  *
  * @example
