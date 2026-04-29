@@ -22,24 +22,24 @@ const REPO_ROOT = path.join(__dirname, '..');
 
 // --- Manifest alignment (D-12) -----------------------------------------
 
-test('phase-25 baseline: package.json is at 1.25.0', () => {
+test('phase-25 baseline: package.json is at 1.26.0', () => {
   const pkg = JSON.parse(fs.readFileSync(path.join(REPO_ROOT, 'package.json'), 'utf8'));
-  assert.equal(pkg.version, '1.25.0');
+  assert.equal(pkg.version, '1.26.0');
 });
 
-test('phase-25 baseline: plugin.json is at 1.25.0', () => {
+test('phase-25 baseline: plugin.json is at 1.26.0', () => {
   const plugin = JSON.parse(
     fs.readFileSync(path.join(REPO_ROOT, '.claude-plugin', 'plugin.json'), 'utf8'),
   );
-  assert.equal(plugin.version, '1.25.0');
+  assert.equal(plugin.version, '1.26.0');
 });
 
-test('phase-25 baseline: marketplace.json is at 1.25.0 in both slots', () => {
+test('phase-25 baseline: marketplace.json is at 1.26.0 in both slots', () => {
   const market = JSON.parse(
     fs.readFileSync(path.join(REPO_ROOT, '.claude-plugin', 'marketplace.json'), 'utf8'),
   );
-  assert.equal(market.metadata.version, '1.25.0');
-  assert.equal(market.plugins[0].version, '1.25.0');
+  assert.equal(market.metadata.version, '1.26.0');
+  assert.equal(market.plugins[0].version, '1.26.0');
 });
 
 test('phase-25 baseline: CHANGELOG.md has a [1.25.0] block', () => {
@@ -47,7 +47,7 @@ test('phase-25 baseline: CHANGELOG.md has a [1.25.0] block', () => {
   assert.match(
     changelog,
     /## \[1\.25\.0\]/,
-    'CHANGELOG.md must contain a "## [1.25.0]" version block',
+    'CHANGELOG.md must contain a "## [1.25.0]" version block (Phase 25 entry)',
   );
 });
 

@@ -14,23 +14,23 @@ const path = require('node:path');
 
 const REPO_ROOT = path.join(__dirname, '..');
 
-test('phase-24 baseline: package.json is at 1.25.0', () => {
+test('phase-24 baseline: package.json is at 1.26.0', () => {
   // Manifest-alignment assertions track the current shipping version per the
   // "ship-it-together" pattern (D-12 of every closeout phase). Bumped from
-  // 1.24.2 → 1.25.0 in Phase 25 closeout (Plan 25-09).
+  // 1.24.2 → 1.26.0 in Phase 25 closeout (Plan 25-09).
   const pkg = JSON.parse(fs.readFileSync(path.join(REPO_ROOT, 'package.json'), 'utf8'));
-  assert.equal(pkg.version, '1.25.0');
+  assert.equal(pkg.version, '1.26.0');
 });
 
-test('phase-24 baseline: plugin.json is at 1.25.0', () => {
+test('phase-24 baseline: plugin.json is at 1.26.0', () => {
   const plugin = JSON.parse(fs.readFileSync(path.join(REPO_ROOT, '.claude-plugin', 'plugin.json'), 'utf8'));
-  assert.equal(plugin.version, '1.25.0');
+  assert.equal(plugin.version, '1.26.0');
 });
 
-test('phase-24 baseline: marketplace.json is at 1.25.0 in both slots', () => {
+test('phase-24 baseline: marketplace.json is at 1.26.0 in both slots', () => {
   const market = JSON.parse(fs.readFileSync(path.join(REPO_ROOT, '.claude-plugin', 'marketplace.json'), 'utf8'));
-  assert.equal(market.metadata.version, '1.25.0');
-  assert.equal(market.plugins[0].version, '1.25.0');
+  assert.equal(market.metadata.version, '1.26.0');
+  assert.equal(market.plugins[0].version, '1.26.0');
 });
 
 test('phase-24 baseline: @clack/prompts is a runtime dependency', () => {
