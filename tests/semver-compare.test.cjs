@@ -108,6 +108,24 @@ const OFF_CADENCE_VERSIONS = new Set([
   //     wiring). Closeout shipped 5 new tests + Phase-25 baseline +
   //     CHANGELOG.
   '1.25.0',
+  //   - 1.26.0 → Phase 26 Headless Model Resolver (gdd-headless-model-
+  //     resolver milestone). 9 plans (26-01 through 26-09): per-runtime
+  //     tier→model adapter (`reference/runtime-models.md` + JSON schema
+  //     + parser); `tier-resolver.cjs` + `runtime-detect.cjs` with the
+  //     fallback chain D-04 (runtime-specific → claude → null + event)
+  //     and Phase 24 env-var lookup chain D-05; installer emits
+  //     `models.json` per runtime config-dir at install; router output
+  //     gains `resolved_models` field next to `model_tier_overrides`
+  //     (additive — strict superset per D-07); `budget-enforcer.cjs`
+  //     shared backend reads `resolved_models` and per-runtime
+  //     `reference/prices/{claude,codex,gemini,qwen}.md` sub-tables;
+  //     reflector cross-runtime cost-arbitrage proposal at >50% spread
+  //     (D-09); `reasoning-class: high|medium|low` runtime-neutral
+  //     alias for `default-tier` (additive D-10); frontmatter validator
+  //     accepts the alias + enforces equivalence; intel-updater keeps
+  //     both fields current. Closeout shipped 4 new tests + Phase-26
+  //     baseline + CHANGELOG + `docs/MULTI-RUNTIME-MODELS.md` ops guide.
+  '1.26.0',
 ]);
 
 test('semver-compare: consecutive versions in sequence are exact patch bumps', () => {

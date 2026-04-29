@@ -1,6 +1,8 @@
 adaptive-mode.cjs
 bandit-router.cjs
 blast-radius.cjs
+budget-enforcer.cjs
+cost-arbitrage.cjs
 dangerous-patterns.cjs
 design-search.cjs
 detect-ui-root.cjs
@@ -21,6 +23,8 @@ redact.cjs
 reference-registry.cjs
 reference-resolver.cjs
 relevance-counter.cjs
+runtime-detect.cjs
 spring.cjs
 start-findings-engine.cjs
+tier-resolver.cjs
 touches-pattern-miner.cjs

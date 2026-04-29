@@ -1,0 +1,21 @@
+# Phase 26 tier-resolver canonical matrix snapshot.
+#
+# Reference snapshot of tier→model resolutions for the four canonical
+# runtimes seeded in Phase 26 (CONTEXT.md D-02). Format: one row per
+# (runtime, tier, model) triple, tab-delimited. NOT a strict-lock —
+# downstream cycles refine the seed picks; this baseline establishes
+# the directory pattern for future regression snapshots.
+#
+# Equivalence convention (D-10): reasoning-class.high ↔ tier.opus,
+# reasoning-class.medium ↔ tier.sonnet, reasoning-class.low ↔ tier.haiku.
+# So this file documents the tier side; the class side mirrors it.
+
+runtime	tier	model
+claude	opus	claude-opus-4-7
+claude	sonnet	claude-sonnet-4-6
+claude	haiku	claude-haiku-4-5
+codex	opus	gpt-5
+codex	sonnet	gpt-5-mini
+codex	haiku	gpt-5-nano
+gemini	opus	gemini-2.5-pro
+qwen	opus	qwen3-max
