@@ -6,6 +6,12 @@ on:
     paths:
       - '.claude-plugin/plugin.json'
       - 'CHANGELOG.md'
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Version to release (e.g. 1.25.0). Use when push-diff detection failed (HEAD^ vs last-tag mismatch from interleaved commits).'
+        required: true
+        type: string
 
 # Per D-19: workflow only tags + releases. It does not push to main, force-push, or delete refs.
 # Per D-22: release-time smoke test is a separate workflow/job — this workflow ends at release creation.
@@ -25,14 +31,34 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v6
         with:
-          fetch-depth: 2   # needs HEAD^ for diff
+          fetch-depth: 0   # need full history for last-tag lookup
+          fetch-tags: true
 
-      - name: Detect plugin.json version change
+      - name: Resolve version (workflow_dispatch input OR last-tag diff)
         id: diff
         run: |
           set -euo pipefail
-          OLD=$(git show HEAD^:.claude-plugin/plugin.json 2>/dev/null | node -e 'let d=""; process.stdin.on("data",c=>d+=c); process.stdin.on("end",()=>{try{console.log(JSON.parse(d).version)}catch{console.log("")}})' || echo "")
           NEW=$(node -e 'console.log(JSON.parse(require("fs").readFileSync(".claude-plugin/plugin.json","utf8")).version)')
+          # workflow_dispatch: version comes from manual input — skip auto-detection
+          INPUT_VERSION="${{ github.event.inputs.version }}"
+          if [ -n "$INPUT_VERSION" ]; then
+            if [ "$INPUT_VERSION" != "$NEW" ]; then
+              echo "ERROR: workflow_dispatch input version ($INPUT_VERSION) does not match plugin.json version ($NEW). Refusing to release a mismatched version."
+              exit 1
+            fi
+            echo "version=$NEW" >> "$GITHUB_OUTPUT"
+            echo "changed=true" >> "$GITHUB_OUTPUT"
+            echo "Manual dispatch: $NEW"
+            exit 0
+          fi
+          # push trigger: compare current plugin.json to last release tag's plugin.json (robust against interleaved commits)
+          LAST_TAG=$(git tag --list 'v*' --sort=-v:refname | head -1 || echo "")
+          if [ -z "$LAST_TAG" ]; then
+            OLD=""
+          else
+            OLD=$(git show "$LAST_TAG:.claude-plugin/plugin.json" 2>/dev/null | node -e 'let d=""; process.stdin.on("data",c=>d+=c); process.stdin.on("end",()=>{try{console.log(JSON.parse(d).version)}catch{console.log("")}})' || echo "")
+          fi
+          echo "last_tag=$LAST_TAG"
           echo "old=$OLD"
           echo "new=$NEW"
           if [ "$OLD" != "$NEW" ] && [ -n "$NEW" ]; then
@@ -41,7 +67,7 @@ jobs:
             echo "Version bump detected: $OLD -> $NEW"
           else
             echo "changed=false" >> "$GITHUB_OUTPUT"
-            echo "No version change. Exiting quietly."
+            echo "No version change vs $LAST_TAG. Exiting quietly."
           fi
 
   tag-and-release:
